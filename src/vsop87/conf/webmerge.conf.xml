@@ -1,0 +1,154 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+		<mkdir path="dist/src" />
+		<mkdir path="dist/min" />
+	</prepare>
+
+	<merge>
+
+		<js id="vsop87">
+
+			<prepend path="../../../vsop87.js" />
+			<prepend>(function(vsop87) {</prepend>
+			<input path="src/vsop87_mer.js" />
+			<input path="src/vsop87_ven.js" />
+			<input path="src/vsop87_emb.js" />
+			<input path="src/vsop87_mar.js" />
+			<input path="src/vsop87_jup.js" />
+			<input path="src/vsop87_sat.js" />
+			<input path="src/vsop87_ura.js" />
+			<input path="src/vsop87_nep.js" />
+			<append>})(vsop87)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop87.js" target="join" />
+			<output path="dist/min/vsop87.js" target="compile" />
+
+		</js>
+
+		<js id="vsop87a">
+
+			<prepend>var vsop87a = {}</prepend>
+			<prepend path="../../../vsop87.js" />
+			<prepend>(function(vsop87a) {</prepend>
+			<input path="src/vsop87a_mer.js" />
+			<input path="src/vsop87a_ven.js" />
+			<input path="src/vsop87a_ear.js" />
+			<input path="src/vsop87a_emb.js" />
+			<input path="src/vsop87a_mar.js" />
+			<input path="src/vsop87a_jup.js" />
+			<input path="src/vsop87a_sat.js" />
+			<input path="src/vsop87a_ura.js" />
+			<input path="src/vsop87a_nep.js" />
+			<append>})(vsop87a)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop87a.js" target="join" />
+			<output path="dist/min/vsop87a.js" target="minify" />
+
+		</js>
+
+		<js id="vsop87b">
+
+			<prepend>var vsop87b = {}</prepend>
+			<prepend path="../../../vsop87.js" />
+			<prepend>(function(vsop87b) {</prepend>
+			<input path="src/vsop87b_mer.js" />
+			<input path="src/vsop87b_ven.js" />
+			<input path="src/vsop87b_ear.js" />
+			<input path="src/vsop87b_mar.js" />
+			<input path="src/vsop87b_jup.js" />
+			<input path="src/vsop87b_sat.js" />
+			<input path="src/vsop87b_ura.js" />
+			<input path="src/vsop87b_nep.js" />
+			<append>})(vsop87b)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop87b.js" target="join" />
+			<output path="dist/min/vsop87b.js" target="compile" />
+
+		</js>
+
+		<js id="vsop87c">
+
+			<prepend>var vsop87c = {}</prepend>
+			<prepend path="../../../vsop87.js" />
+			<prepend>(function(vsop87c) {</prepend>
+			<input path="src/vsop87c_mer.js" />
+			<input path="src/vsop87c_ven.js" />
+			<input path="src/vsop87c_ear.js" />
+			<input path="src/vsop87c_mar.js" />
+			<input path="src/vsop87c_jup.js" />
+			<input path="src/vsop87c_sat.js" />
+			<input path="src/vsop87c_ura.js" />
+			<input path="src/vsop87c_nep.js" />
+			<append>})(vsop87c)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop87c.js" target="join" />
+			<output path="dist/min/vsop87c.js" target="compile" />
+
+		</js>
+
+		<js id="vsop87d">
+
+			<prepend>var vsop87d = {}</prepend>
+			<prepend path="../../../vsop87.js" />
+			<prepend>(function(vsop87d) {</prepend>
+			<input path="src/vsop87d_mer.js" />
+			<input path="src/vsop87d_ven.js" />
+			<input path="src/vsop87d_ear.js" />
+			<input path="src/vsop87d_mar.js" />
+			<input path="src/vsop87d_jup.js" />
+			<input path="src/vsop87d_sat.js" />
+			<input path="src/vsop87d_ura.js" />
+			<input path="src/vsop87d_nep.js" />
+			<append>})(vsop87d)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop87d.js" target="join" />
+			<output path="dist/min/vsop87d.js" target="compile" />
+
+		</js>
+
+		<js id="vsop87e">
+
+			<prepend>var vsop87e = {}</prepend>
+			<prepend path="../../../vsop87.js" />
+			<prepend>(function(vsop87e) {</prepend>
+			<input path="src/vsop87e_sun.js" />
+			<input path="src/vsop87e_mer.js" />
+			<input path="src/vsop87e_ven.js" />
+			<input path="src/vsop87e_ear.js" />
+			<input path="src/vsop87e_mar.js" />
+			<input path="src/vsop87e_jup.js" />
+			<input path="src/vsop87e_sat.js" />
+			<input path="src/vsop87e_ura.js" />
+			<input path="src/vsop87e_nep.js" />
+			<append>})(vsop87e)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop87e.js" target="join" />
+			<output path="dist/min/vsop87e.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
