@@ -1,0 +1,4 @@
+[submodule "astro.js"]
+	path = astro.js
+	url = https://github.com/mgreter/astro.js
+	branch = develop
