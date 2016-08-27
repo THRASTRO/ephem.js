@@ -1,0 +1,82 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+	</prepare>
+
+	<merge>
+
+		<js id="src/elp2000nova">
+
+			<prepend>(function (window) {</prepend>
+
+			<input path="src/elp1.js" />
+			<input path="src/elp2.js" />
+			<input path="src/elp3.js" />
+			<input path="src/elp4.js" />
+			<input path="src/elp5.js" />
+			<input path="src/elp6.js" />
+			<input path="src/elp7.js" />
+			<input path="src/elp8.js" />
+			<input path="src/elp9.js" />
+
+			<input path="src/elp10.js" />
+			<input path="src/elp11.js" />
+			<input path="src/elp12.js" />
+			<input path="src/elp13.js" />
+			<input path="src/elp14.js" />
+			<input path="src/elp15.js" />
+			<input path="src/elp16.js" />
+			<input path="src/elp17.js" />
+			<input path="src/elp18.js" />
+			<input path="src/elp19.js" />
+
+			<input path="src/elp20.js" />
+			<input path="src/elp21.js" />
+			<input path="src/elp22.js" />
+			<input path="src/elp23.js" />
+			<input path="src/elp24.js" />
+			<input path="src/elp25.js" />
+			<input path="src/elp26.js" />
+			<input path="src/elp27.js" />
+			<input path="src/elp28.js" />
+			<input path="src/elp29.js" />
+
+			<input path="src/elp30.js" />
+			<input path="src/elp31.js" />
+			<input path="src/elp32.js" />
+			<input path="src/elp33.js" />
+			<input path="src/elp34.js" />
+			<input path="src/elp35.js" />
+			<input path="src/elp36.js" />
+
+			<input path="src/elp2000.js" />
+
+			<append>elp2000nova.ecl = elp2000nova_ecl</append>
+			<append>window.elp2000nova = elp2000nova</append>
+
+			<append>})(window)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/elp2000.src.js" target="join" />
+			<output path="dist/elp2000.min.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
