@@ -1,14 +1,12 @@
-## JavaScript Library to get Positions for Astronomical Bodies
+## JavaScript libs to get Positions for Astronomical Bodies
 
-This library contains various planetary theories to compute the position of
-astronomical bodies. Most of them are from [Bureau des Longitudes] [1] in
-[Paris] [2].
+Various planetary theories to compute positions of astronomical
+bodies; mostly from the [Bureau des Longitudes] [1] in [Paris] [2].
 
 [1]: https://en.wikipedia.org/wiki/Bureau_des_Longitudes
 [2]: http://www.bureau-des-longitudes.fr/
 
-Currently only a few theories are here on github. Below are a few excerpts from
-the main theories to be supported soon(ish).
+## Planets (VSOP)
 
 The first version, VSOP82, computed only the orbital elements at any moment. An
 updated version, VSOP87, besides providing improved accuracy, computed the
@@ -27,6 +25,13 @@ to VSOP2013. The precision of the theory of Pluto remains valid up to the time
 span from 0 to 4000. The VSOP2013 and TOP2013 data are available on the WEB
 server of the IMCCE.
 
+The tables of Pluto have been constructed by J. Chapront (BDL) with a new
+method of approximation using frequency analysis as described in the paper :
+Representation of planetary ephemerides by frequency analysis.
+Application to the five outer planets (Pluto95).
+
+## Lunar/Moon (ELP)
+
 ELP gives a series expansion of the orbital elements and the coordinates of the
 Moon. The authors refer to it as a "semi-analytical" theory because they
 developed their expressions not purely symbolically, but introduced numerical
@@ -40,10 +45,15 @@ includes the Lunar Ephemerides), that in their turn have been fitted to actual
 astronomical observations. ELP was fitted initially to the DE200, but
 improved parameters have been published up to DE405.
 
-The tables of Pluto have been constructed by J. Chapront (BDL) with a new
-method of approximation using frequency analysis as described in the paper :
-Representation of planetary ephemerides by frequency analysis.
-Application to the five outer planets (Pluto95).
+ELP/MPP02, proposes two ways for computing the lunar coordinates:
+- to use corrections obtained by the fit to Laser Lunar Ranging data (LLR);
+- to use corrections obtained by the fit to the numerical integration DE405
+  of the Jet Propulsion Laboratory (Standish, 1998)) used as an observing
+  model; in that case some additive corrections are also applied to secular
+  values of the lunar angles for approaching closer the JPL Ephemeris over
+  6000 years.
+
+## Dwarfs (ToDo)
 
 The observations of minor planets have been collected from Minor
 Planets Center. Numerical integrations have been performed and
@@ -53,3 +63,11 @@ the form of Poisson series, covering 150 years from 1900.
 The list is presently limited to planets number: 1, 2, 3, 4, 5, 6,
 7, and 324 (Ceres, Pallas,Juno, Vesta, Astrae, Hebe, Iris and
 Bamberga).
+
+## Distribution files
+
+- [VSOP87](src/vsop87/data) - [tiny](src/vsop87/dist/02-tiny/min) | [small](src/vsop87/dist/04-small/min) | [normal](src/vsop87/dist/06-normal/min) | [big](src/vsop87/dist/08-big/min) | [full](src/vsop87/dist/12-full/min)
+- [VSOP2010](src/vsop2010/data) - [tiny](src/vsop2010/dist/02-tiny/min) | [small](src/vsop2010/dist/04-small/min) | [normal](src/vsop2010/dist/06-normal/min) | [big](src/vsop2010/dist/08-big/min) | [extreme](src/vsop2010/dist/10-extreme/min)
+- [VSOP2013](src/vsop2013/data) - [tiny](src/vsop2013/dist/02-tiny/min) | [small](src/vsop2013/dist/04-small/min) | [normal](src/vsop2013/dist/06-normal/min) | [big](src/vsop2013/dist/08-big/min) | [extreme](src/vsop2013/dist/10-extreme/min)
+- [ELP2000-MPP02](src/elpmpp02/data) - [tiny](src/elpmpp02/dist/02-tiny/min) | [small](src/elpmpp02/dist/04-small/min) | [normal](src/elpmpp02/dist/06-normal/min) | [big](src/elpmpp02/dist/08-big/min) | [full](src/elpmpp02/dist/12-full/min)
+- [ELP2000-82b](src/elp2000/data) - [libnova](src/elp2000/nova/dist) | [orb](src/elp2000/elp2000orb.js) | [xyz](src/elp2000/elp2000xyz.js)
