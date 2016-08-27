@@ -1,0 +1,49 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+		<mkdir path="dist/src" />
+		<mkdir path="dist/min" />
+	</prepare>
+
+	<merge>
+
+		<js id="vsop2013">
+
+			<prepend>(function(window) {</prepend>
+			<prepend>window.vsop2013 = {};</prepend>
+			<prepend path="../../../vsop2k.js" />
+			<input path="src/vsop2013_mer.js" />
+			<input path="src/vsop2013_ven.js" />
+			<input path="src/vsop2013_emb.js" />
+			<input path="src/vsop2013_mar.js" />
+			<input path="src/vsop2013_jup.js" />
+			<input path="src/vsop2013_sat.js" />
+			<input path="src/vsop2013_ura.js" />
+			<input path="src/vsop2013_nep.js" />
+			<input path="src/vsop2013_plu.js" />
+			<append>})(window)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/vsop2013.js" target="join" />
+			<output path="dist/min/vsop2013.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
