@@ -31,10 +31,10 @@ while ($data =~ s/\A\s*$re_head//s) {
 	my $test = $json->{$key} = [];
 	warn "Generating $name\n";
 	while ($entry =~ s/\A\s*$re_entry//s) {
-		my @els_orb = split(/\s+/, $3);
-		my @els_ecl = split(/\s+/, $4);
-		my @els_equ = split(/\s+/, $5);
-		push @{$test}, [$2, @els_orb, @els_ecl, @els_equ];
+		my @els_orb = map { $_ + 0 } split(/\s+/, $3);
+		my @els_ecl = map { $_ + 0 } split(/\s+/, $4);
+		my @els_equ = map { $_ + 0 } split(/\s+/, $5);
+		push @{$test}, [$2 + 0, @els_orb, @els_ecl, @els_equ];
 	}
 }
 
