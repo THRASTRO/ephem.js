@@ -1,3 +1,8 @@
+//***********************************************************
+// (c) 2016 by Marcel Greter
+// AstroJS VSOP2010/13 utility lib
+// https://github.com/mgreter/ephem.js
+//***********************************************************
 (function() {
 
 	// factors for the angles (sin/cos phi)
@@ -96,4 +101,4 @@
 	}
 	// EO fn vsop2k.xyz
 
-})();
+})(window);

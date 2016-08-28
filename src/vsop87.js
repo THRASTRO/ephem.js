@@ -1,3 +1,8 @@
+//***********************************************************
+// (c) 2016 by Marcel Greter
+// AstroJS VSOP87 utility lib
+// https://github.com/mgreter/ephem.js
+//***********************************************************
 (function() {
 
 	// generic vsop87 solver (pass coefficients and time)
@@ -94,4 +99,4 @@
 	}
 	*/
 
-})();
+})(window);
