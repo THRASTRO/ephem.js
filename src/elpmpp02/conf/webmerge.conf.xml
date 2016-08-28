@@ -1,0 +1,43 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+		<mkdir path="dist/src" />
+		<mkdir path="dist/min" />
+	</prepare>
+
+	<merge>
+
+		<js id="elpmpp02">
+
+			<prepend>(function(window) {</prepend>
+			<prepend>window.elpmpp02 = {}</prepend>
+			<prepend path="../../../elpmpp.js" />
+			<input path="src/elpmpp02.js" />
+			<append>elpmpp02.llr = function elpmpp02_llr(tj) { return elpmpp.llr(elpmpp02.coeffs, tj); }</append>
+			<append>elpmpp02.jpl = function elpmpp02_jpl(tj) { return elpmpp.jpl(elpmpp02.coeffs, tj); }</append>
+			<append>})(window)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/elpmpp02.js" target="join" />
+			<output path="dist/min/elpmpp02.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
