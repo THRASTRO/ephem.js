@@ -10,7 +10,7 @@
 
 	QUnit.module( "Moon", function () {
 
-		QUnit.test( "nova (1e-15)", function( assert )
+		QUnit.test( "orb (1e-3)", function( assert )
 		{
 
 			for (var i = 0; i < tests.length; i += 25)
@@ -19,14 +19,15 @@
 				var test = tests[i],
 				    time = JD2J2000(test[0]);
 
-				var orb = elp2000nova(time);
+				var orb = elp2000orb(time);
+				var orbital = new Orbital(orb);
 
-				var vars = ["t", "x", "y", "z" /* , "vx", "vy", "vz" */];
+				var vars = ["t", "x", "y", "z"];
 
 				for (var n = 1; n < vars.length; n += 1)
 				{
 					assert.close(
-						orb[vars[n]], test[n] * KM2AU, 10e-15,
+						orbital.r()[vars[n]], test[n] * KM2AU, 1e-3,
 						test[0] + ": VSOP Parameter " +vars[n]
 					);
 				}
