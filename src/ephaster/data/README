@@ -1,0 +1,76 @@
+===========================                         ============================
+                         IMCCE - Observatoire de Paris
+                           /pub/ephem/asteroids/series
+					  1997, May 14
+===========================                         ============================
+EPHEMERIDES - MINOR PLANETS:
+
+AUTHORS :
+	P. Rocher J. Chapront
+
+ADDRESS :
+	IMCCE - Observatoire de Paris
+	Group: Dynamics of Solar System
+	77 av. Denfert Rochereau, F-75014 PARIS
+	Phone: 01 40 51 22 72
+	Fax:   01 46 33 28 34
+	e-mail: rocher@imcce.fr Jean.Chapront@imcce.fr
+
+REFERENCES :
+	Rocher P. and Chapront J. 1997, Compact Ephemerides for
+	Minor Planets, Planetary and Space Science, To be published
+_______________________________________________________________
+
+DESCRIPTION : The observations of minor planets have been collected from Minor
+	Planets Center. Numerical integrations have been performed and
+	fitted to observations. Ephemerides of the equatorial heliocentric
+	rectangular coordinates of the minor planets are presented under
+	the form of Poisson series, covering 150 years from 1900.
+	The list is presently limited to planets number: 1, 2, 3, 4, 5, 6,
+	7, and 324 (Ceres, Pallas, Juno, Vesta, Astrae, Hebe, Iris and
+	Bamberga).
+
+CONTENTS : 2 types of files are provided:
+
+	1 - Time series for heliocentric equatorial coordinates of
+	    minor planets, as well as heliocentric and geocentric equatorial
+	    rectangular coordinates of the Earth-Moon barycenter under the
+	    same form which are necessary for geocentric positions.
+	2 - Software: A FORTRAN program useful to read the series and
+	    substitute the time. It computes geocentric positions.
+	    An example of use is given.
+
+FILE SUMMARY :
+
+--------------------------------------------------------------------------------
+FileName      Lrecl   Records     Explanations
+--------------------------------------------------------------------------------
+
+README        80         .        This file
+0001.XYZ      80      1395        Ceres
+0002.XYZ      80      1656        Pallas
+0003.XYZ      80      1665        Juno
+0004.XYZ      80      1557        Vesta
+0005.XYZ      80      1584        Astrae
+0006.XYZ      80      1773        Hebe
+0007.XYZ      80      1701        Iris
+0324.XYZ      80      1791        Vesta
+
+EMB.XYZ       80      2155        Heliocentric equatorial rectangular
+				  coordinates of the Earth-Moon barycenter
+BARYCENT.XYZ  80       152        Geocentric equatorial rectangular
+				  coordinates of the Earth-Moon barycenter
+EPHASTER.FOR  80       354        FORTRAN source program to compute
+                                  geocentric positions
+--------------------------------------------------------------------------------
+REMARK :
+A bug in EPHASTER.FOR has been removed from the previous version (February 1)
+
+User feed-back is encouraged. Unless otherwise specified,
+send comments and bug reports to:       E-mail     : comments@imcce.fr
+					Fax        : (33) 1 46 33 28 34
+					Postal mail: IMCCE - Obs. de Paris
+					77 avenue Denfert Rochereau
+					F-75014 PARIS
+
+================================================================================
