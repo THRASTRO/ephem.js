@@ -1,0 +1,49 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+		<mkdir path="dist/src" />
+		<mkdir path="dist/min" />
+	</prepare>
+
+	<merge>
+
+		<js id="ephaster">
+
+			<prepend path="../../../ephaster.js" />
+			<prepend>(function(ephaster) {</prepend>
+			<input path="src/0000-barycenter.js" />
+			<input path="src/0000-emb.js" />
+			<input path="src/0001-ceres.js" />
+			<input path="src/0002-pallas.js" />
+			<input path="src/0003-juno.js" />
+			<input path="src/0004-vesta.js" />
+			<input path="src/0005-astrae.js" />
+			<input path="src/0006-hebe.js" />
+			<input path="src/0007-iris.js" />
+			<input path="src/0324-bamberga.js" />
+			<append>})(ephaster)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/ephaster.js" target="join" />
+			<output path="dist/min/ephaster.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
