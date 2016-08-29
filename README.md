@@ -53,7 +53,7 @@ ELP/MPP02, proposes two ways for computing the lunar coordinates:
   values of the lunar angles for approaching closer the JPL Ephemeris over
   6000 years.
 
-## Dwarfs (ToDo)
+## Minor/Dwarf Planets (EPHASTER)
 
 The observations of minor planets have been collected from Minor
 Planets Center. Numerical integrations have been performed and
@@ -61,7 +61,7 @@ fitted to observations. Ephemerides of the equatorial heliocentric
 rectangular coordinates of the minor planets are presented under
 the form of Poisson series, covering 150 years from 1900.
 The list is presently limited to planets number: 1, 2, 3, 4, 5, 6,
-7, and 324 (Ceres, Pallas,Juno, Vesta, Astrae, Hebe, Iris and
+7, and 324 (Ceres, Pallas, Juno, Vesta, Astrae, Hebe, Iris and
 Bamberga).
 
 ## Distribution files
@@ -69,5 +69,6 @@ Bamberga).
 - [VSOP87](src/vsop87/data) - [tiny](src/vsop87/dist/02-tiny/min) | [small](src/vsop87/dist/04-small/min) | [normal](src/vsop87/dist/06-normal/min) | [big](src/vsop87/dist/08-big/min) | [full](src/vsop87/dist/12-full/min)
 - [VSOP2010](src/vsop2010/data) - [tiny](src/vsop2010/dist/02-tiny/min) | [small](src/vsop2010/dist/04-small/min) | [normal](src/vsop2010/dist/06-normal/min) | [big](src/vsop2010/dist/08-big/min) | [extreme](src/vsop2010/dist/10-extreme/min)
 - [VSOP2013](src/vsop2013/data) - [tiny](src/vsop2013/dist/02-tiny/min) | [small](src/vsop2013/dist/04-small/min) | [normal](src/vsop2013/dist/06-normal/min) | [big](src/vsop2013/dist/08-big/min) | [extreme](src/vsop2013/dist/10-extreme/min)
+- [EPHASTER](src/ephaster/data) - [tiny](src/ephaster/dist/02-tiny/min) | [small](src/ephaster/dist/04-small/min) | [normal](src/ephaster/dist/06-normal/min) | [big](src/ephaster/dist/08-big/min) | [extreme](src/ephaster/dist/12-full/min)
 - [ELP2000-MPP02](src/elpmpp02/data) - [tiny](src/elpmpp02/dist/02-tiny/min) | [small](src/elpmpp02/dist/04-small/min) | [normal](src/elpmpp02/dist/06-normal/min) | [big](src/elpmpp02/dist/08-big/min) | [full](src/elpmpp02/dist/12-full/min)
 - [ELP2000-82b](src/elp2000/data) - [libnova](src/elp2000/nova/dist) | [orb](src/elp2000/elp2000orb.js) | [xyz](src/elp2000/elp2000xyz.js)
