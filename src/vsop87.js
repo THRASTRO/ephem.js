@@ -3,7 +3,7 @@
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function() {
+(function(window) {
 
 	// generic vsop87 solver (pass coefficients and time)
 	// this is basically a one to one translation from the official

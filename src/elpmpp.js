@@ -5,7 +5,7 @@
 //***********************************************************
 // Direct conversion of ELPMPP02.for (fortran sample)
 //***********************************************************
-(function () {
+(function (window) {
 	'use strict';
 
 	// Constant parameters

@@ -3,7 +3,7 @@
 // AstroJS VSOP2010/13 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function() {
+(function(window) {
 
 	// factors for the angles (sin/cos phi)
 	function vsop2k_time_factors(kj2ky) {
