@@ -3,13 +3,13 @@
 // AstroJS EPHASTER utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function(window) {
+(function(self) {
 
 	// generic asteroid series solver (pass coefficients and time)
-	if (typeof window.ephaster !== "function") {
+	if (typeof self.ephaster !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		window.ephaster = function ephaster(coeffss, jd)
+		self.ephaster = function ephaster(coeffss, jd)
 		{
 
 			var nser = 0;
@@ -85,4 +85,4 @@
 	}
 	// EO fn ephaster
 
-})(window);
+})(self);

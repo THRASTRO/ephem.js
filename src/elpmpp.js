@@ -5,7 +5,7 @@
 //***********************************************************
 // Direct conversion of ELPMPP02.for (fortran sample)
 //***********************************************************
-(function (window) {
+(function (self) {
 	'use strict';
 
 	// Constant parameters
@@ -309,8 +309,8 @@
 
 	}
 
-	if (typeof window.elpmpp == "undefined") {
-		window.elpmpp = function elpmpp(coeffs, tj, icor)
+	if (typeof self.elpmpp == "undefined") {
+		self.elpmpp = function elpmpp(coeffs, tj, icor)
 		{
 			// initialize correction factors (cached)
 			var corr = elpmpp_init(coeffs, icor || 0);
@@ -432,4 +432,4 @@
 
 	}
 
-})(window);
+})(self);

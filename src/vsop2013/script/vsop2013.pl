@@ -98,10 +98,6 @@ sub gen_vsop2k
 				die "no number $_" unless m/^\s*$float\s*$/;
 				$_ + 0
 			} split /(?:\s+|(?=-))/, $line;
-			# 0: time power of the series (0 <= a <= 20)
-			# ..: 17 ceoffs for a(i)
-			# 18: coeff S, mantissa, 19: coeff S, exponent
-			# 20: coeff C, mantissa, 21: coeff C, exponent
 			warn "invalid factors?" if scalar @coeffs != 22;
 			push @{$factors}, \@coeffs;
 		}
@@ -122,7 +118,7 @@ sub gen_vsop2k
 		sprintf "	%s: %s", $_ , $json->encode($coeffs->{$_})
 	} sort keys %{$coeffs}) . "\n}";
 
-$code .="
+	$code .="
 function ${name}(tj) { return vsop2k(${name}.coeffs, tj); }
 function ${name}_xyz(tj) { return vsop2k.xyz(${name}.coeffs, tj); }
 ${name}.xyz = ${name}_xyz; // assign
@@ -130,6 +126,7 @@ vsop2013.${theory} = ${name}; // export
 ${name}.coeffs = ${js}; // assign
 ";
 
+	# write the final javascript file
 	write_file "$target/$name.js", $code;
 
 }

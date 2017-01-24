@@ -3,7 +3,7 @@
 // AstroJS VSOP2010/13 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function(window) {
+(function(self) {
 
 	// factors for the angles (sin/cos phi)
 	function vsop2k_time_factors(kj2ky) {
@@ -48,10 +48,10 @@
 
 	// generic vsop2010/2013 solver (pass coefficients and time)
 	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof window.vsop2k !== "function") {
+	if (typeof self.vsop2k !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		window.vsop2k = function vsop2k(coeffs, j2ky)
+		self.vsop2k = function vsop2k(coeffs, j2ky)
 		{
 			// want in thousand years
 			var kj2ky = j2ky / 1000;
@@ -81,24 +81,26 @@
 
 	// generic vsop2010/2013 solver (pass coefficients and time)
 	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof window.vsop2k.xyz !== "function") {
+	if (typeof self.vsop2k.xyz !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		window.vsop2k.xyz = function vsop2k_xyz(coeffs, j2ky)
+		self.vsop2k.xyz = function vsop2k_xyz(coeffs, j2ky)
 		{
 			// call main theory
-			var orb = vsop2k(coeffs, j2ky);
+			var orb = self.vsop2k(coeffs, j2ky);
 			// create orbit object
 			var orbit = new Orbit(orb);
 			// query state vector
 			var state = orbit.state();
 			// return object
-			return {
-				x: state.r.x, y: state.r.y, z: state.r.z,
-				vx: state.v.x, vy: state.v.y, vz: state.v.z,
-			};
+			// attach new properties
+			orb.x = state.r.x; orb.vx = state.v.x;
+			orb.y = state.r.y; orb.vy = state.v.y;
+			orb.z = state.r.z; orb.vz = state.v.z;
+			// return object
+			return orb;
 		}
 	}
 	// EO fn vsop2k.xyz
 
-})(window);
+})(self);

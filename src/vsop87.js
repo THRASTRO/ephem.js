@@ -3,7 +3,7 @@
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function(window) {
+(function(self) {
 
 	// generic vsop87 solver (pass coefficients and time)
 	// this is basically a one to one translation from the official
@@ -12,10 +12,10 @@
 	// it after the sum has been calculated. IMO this should be a bit
 	// faster than the original implementation, but not sure if the
 	// precision will suffer from that change.
-	if (typeof window.vsop87 !== "function") {
+	if (typeof self.vsop87 !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		window.vsop87 = function vsop87(coeffs, time)
+		self.vsop87 = function vsop87(coeffs, time)
 		{
 			// want 1000 JY (KJY)
 			var t = time / 1000, result = {},
@@ -73,6 +73,29 @@
 
 	}
 
+	// generic vsop2010/2013 solver (pass coefficients and time)
+	// time is julian years from j2000 (delta JD2451545.0 in JY)
+	if (typeof self.vsop87.xyz !== "function") {
+		// only define once in global scope
+		// otherwise we overwrite loaded data
+		self.vsop87.xyz = function vsop87_xyz(coeffs, j2ky)
+		{
+			// call main theory
+			var orb = self.vsop87(coeffs, j2ky);
+			// create orbit object
+			var orbit = new Orbit(orb);
+			// query state vector
+			var state = orbit.state();
+			// attach new properties
+			orb.x = state.r.x; orb.vx = state.v.x;
+			orb.y = state.r.y; orb.vy = state.v.y;
+			orb.z = state.r.z; orb.vz = state.v.z;
+			// return object
+			return orb;
+		}
+	}
+	// EO fn vsop2k.xyz
+
 	/*
 	// position = heliocentric
 	function vsop2fk5(position, JD)
@@ -99,4 +122,4 @@
 	}
 	*/
 
-})(window);
+})(self);
