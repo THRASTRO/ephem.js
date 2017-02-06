@@ -1,7 +1,7 @@
 ## JavaScript libs to get Positions for Astronomical Bodies
 
 Various planetary theories to compute positions of astronomical
-bodies; mostly from the [Bureau des Longitudes] [1] in [Paris] [2].
+bodies; mostly from the [Bureau des Longitudes][1] in [Paris][2].
 
 [1]: https://en.wikipedia.org/wiki/Bureau_des_Longitudes
 [2]: http://www.bureau-des-longitudes.fr/
@@ -66,9 +66,9 @@ Bamberga).
 
 ## Distribution files
 
-- [VSOP87](src/vsop87/data) - [tiny](src/vsop87/dist/02-tiny/min) | [small](src/vsop87/dist/04-small/min) | [normal](src/vsop87/dist/06-normal/min) | [big](src/vsop87/dist/08-big/min) | [full](src/vsop87/dist/12-full/min)
-- [VSOP2010](src/vsop2010/data) - [tiny](src/vsop2010/dist/02-tiny/min) | [small](src/vsop2010/dist/04-small/min) | [normal](src/vsop2010/dist/06-normal/min) | [big](src/vsop2010/dist/08-big/min) | [extreme](src/vsop2010/dist/10-extreme/min)
-- [VSOP2013](src/vsop2013/data) - [tiny](src/vsop2013/dist/02-tiny/min) | [small](src/vsop2013/dist/04-small/min) | [normal](src/vsop2013/dist/06-normal/min) | [big](src/vsop2013/dist/08-big/min) | [extreme](src/vsop2013/dist/10-extreme/min)
-- [EPHASTER](src/ephaster/data) - [tiny](src/ephaster/dist/02-tiny/min) | [small](src/ephaster/dist/04-small/min) | [normal](src/ephaster/dist/06-normal/min) | [big](src/ephaster/dist/08-big/min) | [extreme](src/ephaster/dist/12-full/min)
-- [ELP2000-MPP02](src/elpmpp02/data) - [tiny](src/elpmpp02/dist/02-tiny/min) | [small](src/elpmpp02/dist/04-small/min) | [normal](src/elpmpp02/dist/06-normal/min) | [big](src/elpmpp02/dist/08-big/min) | [full](src/elpmpp02/dist/12-full/min)
-- [ELP2000-82b](src/elp2000/data) - [libnova](src/elp2000/nova/dist) | [orb](src/elp2000/elp2000orb.js) | [xyz](src/elp2000/elp2000xyz.js)
+- [VSOP87](src/vsop87/data) - [tiny](src/vsop87/dist/02-tiny/min) | [small](src/vsop87/dist/04-small/min) | [normal](src/vsop87/dist/06-normal/min) | [big](src/vsop87/dist/08-big/min) | [full](src/vsop87/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop87/06-normal.html)
+- [VSOP2010](src/vsop2010/data) - [tiny](src/vsop2010/dist/02-tiny/min) | [small](src/vsop2010/dist/04-small/min) | [normal](src/vsop2010/dist/06-normal/min) | [big](src/vsop2010/dist/08-big/min) | [extreme](src/vsop2010/dist/10-extreme/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop2010/06-normal.html)
+- [VSOP2013](src/vsop2013/data) - [tiny](src/vsop2013/dist/02-tiny/min) | [small](src/vsop2013/dist/04-small/min) | [normal](src/vsop2013/dist/06-normal/min) | [big](src/vsop2013/dist/08-big/min) | [extreme](src/vsop2013/dist/10-extreme/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop2013/06-normal.html)
+- [EPHASTER](src/ephaster/data) - [tiny](src/ephaster/dist/02-tiny/min) | [small](src/ephaster/dist/04-small/min) | [normal](src/ephaster/dist/06-normal/min) | [big](src/ephaster/dist/08-big/min) | [extreme](src/ephaster/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/ephaster/06-normal.html)
+- [ELP2000-MPP02](src/elpmpp02/data) - [tiny](src/elpmpp02/dist/02-tiny/min) | [small](src/elpmpp02/dist/04-small/min) | [normal](src/elpmpp02/dist/06-normal/min) | [big](src/elpmpp02/dist/08-big/min) | [full](src/elpmpp02/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/elpmpp02/06-normal.html)
+- [ELP2000-82b](src/elp2000/data) - [libnova](src/elp2000/nova/dist) | [orb](src/elp2000/elp2000orb.js) | [xyz](src/elp2000/elp2000xyz.js)  - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/elp2000/test.html)

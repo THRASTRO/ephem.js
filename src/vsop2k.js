@@ -3,7 +3,7 @@
 // AstroJS VSOP2010/13 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function(self) {
+(function(exports) {
 
 	// factors for the angles (sin/cos phi)
 	function vsop2k_time_factors(kj2ky) {
@@ -48,10 +48,10 @@
 
 	// generic vsop2010/2013 solver (pass coefficients and time)
 	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof self.vsop2k !== "function") {
+	if (typeof exports.vsop2k !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		self.vsop2k = function vsop2k(coeffs, j2ky)
+		exports.vsop2k = function vsop2k(coeffs, j2ky)
 		{
 			// want in thousand years
 			var kj2ky = j2ky / 1000;
@@ -81,13 +81,13 @@
 
 	// generic vsop2010/2013 solver (pass coefficients and time)
 	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof self.vsop2k.xyz !== "function") {
+	if (typeof exports.vsop2k.xyz !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		self.vsop2k.xyz = function vsop2k_xyz(coeffs, j2ky)
+		exports.vsop2k.xyz = function vsop2k_xyz(coeffs, j2ky)
 		{
 			// call main theory
-			var orb = self.vsop2k(coeffs, j2ky);
+			var orb = exports.vsop2k(coeffs, j2ky);
 			// create orbit object
 			var orbit = new Orbit(orb);
 			// query state vector
@@ -103,4 +103,4 @@
 	}
 	// EO fn vsop2k.xyz
 
-})(self);
+})(this);

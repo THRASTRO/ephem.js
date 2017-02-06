@@ -3,7 +3,7 @@
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function(self) {
+(function(exports) {
 
 	// generic vsop87 solver (pass coefficients and time)
 	// this is basically a one to one translation from the official
@@ -12,10 +12,10 @@
 	// it after the sum has been calculated. IMO this should be a bit
 	// faster than the original implementation, but not sure if the
 	// precision will suffer from that change.
-	if (typeof self.vsop87 !== "function") {
+	if (typeof exports.vsop87 !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		self.vsop87 = function vsop87(coeffs, time)
+		exports.vsop87 = function vsop87(coeffs, time)
 		{
 			// want 1000 JY (KJY)
 			var t = time / 1000, result = {},
@@ -75,13 +75,13 @@
 
 	// generic vsop2010/2013 solver (pass coefficients and time)
 	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof self.vsop87.xyz !== "function") {
+	if (typeof exports.vsop87.xyz !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		self.vsop87.xyz = function vsop87_xyz(coeffs, j2ky)
+		exports.vsop87.xyz = function vsop87_xyz(coeffs, j2ky)
 		{
 			// call main theory
-			var orb = self.vsop87(coeffs, j2ky);
+			var orb = exports.vsop87(coeffs, j2ky);
 			// create orbit object
 			var orbit = new Orbit(orb);
 			// query state vector
@@ -122,4 +122,4 @@
 	}
 	*/
 
-})(self);
+})(this);
