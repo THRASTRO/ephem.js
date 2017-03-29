@@ -185,8 +185,7 @@ var elp82 = [
 ];
 
 function elp2000xyz(t) {
-	// var ear = vsop87a_ear(t);
-	// var emb = vsop87a_emb(t);
+
 	t *= 0.01;
 
 	var rp = [];
@@ -228,50 +227,73 @@ function elp2000xyz(t) {
 		y: rp[2] * Math.cos(rp[1]) * Math.sin(rp[0]) * 6.68459e-9,
 		z: rp[2] * Math.sin(rp[1]) * 6.68459e-9,
 	};
-	// rv.x += ear.x - emb.x;
-	// rv.y += ear.y - emb.y;
-	// rv.z += ear.z - emb.z;
+
 	rv.x *= 1;
 	rv.y *= 1;
 	rv.z *= 1;
- // console.log('elp82: ', rv);
+
 	return rv;
 }
 
+/*
+// helper use in solsys-explorer
+// not fully sanctioned implementation
+// this needs to have velocity state
+elp2000xyz.orb = function elp2000xyzorb(t) {
+	var orb = elp2000xyz(t);
+	var orbital = new Orbital(orb);
+	orb.a = orbital.a();
+	orb.L = orbital.L();
+	orb.k = orbital.k();
+	orb.h = orbital.h();
+	orb.q = orbital.q();
+	orb.p = orbital.p();
+	var pos = orb2xyz(orb);
+	orb.x = - pos.x;
+	orb.y = pos.z;
+	orb.z = pos.y;
+	return orb;
+}
+*/
+
+// not sure if used anywhere?
+// seems to implement libnova?
 function elp82_moon_equ(t) {
 
-return elp82_moon(t);
+	return elp82_moon(t);
 
+  /*
 	return {
 		x: 0.7555662,
 		y: -0.6717840,
 		z: 0.0000211
 	}
 
+	var r = Math.sqrt(
+	-275357.939343 * -275357.939343
+	+ 251763.709161 * 251763.709161
+	+ 2756.585406 * 2756.585406
+	) * KM2AU;
 
-var r = Math.sqrt(
--275357.939343 * -275357.939343
-+ 251763.709161 * 251763.709161
-+ 2756.585406 * 2756.585406
-) * KM2AU;
+	var ra = 137.562877 * DEG2RAD;
+	var dec = 0.423307 * DEG2RAD;
 
-var ra = 137.562877 * DEG2RAD;
-var dec = 0.423307 * DEG2RAD;
+	var sin_rho = Math.sin(ra)
+	var cos_rho = Math.cos(ra);
+	var sin_phi = Math.sin(dec)
+	var cos_phi = Math.cos(dec)
 
-var sin_rho = Math.sin(ra)
-var cos_rho = Math.cos(ra);
-var sin_phi = Math.sin(dec)
-var cos_phi = Math.cos(dec)
-
-return {
-	y: r * sin_rho * cos_phi,
-	z: r * sin_rho * sin_phi,
-	x: r * cos_rho
-}
+	return {
+		y: r * sin_rho * cos_phi,
+		z: r * sin_rho * sin_phi,
+		x: r * cos_rho
+	}
 
 	var rv = elp82_moon(t);
 
 	// convert ecliptic to equatorial
 
 	return rv;
+	*/
+
 }

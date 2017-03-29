@@ -344,3 +344,20 @@ function elp2000orb(tjd)
 
 }
 
+// helper use in solsys-explorer
+// not fully sanctioned implementation
+elp2000orb.xyz = function elp2000orbxyz(t) {
+	var orb = elp2000orb(t);
+	var orbital = new Orbital(orb);
+	orb.a = orbital.a();
+	orb.L = orbital.L();
+	orb.k = orbital.k();
+	orb.h = orbital.h();
+	orb.q = orbital.q();
+	orb.p = orbital.p();
+	var pos = orb2xyz(orb);
+	orb.x = - pos.x;
+	orb.y = pos.z;
+	orb.z = pos.y;
+	return orb;
+}

@@ -23,7 +23,7 @@ var DELG = (-0.08066 / RAD);
 var DELE = (0.01789 / RAD);
 var DELEP = (-0.12879 / RAD);
 
-/*     Precession matrix */
+/* Precession matrix */
 var P1 = 0.10180391e-4;
 var P2 = 0.47020439e-6;
 var P3 = -0.5417367e-9;
@@ -140,7 +140,7 @@ function doElp4(t, coeff)
 
 	for (j = 0; j < coeff.length; j++) {
 		y = coeff[j][5] * DEG;
-		for (k = 0; k < 2; k++)  {
+		for (k = 0; k < 2; k++) {
 			y += coeff[j][0] * zeta[k] * t[k];
 			for (i = 0; i < 4; i++)
 				y += coeff[j][i+1] * del[i][k] * t[k];
@@ -160,7 +160,7 @@ function doElp7(t, coeff)
 	var y, A;
 
 /*
-  - earth_pert
+	- earth_pert
 	double iz; // 0
 	double ilu[4]; // 1-4
 	double O; // 5
@@ -296,7 +296,7 @@ function doElp34(t, coeff) {
 	var y, A;
 
 /*
-  - earth_pert
+	- earth_pert
 	double iz; // 0
 	double ilu[4]; // 1-4
 	double O; // 5
