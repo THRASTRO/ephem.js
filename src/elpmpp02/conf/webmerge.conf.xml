@@ -25,13 +25,15 @@
 
 		<js id="elpmpp02">
 
-			<prepend>(function(window) {</prepend>
-			<prepend>window.elpmpp02 = {}</prepend>
+			<prepend>(function(exports) {</prepend>
+			<prepend>exports.elpmpp02 = {}</prepend>
 			<prepend path="../../../elpmpp.js" />
 			<input path="src/elpmpp02.js" />
 			<append>elpmpp02.llr = function elpmpp02_llr(tj) { return elpmpp.llr(elpmpp02.coeffs, tj); }</append>
 			<append>elpmpp02.jpl = function elpmpp02_jpl(tj) { return elpmpp.jpl(elpmpp02.coeffs, tj); }</append>
-			<append>})(window)</append>
+			<append>elpmpp02.llr.orb = function elpmpp02_llr_orb(tj) { return elpmpp.llr.orb(elpmpp02.coeffs, tj); }</append>
+			<append>elpmpp02.jpl.orb = function elpmpp02_jpl_orb(tj) { return elpmpp.jpl.orb(elpmpp02.coeffs, tj); }</append>
+			<append>})(this)</append>
 
 			<!-- where to store the resulting files -->
 			<output path="dist/src/elpmpp02.js" target="join" />

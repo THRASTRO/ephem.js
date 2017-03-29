@@ -8,6 +8,9 @@
 (function (exports) {
 	'use strict';
 
+	// not shared?
+	var KM2AU = 6.6846e-9;
+
 	// Constant parameters
 	var cpi = 3.141592653589793,
 	    rad = 648000 / cpi,
@@ -411,14 +414,16 @@
 			    rap    = (ppw2+qpw2)/ra,
 			    ppwra  = ppw*ra+pw*rap,
 			    qpwra  = qpw*ra+qw*rap;
-
+			
 			return {
 				x: (pw2*x1+pwqw*x2+pwra*x3)*KM2AU,
 				y: (pwqw*x1+qw2*x2-qwra*x3)*KM2AU,
 				z: (-pwra*x1+qwra*x2+(pw2+qw2-1)*x3)*KM2AU,
 				vx: (pw2*xp1+pwqw*xp2+pwra*xp3 + ppw2*x1+ppwqpw*x2+ppwra*x3)*KM2AU/sc,
 				vy: (pwqw*xp1+qw2*xp2-qwra*xp3 + ppwqpw*x1+qpw2*x2-qpwra*x3)*KM2AU/sc,
-				vz: (-pwra*xp1+qwra*xp2+(pw2+qw2-1)*xp3 - ppwra*x1+qpwra*x2+(ppw2+qpw2)*x3)*KM2AU/sc
+				vz: (-pwra*xp1+qwra*xp2+(pw2+qw2-1)*xp3 - ppwra*x1+qpwra*x2+(ppw2+qpw2)*x3)*KM2AU/sc,
+				G: 2.9591220836841438269e-04, // sun works with factor?
+				// G: 8.9970116036316091182e-10, // earth does not?
 			};
 
 		};
@@ -429,6 +434,34 @@
 		{ return elpmpp(coeffs, tj, 0); }
 		elpmpp.jpl = function elpmpp_jpl(coeffs, tj)
 		{ return elpmpp(coeffs, tj, 1); }
+
+		// Used in solar system explorer
+		// Unsanctioned implementation!
+		var fact = Math.pow(1000, 3) * 10;
+		function Orbitalize(state) {
+			// velocity is in km/day
+			// unsure why this even works?
+			// GM is not right (sun not earth?)
+			// Gravitational COnstant in au^3/d^2
+			// maybe state to orbital is buggy?
+			state.vx *= sc/KM2AU/fact;
+			state.vy *= sc/KM2AU/fact;
+			state.vz *= sc/KM2AU/fact;
+			var orbital = new Orbital(state);
+			state.a = orbital.a();
+			state.L = orbital.L();
+			state.k = orbital.k();
+			state.h = orbital.h();
+			state.q = orbital.q();
+			state.p = orbital.p();
+			return state;
+		}
+
+		// create actual functions to call (return full state)
+		elpmpp.llr.orb = function elpmpp_llr_orb(coeffs, t)
+		{ return Orbitalize(elpmpp(coeffs, t*365.25, 0)); }
+		elpmpp.jpl.orb = function elpmpp_jpl_orb(coeffs, t)
+		{ return Orbitalize(elpmpp(coeffs, t*365.25, 1)); }
 
 	}
 
