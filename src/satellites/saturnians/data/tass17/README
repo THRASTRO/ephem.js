@@ -1,0 +1,72 @@
+===========================                         ============================
+                         IMCCE - Observatoire de Paris
+
+                                       and
+
+                 UNIVERSITE DES SCIENCES ET TECHNOLOGIES DE LILLE
+
+                         /pub/ephem/satel/tass17/
+
+                                1996, november 14
+===========================                         ============================
+
+
+TASS 1.7    :  New version of the TASS theory of the Saturnian satellites 
+                        including HYPERION  (5 Nov 1996)
+
+   
+AUTHORS :   Alain VIENNE et Luc DURIEZ
+
+E_MAIL:     VIENNE@GAT.UNIV-LILLE1.FR
+            DURIEZ@GAT.UNIV-LILLE1.FR
+
+
+ADDRESS :   UNIVERSITE DES SCIENCES ET TECHNOLOGIES DE LILLE
+            Laboratoire d'Astronomie
+            1 Impasse de l'Observatoire
+            F-59000  LILLE
+            FRANCE                
+            
+
+CONTENTS:   
+            tass17.f: 
+
+            FORTRAN source code for ephemerides issued from 
+            the new theory of high precision of 
+            the motion of the main Saturnian satellites TASS 1.6.
+            (1995, A&A 297, 588-605)
+            and 'Theory of motion and ephemerides of Hyperion', 
+            (to appear in A&A)  
+
+*************************************************************************
+*    Positions and velocities of the satellites Mimas, Enceladus, Tethys,
+*    Dione, Rhea, Titan, Hyperion and Iapetus referred to the center of
+*    Saturn and to the mean ecliptic and mean equinox for J2000.0 epoch
+*************************************************************************
+*   Installation of TASS:
+* 
+*   Split this mail in order to put the part 'SUBROUTINES' in a file 
+*   called for example 'POSIRED.FOR' and the part 'SERIES' in a file
+*   called for example 'redtass7.dat'
+*   Type a FORTRAN program to monitor the computations. An example of
+*   such a monitor is given just below with the corresponding results
+*
+*************************************************************************
+
+
+
+
+*   The present version has been checked on a Work Station:
+*   IBM RISC 6000 mod. 360 ( AIX 3.2.5 & X11R5 1.2.4 )
+
+================================================================================
+User feed-back is encouraged. Unless otherwise specified, send comments and bug 
+reports to:                    E-mail     : comments@imcce.fr
+                               Fax        : (33) 1 46 33 28 34 
+                               Postal mail: IMCCE - Observatoire de Paris
+                                            77 avenue Denfert Rochereau
+                                            F-75014 PARIS
+================================================================================
+
+
+
