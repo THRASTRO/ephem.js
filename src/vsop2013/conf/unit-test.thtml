@@ -20,7 +20,7 @@
 	<!-- include needed libraries -->
 	<script src="../../src/vsop2k.js"></script>
 	<script src="../lib/astro.math.js"></script>
-	<script src="../lib/astro.js"></script>
+	<script src="../lib/astro.full.js"></script>
 
 	<!-- include needed libraries -->
 	<script src="tests.js"></script>
