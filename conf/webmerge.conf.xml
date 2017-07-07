@@ -3,7 +3,7 @@
 	<include src="{EXT}/conf/common.conf.xml" />
 
 	<config>
-		<webport>6371</webport>
+		<webport>6379</webport>
 		<!-- where is your htdocs root directory -->
 		<!-- this is needed to create absolute urls -->
 		<!-- default is relative to the config file -->

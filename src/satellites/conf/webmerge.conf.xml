@@ -1,0 +1,43 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+		<mkdir path="dist/src" />
+		<mkdir path="dist/min" />
+	</prepare>
+
+	<merge>
+
+		<js id="satellites">
+
+			<prepend>(function(exports) {</prepend>
+			<prepend path="satellites.js" />
+			<input path="martians/src/martians.sat.js" />
+			<input path="jovians/src/jovians.l1.js" />
+			<input path="saturnians/src/saturnians.tass17.js" />
+			<input path="uranians/src/uranians.gust86.js" />
+			<append>}).call(this, this)</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/satellites.js" target="join" />
+			<output path="dist/min/satellites.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
