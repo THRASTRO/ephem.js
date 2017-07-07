@@ -1,0 +1,143 @@
+===========================                         ============================
+                              BUREAU DES LONGITUDES
+
+                                       and
+
+                 UNIVERSITE DES SCIENCES ET TECHNOLOGIES DE LILLE
+
+                         /pub/ephem/satel/galilean/L1/L1.2
+
+                                2006, february  14
+===========================                         ============================
+
+
+L1.2    :   New version of the L1 theory of the Galilean satellites
+
+
+AUTHORS :   Valery LAINEY, Alain VIENNE et Luc DURIEZ
+
+E_MAIL:     Lainey@imcce.fr
+            Alain.Vienne@univ-lille1.fr
+            Luc.Duriez@tele2.fr
+
+
+ADDRESS :   UNIVERSITE DES SCIENCES ET TECHNOLOGIES DE LILLE
+            Laboratoire d'Astronomie
+            1 Impasse de l'Observatoire
+            F-59000  LILLE
+            FRANCE
+
+********************************************************************************
+
+CONTENTS:   L1_2.f
+            GalileanL1.2.dat
+            BisL1.2.dat
+            TestL1.2.f
+            TestL1.2.res
+
+   L1_2.f : It is a set of F90 FORTRAN subroutines to compute ephemerides of the
+            galilean satellites from data given in file  GalileanL1.2.dat
+            These ephemerides are issued from the improved accurate theory
+            of the motion of the galilean satellites L1.2 described in
+            'Synthetic representation of the galilean satellites orbital
+            motions from L1 ephemerides', (2006, A&A 456, 783-788)
+
+            L1_2.f  allows to compute three kinds of ephemerides for time T
+            given in form of  Julian Days in the Terrestrial Time scale (TT):
+            - Orbital elements of the galilean satellites Io, Europa, Ganymede
+              and Callisto referred to the center of Jupiter in a fixed
+              reference frame close to the jovian equatorial frame for J2000.0
+              epoch,
+            - Cartesian Positions-Velocities of the galilean satellites in
+              this same frame,
+            - Cartesian Positions-Velocities referred to Jupiter in the fixed
+              celestial reference frame : mean equator and mean equinox for
+              J2000.0 epoch.
+            The theory has been fitted to observations between 1891 and 2003
+            converted in coordinates J2000 in this last reference frame, and
+            using DE406 to compute Earth-Jupiter vector.
+
+   GalileanL1.2.dat :
+            This file gives the semi-analytical representation of the
+            orbital elements in a fixed jovicentric reference frame close to
+            the jovian equatorial frame for J2000.0 epoch.
+            The elements are :
+            'a'    = semi-major axis,
+            'L'    = mean longitude,
+            'z'    = e exp(I w) with 'e' eccentricity, 'I' =sqrt(-1) and 'w'
+                      longitude of pericenter,
+            'zeta' = sin(i/2) exp(I Om) with 'i' inclination and 'Om' longitude
+                      of ascending node.
+
+            Each element is represented as a series of trigonometric terms,
+            each one giving the numerical value of amplitude, frequency and
+            phase, completed by the integer combination of 17 fundamental
+            arguments that represents at best the frequency and the phase;
+            the frequency and phase of the fundamental arguments are also given.
+            The phase of arguments depending on solar perturbations are
+            generally not identified and some other frequencies are also not
+            identified. For those terms well identified, the precision of the
+            identification in frequency and phase is also given.
+
+            Hence, ephemerides are preferently computed from the numerical
+            value of amplitude, frequency and phase of each term.
+
+            To compute the positions and velocities of the satellites from these
+            elements, the masses of Jupiter and satellites are also given, as
+            well as the angles 'Psi' and 'I' connecting the fixed jovicentric
+            reference frame to mean equator and mean equinox for J2000.0 epoch.
+            These parameters have been fitted to observations to produce L1
+            ephemerides.
+
+            This file includes comments and is read by the subroutine
+            INIT   given in  L1_2.f
+
+
+            REMARK :
+            This semi-analytical representation of the orbital elements has been
+            obtained by applying a Frequency Analysis program to the time series
+            produced by numerical integration of the dynamical system, in order
+            to produce a trigonometric representation of the motions. Then, when
+            searching to identify arguments of the trigonometric terms as integer
+            combinations of the fundamental arguments, it appears that some terms
+            in the semi-major axis of Io and Europa were aliased terms and then
+            have been corrected in L1.2. These alias are very short period terms
+            (with a frequency higher than  13.089969 rd/day, ie the Nyquist
+            frequency of the Frequency Analysis we used). However, these have a
+            very small apmlitude so that their contribution gives a correction
+            to semi-major axes amounting up to  1.44 km  for Io and  3.02 km for
+            Europa between  L1.1 and L1.2.
+
+   BisL1.2.dat :
+            It contains the same data as  GalileanL1.2.dat, but without comments
+            This file is read by the subroutine  INITbis given in  L1_2.f
+
+
+   TestL1.2.f :
+            f90 FORTRAN program which uses the subroutines L1_2.f
+            and shows how to monitor computations of ephemerides.
+
+   TestL1.2.res :
+            Results obtained from TestL1.2.f , giving an example of computing
+            ephemerides, allowing to check computations.
+
+
+
+   Installation of L1.2:    Put simply these files in the same directory
+
+********************************************************************************
+
+   The present version has been checked on PC Work Stations:
+   AMD Athlon XP 2200+  and Intel pentium5
+
+================================================================================
+User feed-back is encouraged. Unless otherwise specified, send comments and bug 
+reports to:                    E-mail     : comments@imcce.fr
+                               Fax        : (33) 1 46 33 28 34
+                               Postal mail: Bureau des longitudes
+                                            77 avenue Denfert Rochereau
+                                            F-75014 PARIS
+================================================================================
+
+
+

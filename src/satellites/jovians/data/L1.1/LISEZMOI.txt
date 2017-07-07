@@ -1,0 +1,123 @@
+==========================                         ============================
+                         IMCCE - Observatoire de Paris
+
+		    Contenu du répertoire:   /pub/ephem/satel/galilean
+
+===========================                         ============================
+
+
+CONTENU: Ces fichiers fournissent les éphémérides des quatre sallites galiléens de Jupiter. 
+
+
+AUTEUR  : V. Lainey
+
+
+ADDRESSE : IMCCE - Observatoire de Paris
+           77 av. Denfert Rochereau, F-75014 PARIS
+           Tel:   (1) 40 51 22 72   
+           Fax:   (1) 46 33 28 34 
+           courrier électronique: lainey@imcce.fr
+
+
+README FILE:       (07/05/2007)
+------------
+
+Le programme V1_1 fournit les éphémérides des satellites galiléens. Il est basé sur un modèle numérique ajusté aux observations réalisées
+entre 1891 et 2003. La précision attendue de ces éphémérides est de quelques dizaines de kilomètres pour la période [1970:2010].
+Il n'y a pas explicitement de limite temporelle d'utilisation de ces éphémérides. Pour l'interrogation de ces éphémérides au delà de la
+période [1150:2750], le calcul des longues périodes solaires doit être désactivé (régler l'option d'entrée "is" à la valeur 0).
+
+
+V1_1 est l'unique routine de calcul que l'utilisateur doit appeler.
+
+
+Entrée:
+-------
+
+ET=Date en jours juliens (TDB) à partir de l'époque 2433282.5 (01/01/1950 a 0H00 (TDB))
+
+nsat=numéro du satellite (1 Io, 2 Europe, 3 Ganymède, 4 Callisto)
+
+is=calcul des longues périodes solaires (0=non, 1=oui)
+
+iv=type de coordonnées en sortie (0 pour des éléments elliptiques (a, L, k, h, q, p) dans une repère centré sur Jupiter d'axes relatifs au plan équatorial
+moyen jovien J2000,
+                       1 pour des coordonnées cartésiennes dans un repère centré sur Jupiter d'axes relatifs au plan équatorial terrestre moyen
+		       J2000)
+
+
+Sortie:
+-------
+
+ELEM(6)=(a, L, k, h, q, p) ou (x, y, z, vx, vy, vz)
+
+
+Unités:
+------
+
+Les positions, vitesses et demi-grands axes sont délivrés en UA et AU/jour. 
+Pour convertir ces résultats en kilomètres, il est nécessaire de multiplier les précédentes valeurs par celle de l'unité astronomique:  149597870.691
+Les angles sont en radians.
+
+
+Exemples:
+---------
+
+2451545.d0
+
+Io
+  2.671999370920431E-003  7.644018403387422E-004  4.087344808808269E-004
+ -3.116203340625001E-003  8.645679572984422E-003  4.066210333795641E-003
+ 
+Europa
+ -3.751373844521062E-003 -2.136179970327756E-003 -1.056765216826830E-003
+  4.310591732986133E-003 -6.143199976514738E-003 -2.800434328620005E-003
+
+Ganymede
+ -5.490036250442612E-003 -4.112229247907583E-003 -2.033821277493470E-003
+  4.036147912130572E-003 -4.364866691392988E-003 -2.037111499364415E-003
+
+Callisto
+  2.172082907229073E-003  1.118792302205555E-002  5.322275059416266E-003
+ -4.662583658656747E-003  7.976685330152526E-004  3.092058747362411E-004
+
+
+REFERENCES:
+
+Lainey, V., Duriez, L. and Vienne, A. "Synthetic representation of the Galilean satellites' orbital motions from L1
+ephemerides", Astron. Astrophys., vol 456 pp.783-788 (2007).
+
+
+Lainey, V., Arlot, J.E. and Vienne, A. "New accurate ephemerides for the Galilean satellites of Jupiter. II. Fitting the
+observations", Astron. Astrophys., vol 427 pp.371-376 (2004).
+
+
+Lainey, V., Duriez, L. and Vienne, A. "New accurate ephemerides for the Galilean satellites of Jupiter. I. Numerical integration
+of elaborated equations of motion", Astron. Astrophys., vol 420 pp.1171-1183 (2004).
+
+
+
+Remarques techniques:
+---------------------
+
+1 - construction des éphémérides: analyse en fréquence et représentation synthétique
+
+2 - logiciel utilisé: EQVARSOL++
+
+
+=========================================================================================
+		 
+	        L'UTILISATION DE CES DONNEES EST SOUMISE A CONDITIONS. 
+		POUR PLUS D'INFORMATIONS, VEUILLEZ VOUS RENDRE A LA PAGE CI-DESSOUS:
+		 
+		http://www.imcce.fr/page.php?nav=fr/site/copyright.php?top=1
+  
+-----------------------------------------------------------------------------------------  
+L'avis des utilisateurs est le bienvenu. Sauf mention contraire, envoyez vos commentaires 
+ou rapport de bugs à:	       Courrier électronique: comments@imcce.fr
+                               Fax        	    : (33) 01 46 33 28 34 
+                               Adresse postale	    : IMCCE - Observatoire de Paris
+                                            	      77 avenue Denfert Rochereau
+                                            	      F-75014 PARIS
+=========================================================================================
+
