@@ -1,0 +1,103 @@
+===========================                         ============================
+                         IMCCE - Observatoire de Paris
+
+		   	     /pub/ephem/satel/gust86
+
+                                1996, February 3
+===========================                         ============================
+
+
+
+
+SATEL/GUST86:    COMPUTATION OF THE COORDINATES OF THE URANIAN SATELLITES (GUST86)
+============     version 0.1 (1988,1995)
+
+Thes files and programs associated to 
+================================================================================
+ GUST86 - An analytical ephemeris of the Uranian satellites
+       LASKAR J., JACOBSON, R.
+       <Astron. Astrophys. 188, 212-224 (1987)>
+================================================================================
+
+********************************************************************************
+*                                                                              *
+*    NOTICE:                                                                   *
+*                                                                              *
+*  This software can be freely copied and distributed provided that:           *
+*  * All the included  files  are kept together.                               *
+*  * This notice is included in the distribution                               *
+*  * no changes or alterations are made on the distributed files               *
+*                                                                              *
+*  Any changes can be performed on the FORTRAN files, for specific use,        *
+*  but these changes cannot be included in the distribution files, and         *
+*  reference to the original programs should be included.                      *
+*                                                                              *
+*  WARNING:                                                                    *
+*  This software is not designed to be used in any possible conditions,        *
+*  and is not presently in a definite version.                                 *
+*                                                                              *
+*                                                                              *
+*     URANIAN satellites theory  Laskar and Jacobson (1987)                    *  
+*     URANUS position (VSOP85, Bretagnon 1985)                                 *
+*     several routines from G. Francou                                         *
+*  (c) Astronomie et Systemes Dynamiques,                                      *
+*      Bureau des Longitudes, (1988, 1995)                                     *
+*                                                                              *
+*     contact                   Jacques Laskar                                 *
+*                               Astronomie et Systemes Dynamiques,             *
+*                               IMCCE - Observatoire de Paris
+*                               77 Avenue denfert Rochereau                    *
+*                               75014 Paris                                    *
+*                       email:  laskar@imcce.fr                                  *
+*                                                                              *
+********************************************************************************
+
+
+
+
+
+
+CONTAINS:
+=========
+
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName             Explanations
+--------------------------------------------------------------------------------
+README               This file
+
+GUST86.f             main FORTRAN program computes everything
+URANUS.DAT           data used for the geocentric position of Uranus
+                     (computed from VSOP85)
+                     
+gust86.example       example of execution of the program.                     
+
+
+
+AUTHORS :      Laskar, J., Jacobson, R.
+========
+
+
+ADDRESS :      Bureau des Longitudes 
+========       Astronomie et Systemes Dynamiques,            
+               3 rue Mazarine                                
+               75006 Paris                                  
+
+
+BIBLIOGRAPHY:
+============
+  
+
+          LASKAR J., JACOBSON, R.: 1987, GUST86 - An analytical ephemeris of the 
+                             Uranian satellites, Astron. Astrophys. 188, 212-224
+
+
+================================================================================
+User feed-back is encouraged. Unless otherwise specified, send comments and bug 
+reports to:                    E-mail     : comments@imcce.fr
+                               Fax        : (33) 1 46 33 28 34 
+                               Postal mail: Bureau des longitudes
+                                            77 avenue Denfert Rochereau
+                                            F-75014 PARIS
+================================================================================
