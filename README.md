@@ -64,6 +64,17 @@ The list is presently limited to planets number: 1, 2, 3, 4, 5, 6,
 7, and 324 (Ceres, Pallas, Juno, Vesta, Astrae, Hebe, Iris and
 Bamberga).
 
+## Planetary Moons
+
+I have ported the code for L1 (Jupiter), TASS17 (Saturn), GUST86 (Uranus)
+and MARSSAT (Mars) directly from Stellarium, which is in turn a port
+of the original Fortran code given in each of these theories:
+
+- ftp://ftp.imcce.fr/pub/ephem/satel/galilean
+- ftp://ftp.imcce.fr/pub/ephem/satel/tass17
+- ftp://ftp.imcce.fr/pub/ephem/satel/gust86
+- ftp://ftp.imcce.fr/pub/ephem/satel/martian
+
 ## Distribution files
 
 - [VSOP87](src/vsop87/data) - [tiny](src/vsop87/dist/02-tiny/min) | [small](src/vsop87/dist/04-small/min) | [normal](src/vsop87/dist/06-normal/min) | [big](src/vsop87/dist/08-big/min) | [full](src/vsop87/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop87/06-normal.html)
@@ -72,3 +83,4 @@ Bamberga).
 - [EPHASTER](src/ephaster/data) - [tiny](src/ephaster/dist/02-tiny/min) | [small](src/ephaster/dist/04-small/min) | [normal](src/ephaster/dist/06-normal/min) | [big](src/ephaster/dist/08-big/min) | [extreme](src/ephaster/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/ephaster/06-normal.html)
 - [ELP2000-MPP02](src/elpmpp02/data) - [tiny](src/elpmpp02/dist/02-tiny/min) | [small](src/elpmpp02/dist/04-small/min) | [normal](src/elpmpp02/dist/06-normal/min) | [big](src/elpmpp02/dist/08-big/min) | [full](src/elpmpp02/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/elpmpp02/06-normal.html)
 - [ELP2000-82b](src/elp2000/data) - [libnova](src/elp2000/nova/dist) | [orb](src/elp2000/elp2000orb.js) | [xyz](src/elp2000/elp2000xyz.js)  - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/elp2000/test.html)
+- [Satellites](src/satellites/dist/min) -  [Martians](src/satellites/martians/dist/min) [tests](https://rawgit.com/mgreter/ephem.js/develop/test/satellites/martians/test.html) | [Jovains](src/satellites/jovians/dist/min) [tests](https://rawgit.com/mgreter/ephem.js/develop/test/satellites/jovians/test.html) | [Saturnians](src/satellites/saturnians/dist/min) [tests](https://rawgit.com/mgreter/ephem.js/develop/test/satellites/saturnians/test.html) | [Uranians](src/satellites/uranians/dist/min) [tests](https://rawgit.com/mgreter/ephem.js/develop/test/satellites/uranians/test.html) |
