@@ -316,6 +316,28 @@ exports.elpmpp02 = {};
 
 	}
 
+	// Used in solar system explorer
+	// Unsanctioned implementation!
+	var fact = Math.pow(1000, 3) * 10;
+	function Orbitalize(state) {
+		// velocity is in km/day
+		// unsure why this even works?
+		// GM is not right (sun not earth?)
+		// Gravitational COnstant in au^3/d^2
+		// maybe state to orbital is buggy?
+		state.vx *= sc/KM2AU/fact;
+		state.vy *= sc/KM2AU/fact;
+		state.vz *= sc/KM2AU/fact;
+		var orbital = new Orbital(state);
+		state.a = orbital.a();
+		state.L = orbital.L();
+		state.k = orbital.k();
+		state.h = orbital.h();
+		state.q = orbital.q();
+		state.p = orbital.p();
+		return state;
+	}
+
 	if (typeof exports.elpmpp == "undefined") {
 		exports.elpmpp = function elpmpp(coeffs, tj, icor)
 		{
@@ -439,28 +461,6 @@ exports.elpmpp02 = {};
 		elpmpp.jpl = function elpmpp_jpl(coeffs, tj)
 		{ return elpmpp(coeffs, tj, 1); }
 
-		// Used in solar system explorer
-		// Unsanctioned implementation!
-		var fact = Math.pow(1000, 3) * 10;
-		function Orbitalize(state) {
-			// velocity is in km/day
-			// unsure why this even works?
-			// GM is not right (sun not earth?)
-			// Gravitational COnstant in au^3/d^2
-			// maybe state to orbital is buggy?
-			state.vx *= sc/KM2AU/fact;
-			state.vy *= sc/KM2AU/fact;
-			state.vz *= sc/KM2AU/fact;
-			var orbital = new Orbital(state);
-			state.a = orbital.a();
-			state.L = orbital.L();
-			state.k = orbital.k();
-			state.h = orbital.h();
-			state.q = orbital.q();
-			state.p = orbital.p();
-			return state;
-		}
-
 		// create actual functions to call (return full state)
 		elpmpp.llr.orb = function elpmpp_llr_orb(coeffs, t)
 		{ return Orbitalize(elpmpp(coeffs, t*365.25, 0)); }
@@ -485,4 +485,4 @@ elpmpp02.jpl = function elpmpp02_jpl(tj) { return elpmpp.jpl(elpmpp02.coeffs, tj
 elpmpp02.llr.orb = function elpmpp02_llr_orb(tj) { return elpmpp.llr.orb(elpmpp02.coeffs, tj); };
 elpmpp02.jpl.orb = function elpmpp02_jpl_orb(tj) { return elpmpp.jpl.orb(elpmpp02.coeffs, tj); };
 })(this)
-/* crc: 6FFF2F236F58B9437C5C688424369CA5 */
+/* crc: E2359D0A2E387B1DF1F2C6A81CE03929 */

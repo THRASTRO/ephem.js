@@ -312,6 +312,28 @@
 
 	}
 
+	// Used in solar system explorer
+	// Unsanctioned implementation!
+	var fact = Math.pow(1000, 3) * 10;
+	function Orbitalize(state) {
+		// velocity is in km/day
+		// unsure why this even works?
+		// GM is not right (sun not earth?)
+		// Gravitational COnstant in au^3/d^2
+		// maybe state to orbital is buggy?
+		state.vx *= sc/KM2AU/fact;
+		state.vy *= sc/KM2AU/fact;
+		state.vz *= sc/KM2AU/fact;
+		var orbital = new Orbital(state);
+		state.a = orbital.a();
+		state.L = orbital.L();
+		state.k = orbital.k();
+		state.h = orbital.h();
+		state.q = orbital.q();
+		state.p = orbital.p();
+		return state;
+	}
+
 	if (typeof exports.elpmpp == "undefined") {
 		exports.elpmpp = function elpmpp(coeffs, tj, icor)
 		{
@@ -434,28 +456,6 @@
 		{ return elpmpp(coeffs, tj, 0); }
 		elpmpp.jpl = function elpmpp_jpl(coeffs, tj)
 		{ return elpmpp(coeffs, tj, 1); }
-
-		// Used in solar system explorer
-		// Unsanctioned implementation!
-		var fact = Math.pow(1000, 3) * 10;
-		function Orbitalize(state) {
-			// velocity is in km/day
-			// unsure why this even works?
-			// GM is not right (sun not earth?)
-			// Gravitational COnstant in au^3/d^2
-			// maybe state to orbital is buggy?
-			state.vx *= sc/KM2AU/fact;
-			state.vy *= sc/KM2AU/fact;
-			state.vz *= sc/KM2AU/fact;
-			var orbital = new Orbital(state);
-			state.a = orbital.a();
-			state.L = orbital.L();
-			state.k = orbital.k();
-			state.h = orbital.h();
-			state.q = orbital.q();
-			state.p = orbital.p();
-			return state;
-		}
 
 		// create actual functions to call (return full state)
 		elpmpp.llr.orb = function elpmpp_llr_orb(coeffs, t)
