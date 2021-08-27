@@ -7,7 +7,7 @@ ftp://ftp.imcce.fr/pub/ephem/satel/galilean/L1
 I (Johannes Gajdosik) have just taken the Fortran code and data
 obtained from above and rearranged it into this piece of software.
 
-I can neigther allow nor forbid the usage of the L1 theory.
+I can neither allow nor forbid the usage of the L1 theory.
 The copyright notice below covers not the work of Valery Lainey
 but just my work, that is the compilation of the L1 theory
 into the software supplied in this file.
@@ -901,7 +901,7 @@ static const struct L1Body l1_bodies[4] = {
   },
 };
 
-void CalcL1Elem(const double t,const int body,double elem[6]) {
+void CalcL1Elem(const double t,const int body,double elem[]) {
   int j;
   const struct L1Body *const bp = l1_bodies + body;
   const double *cheb = bp->cheb_coef;
@@ -1004,12 +1004,14 @@ void GetL1Coor(double jd,int body,double *xyz) {
 
 void GetL1OsculatingCoor(const double jd0,const double jd,
                          const int body,double *xyz) {
-  double x[3];
+  double x[6];
   double elem[6];
   CalcL1Elem(jd0 - 2433282.5,body,elem); // jd == 0
   EllipticToRectangularA(l1_bodies[body].mu,elem,jd-jd0,x);
   xyz[0] = L1toVsop87[0]*x[0]+L1toVsop87[1]*x[1]+L1toVsop87[2]*x[2];
   xyz[1] = L1toVsop87[3]*x[0]+L1toVsop87[4]*x[1]+L1toVsop87[5]*x[2];
   xyz[2] = L1toVsop87[6]*x[0]+L1toVsop87[7]*x[1]+L1toVsop87[8]*x[2];
-  // xyz[0] = x[0]; xyz[1] = x[1]; xyz[2] = x[2];
+  xyz[3] = L1toVsop87[0]*x[3]+L1toVsop87[1]*x[4]+L1toVsop87[2]*x[5];
+  xyz[4] = L1toVsop87[3]*x[3]+L1toVsop87[4]*x[4]+L1toVsop87[5]*x[5];
+  xyz[5] = L1toVsop87[6]*x[3]+L1toVsop87[7]*x[4]+L1toVsop87[8]*x[5];
 }

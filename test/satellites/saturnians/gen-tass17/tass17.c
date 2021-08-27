@@ -7,7 +7,7 @@ ftp://ftp.imcce.fr/pub/ephem/satel/tass17
 I (Johannes Gajdosik) have just taken the Fortran code and data
 obtained from above and rearranged it into this piece of software.
 
-I can neigther allow nor forbid the usage of the TASS 1.7 theory.
+I can neither allow nor forbid the usage of the TASS 1.7 theory.
 The copyright notice below covers not the work of Alain VIENNE and Luc DURIEZ
 but just my work, that is the compilation of the TASS 1.7 theory
 into the software supplied in this file.
@@ -3169,16 +3169,18 @@ void GetTass17Coor(double jd,int body,double *xyz)
 
 void GetTass17OsculatingCoor(const double jd0,const double jd, const int body,double *xyz)
 {
-	double x[3];
-	double lon[8];
+  double x[6];
+  double lon[8];
   double elem[6];
-	CalcLon(jd0 - 2444240.0,lon);
+  CalcLon(jd0 - 2444240.0,lon); // delta 7305.0
   CalcTass17Elem(jd0 - 2444240.0,lon,body,elem); // jd == 0
-	EllipticToRectangularN(tass17bodies[body].mu,elem,jd-jd0,x);
-	xyz[0] = TASS17toVSOP87[0]*x[0]+TASS17toVSOP87[1]*x[1]+TASS17toVSOP87[2]*x[2];
-	xyz[1] = TASS17toVSOP87[3]*x[0]+TASS17toVSOP87[4]*x[1]+TASS17toVSOP87[5]*x[2];
-	xyz[2] = TASS17toVSOP87[6]*x[0]+TASS17toVSOP87[7]*x[1]+TASS17toVSOP87[8]*x[2];
-  // xyz[0] = x[0]; xyz[1] = x[1]; xyz[2] = x[2];
+  EllipticToRectangularN(tass17bodies[body].mu,elem,jd-jd0,x);
+  xyz[0] = TASS17toVSOP87[0]*x[0] + TASS17toVSOP87[1]*x[1] + TASS17toVSOP87[2]*x[2];
+  xyz[1] = TASS17toVSOP87[3]*x[0] + TASS17toVSOP87[4]*x[1] + TASS17toVSOP87[5]*x[2];
+  xyz[2] = TASS17toVSOP87[6]*x[0] + TASS17toVSOP87[7]*x[1] + TASS17toVSOP87[8]*x[2];
+  xyz[3] = TASS17toVSOP87[0]*x[3] + TASS17toVSOP87[1]*x[4] + TASS17toVSOP87[2]*x[5];
+  xyz[4] = TASS17toVSOP87[3]*x[3] + TASS17toVSOP87[4]*x[4] + TASS17toVSOP87[5]*x[5];
+  xyz[5] = TASS17toVSOP87[6]*x[3] + TASS17toVSOP87[7]*x[4] + TASS17toVSOP87[8]*x[5];
 }
 
 

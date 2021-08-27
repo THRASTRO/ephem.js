@@ -14,7 +14,7 @@ I (Johannes Gajdosik) have just taken Valery Laineys Fortran code,
 MarsSatV1-0.f, which he kindly supplied, and rearranged it into
 this piece of software.
 
-I can neigther allow nor forbid the usage of Valery Laineys
+I can neither allow nor forbid the usage of Valery Laineys
 Ephemerides of the Martian satellites.
 The copyright notice below covers not the work of Valery Lainey
 but just my work, that is the compilation of Valery Laineys
@@ -48,8 +48,8 @@ in MarsSatV1-0.f are
 
 ****************************************************************/
 
-#ifndef _MARS_SAT_H_
-#define _MARS_SAT_H_
+#ifndef MARSSAT_H
+#define MARSSAT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,8 +58,8 @@ extern "C" {
 #define MARS_SAT_PHOBOS 0
 #define MARS_SAT_DEIMOS 1
 
-void GetMarsSatCoor(double jd,int body,double *xyz);
-  /* Return the rectangular coordinates of the given satellite
+void GetMarsSatCoor(double jd, int body, double *xyz, double *xyzdot);
+  /* Return the rectangular coordinates and speed of the given satellite
      and the given julian date jd expressed in dynamical time (TAI+32.184s).
      The origin of the xyz-coordinates is the center of the planet.
      The reference frame is "dynamical equinox and ecliptic J2000",
@@ -68,6 +68,7 @@ void GetMarsSatCoor(double jd,int body,double *xyz);
 
 void GetMarsSatOsculatingCoor(const double jd0, const double jd, const int body,double *xyz);
   /* The oculating orbit of epoch jd0, evatuated at jd, is returned.
+   * xyz is a 6-vector
   */
 
 void CalcMarsSatElem(double t,int body,double elem[6]);

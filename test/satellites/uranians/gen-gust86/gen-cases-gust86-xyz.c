@@ -5,10 +5,10 @@ int main()
 {
 
 	int body;
-	double jd;
+	double jd2k;
 	double start = - 20000.0;
 	double end = + 20000.0;
-	double step = 133.333;
+	double step = 225.0;
 	double xyz[5*6];
 
 	printf("{\n");
@@ -16,11 +16,12 @@ int main()
 	// element for all bodies (don't care)
 	for (body = 0; body < 5; body ++) {
 		printf("\t\"%d\": [\n", body);
-		for (jd = start; jd < end; jd += step) {
-			GetGust86OsculatingCoor(jd + 2444239.5, 0, body, xyz);
+		for (jd2k = start; jd2k <= end; jd2k += step) {
+			float jd = jd2k + 2451545;
+			GetGust86OsculatingCoor(jd, jd, body, xyz);
 			printf(
-				"\t\t[%.13f, %.13f, %.13f, %.13f],\n",
-				jd, xyz[0], xyz[1], xyz[2]
+				"\t\t[%.13f, %.13f, %.13f, %.13f, %.13f, %.13f, %.13f],\n",
+				jd2k, xyz[0], xyz[1], xyz[2], xyz[3], xyz[4], xyz[5]
 			);
 		}
 		printf("\t],\n");

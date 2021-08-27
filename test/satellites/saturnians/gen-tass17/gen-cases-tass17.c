@@ -5,22 +5,24 @@ int main()
 {
 
 	int body;
-	double jd;
-	double start = - 20000.0;
+	double jd2k;
+	double start = -20000.0;
 	double end = + 20000.0;
-	double step = 133.333;
-	double elem[6];
+	double step = 225.0;
+	double elem[7];
 	double lon[7];
 
 	printf("{\n");
 	for (body = 0; body < 8; body ++) {
 		printf("\t\"%d\": [\n", body);
-		for (jd = start; jd < end; jd += step) {
-			CalcLon(jd, lon); // cacheable per time
-			CalcTass17Elem(jd, lon, body, elem);
+		for (jd2k = start; jd2k < end; jd2k += step) {
+			// Both expect an offset
+			float time = jd2k + 7305.0;
+			CalcLon(time, lon); // cacheable per time
+			CalcTass17Elem(time, lon, body, elem);
 			printf(
 				"\t\t[%.13f, %.13f, %.13f, %.13f, %.13f, %.13f, %.13f],\n",
-				jd, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5]
+				jd2k, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5]
 			);
 		}
 		printf("\t],\n");

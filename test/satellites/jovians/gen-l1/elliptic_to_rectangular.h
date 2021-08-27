@@ -7,7 +7,7 @@ ftp://ftp.imcce.fr/pub/ephem/satel
 I (Johannes Gajdosik) have just taken the Fortran code and data
 obtained from above and rearranged it into this piece of software.
 
-I can neigther allow nor forbid the above theories.
+I can neither allow nor forbid the above theories.
 The copyright notice below covers just my work,
 that is the compilation of the data obtained from above
 into the software supplied in this file.

@@ -8,17 +8,17 @@ int main()
 	double jd;
 	double start = - 20000.0;
 	double end = + 20000.0;
-	double step = 133.333;
-	double xyz[3];
+	double step = 225.0;
+	double xyz[6];
 
 	printf("{\n");
 	for (body = 0; body < 4; body ++) {
 		printf("\t\"%d\": [\n", body);
 		for (jd = start; jd < end; jd += step) {
-			GetL1OsculatingCoor(jd + 2433282.5, 0, body, xyz);
+			GetL1Coor(jd + 2451545.0, body, xyz);
 			printf(
-				"\t\t[%.13f, %.13f, %.13f, %.13f],\n",
-				jd, xyz[0], xyz[1], xyz[2]
+				"\t\t[%.13f, %.13f, %.13f, %.13f, %.13f, %.13f, %.13f],\n",
+				jd, xyz[0], xyz[1], xyz[2], xyz[3], xyz[4], xyz[5]
 			);
 		}
 		printf("\t],\n");

@@ -7,7 +7,7 @@ ftp://ftp.imcce.fr/pub/ephem/satel/gust86
 I (Johannes Gajdosik) have just taken the Fortran code and data
 obtained from above and rearranged it into this piece of software.
 
-I can neigther allow nor forbid the usage of the GUST86 theory.
+I can neither allow nor forbid the usage of the GUST86 theory.
 The copyright notice below covers not the works of LASKAR J. and JACOBSON, R.,
 but just my work, that is the compilation of the GUST86 theory
 into the software supplied in this file.
@@ -443,13 +443,14 @@ void GetGust86Coor(const double jd,const int body,double *xyz) {
 
 void GetGust86OsculatingCoor(const double jd0,const double jd,
                              const int body,double *xyz) {
-  double x[3];
+  double x[6];
   double elem[5*6];
   CalcGust86Elem(jd0 - 2444239.5,elem); // jd == 0
   EllipticToRectangularN(gust86_rmu[body],elem + body*6,jd-jd0,x);
   xyz[0] = GUST86toVsop87[0]*x[0]+GUST86toVsop87[1]*x[1]+GUST86toVsop87[2]*x[2];
   xyz[1] = GUST86toVsop87[3]*x[0]+GUST86toVsop87[4]*x[1]+GUST86toVsop87[5]*x[2];
   xyz[2] = GUST86toVsop87[6]*x[0]+GUST86toVsop87[7]*x[1]+GUST86toVsop87[8]*x[2];
-  // xyz[0] = elem[body*6+0]; xyz[1] = elem[body*6+1]; xyz[2] = elem[body*6+2];
-  // xyz[0] = x[0]; xyz[1] = x[1]; xyz[2] = x[2];
+  xyz[3] = GUST86toVsop87[0]*x[3] + GUST86toVsop87[1]*x[4] + GUST86toVsop87[2]*x[5];
+  xyz[4] = GUST86toVsop87[3]*x[3] + GUST86toVsop87[4]*x[4] + GUST86toVsop87[5]*x[5];
+  xyz[5] = GUST86toVsop87[6]*x[3] + GUST86toVsop87[7]*x[4] + GUST86toVsop87[8]*x[5];
 }
