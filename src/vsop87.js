@@ -12,114 +12,77 @@
 	// it after the sum has been calculated. IMO this should be a bit
 	// faster than the original implementation, but not sure if the
 	// precision will suffer from that change.
-	if (typeof exports.vsop87 !== "function") {
-		// only define once in global scope
-		// otherwise we overwrite loaded data
-		exports.vsop87 = function vsop87(coeffs, time)
-		{
-			// want 1000 JY (KJY)
-			var t = time / 1000, result = {},
-			    u, cu, tt = [0, 1, t, t*t];
-			// reuse old multiplications
-			// fortran t(x) array starts at -1!
-			// therefore t(it) = tt[it+1] (js)
-			tt[4] = tt[3] * t, tt[5] = tt[4] * t, tt[6] = tt[5] * t;
-			// do a cheap test if coefficients are from the main vsop87
-			// theories. All other [a-e] only need 3 to calculate the
-			// full 6 elements (velocity is calculated from position).
-			var main = 'a' in coeffs;
-			// calculate poisson series
-			for (var v in coeffs) {
-				// init result holders
-				result[v] = 0;
-				if (!main) result['v'+v] = 0;
-				// loop all coefficients for all powers (t^0, t^1, t^2, etc.)
-				for (var it = 0, sum = 0, dsum = 0; it < coeffs[v].length; it += 1) {
-					var pow_sum = 0, dpow_sum = 0, coeff = coeffs[v][it];
-					for (var i = 0, cl = coeff.length; i < cl; i += 3) {
-						// assign coefficients as in fortran code
-						// `read (lu,1002,err=500) a,b,c` (line 187)
-						var a = coeff[i+0], b = coeff[i+1], c = coeff[i+2];
-						// `u=b+c*t(1)` and `cu=dcos(u)`
-						u = b + c * t, cu = Math.cos(u);
-						// `r(ic)=r(ic)+a*cu*t(it)`
-						pow_sum += a * cu * tt[it+1];
-						// condition for `if (iv.eq.0) goto 200`
-						// calculation for `t(it)*a*c*su` (line 194)
-						// note to myself: tt[it]*it != tt[it+1]
-						if (!main) dpow_sum += tt[it]*it*a*cu - tt[it+1]*a*c*Math.sin(u);
-					}
-					// this is the step for r(ic)=r(ic)+(...) (line 191)
-					result[v] += pow_sum; /*t(it)*/;
-					if (!main) result['v'+v] += dpow_sum / 365250;
-				}
-			}
-			// normalize angles
-			if ('L' in result) {
-				result.L = result.L % (Math.PI * 2);
-				if (result.L < 0) result.L += (Math.PI * 2);
-			}
-			if ('l' in result) {
-				result.l = result.l % (Math.PI * 2);
-				if (result.l < 0) result.l += (Math.PI * 2);
-			}
-			if ('b' in result) {
-				result.n = result.n % (Math.PI * 2);
-				if (result.n < 0) result.n += (Math.PI * 2);
-			}
-			// return result
-			return result;
-		}
-
-	}
-
-	// generic vsop2010/2013 solver (pass coefficients and time)
-	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof exports.vsop87.xyz !== "function") {
-		// only define once in global scope
-		// otherwise we overwrite loaded data
-		exports.vsop87.xyz = function vsop87_xyz(coeffs, j2ky)
-		{
-			// call main theory
-			var orb = exports.vsop87(coeffs, j2ky);
-			// create orbit object
-			var orbit = new Orbit(orb);
-			// query state vector
-			var state = orbit.state();
-			// attach new properties
-			orb.x = state.r.x; orb.vx = state.v.x;
-			orb.y = state.r.y; orb.vy = state.v.y;
-			orb.z = state.r.z; orb.vz = state.v.z;
-			// return object
-			return orb;
-		}
-	}
-	// EO fn vsop2k.xyz
-
-	/*
-	// position = heliocentric
-	function vsop2fk5(position, JD)
+	function vsop87_theory(theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		var LL, cos_LL, sin_LL, T, delta_L, delta_B, B;
-
-		// get julian centuries from 2000
-		T = (JD - 2451545.0) / 36525.0;
-
-		LL = position.L + (- 1.397 * DEG2RAD - 0.00031 * DEG2RAD * T) * T;
-		// LL = ln_deg_to_rad(LL);
-		cos_LL = Math.cos(LL);
-		sin_LL = Math.sin(LL);
-		// B = ln_deg_to_rad(position.B);
-
-		delta_L = (-0.09033 / 3600.0) + (0.03916 / 3600.0) *
-				(cos_LL + sin_LL) * Math.tan(B);
-		delta_B = (0.03916 / 3600.0) * (cos_LL - sin_LL);
-
-		return {
-			l: L + delta_L,
-			b: B + delta_B
-		};
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// get the coefficients
+		var coeffs = theory.coeffs;
+		// want in thousand years
+		var t = jy2k / 1000, orb = {},
+			u, cu, tt = [0, 1, t, t*t];
+		// reuse old multiplications
+		// fortran t(x) array starts at -1!
+		// therefore t(it) = tt[it+1] (js)
+		tt[4] = tt[3] * t, tt[5] = tt[4] * t, tt[6] = tt[5] * t;
+		// do a cheap test if coefficients are from the main vsop87
+		// theories. All other [a-e] only need 3 to calculate the
+		// full 6 elements (velocity is calculated from position).
+		var main = 'a' in coeffs;
+		// calculate poisson series
+		for (var v in coeffs) {
+			// init result holders
+			orb[v] = 0;
+			if (!main) orb['v'+v] = 0;
+			// loop all coefficients for all powers (t^0, t^1, t^2, etc.)
+			for (var it = 0; it < coeffs[v].length; it += 1) {
+				var pow_sum = 0, dpow_sum = 0, coeff = coeffs[v][it];
+				for (var i = 0, cl = coeff.length; i < cl; i += 3) {
+					// assign coefficients as in fortran code
+					// `read (lu,1002,err=500) a,b,c` (line 187)
+					var a = coeff[i+0], b = coeff[i+1], c = coeff[i+2];
+					// `u=b+c*t(1)` and `cu=dcos(u)`
+					u = b + c * t, cu = Math.cos(u);
+					// `r(ic)=r(ic)+a*cu*t(it)`
+					pow_sum += a * cu * tt[it+1];
+					// condition for `if (iv.eq.0) goto 200`
+					// calculation for `t(it)*a*c*su` (line 194)
+					// note to myself: tt[it]*it != tt[it+1]
+					if (!main) dpow_sum += tt[it]*it*a*cu - tt[it+1]*a*c*Math.sin(u);
+				}
+				// this is the step for r(ic)=r(ic)+(...) (line 191)
+				orb[v] += pow_sum; /*t(it)*/;
+				if (!main) orb['v'+v] += dpow_sum / 365250;
+			}
+		}
+		// normalize angles
+		if ('L' in orb) {
+			orb.L = orb.L % (Math.PI * 2);
+			if (orb.L < 0) orb.L += (Math.PI * 2);
+		}
+		if ('l' in orb) {
+			orb.l = orb.l % (Math.PI * 2);
+			if (orb.l < 0) orb.l += (Math.PI * 2);
+		}
+		if ('b' in orb) {
+			orb.n = orb.n % (Math.PI * 2);
+			if (orb.n < 0) orb.n += (Math.PI * 2);
+		}
+		// set orbital epoch
+		orb.epoch = jy2k;
+		// return orbital
+		return orb;
 	}
-	*/
+	// EO vsop87_theory
+
+	// Export the main export function
+	// Call this function for each theory
+	exports.VSOP87 = function(name, GM, coeffs)
+	{
+		// export generic VSOP theory with solver attached
+		return exports.VSOP(vsop87_theory, name, GM, coeffs);
+	}
+	// EO exports.VSOP87
 
 })(this);

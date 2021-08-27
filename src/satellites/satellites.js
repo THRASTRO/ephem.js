@@ -4,146 +4,181 @@
 // https://github.com/mgreter/ephem.js
 // pretty much only inspired by Stellarium
 //***********************************************************
-(function (exports)
+(function(exports)
 {
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-	// re-used below
-	// allocate once
-	var elem = [];
-
-	// import math functions
-	var cbrt = Math.cbrt;
-
-	/*************************************************************************/
-	/*************************************************************************/
-
-	// calculate VSOP orbital elements in local frame
-	function getOrbital(t, body, orbital)
+	// update vsop elements in elems at offset and return elems array
+	function vsop(solver, theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		// js is funky :)
-		var fn = this;
-		// re-use or create
-		orbital = orbital || {};
-		// call function with adjusted epoch
-		if (!fn || typeof fn != "function") debugger;
-		fn(t * 365.25 + fn.epoch, body, elem);
-		// get semi-major-axis from via `n` parameter
-		// here the first parameter gives the mean motion
-		// directly related to period and semi-major-axis
-		if (fn.type == 'n') elem[0] =
-			cbrt(fn.rmu[body] / (elem[0] * elem[0]));
-		// move over to result object
-		orbital.a = elem[0]; orbital.L = elem[1];
-		orbital.k = elem[2]; orbital.h = elem[3];
-		orbital.q = elem[4]; orbital.p = elem[5];
-		// set the epoch
-		orbital.t = t;
-		// return object
-		return orbital;
-	}
-	// EO getOrbital
-
-	/*************************************************************************/
-	/*************************************************************************/
-
-	// re-use rotation matrix
-	var mat3 = new THREE.Matrix3();
-
-	// get VSOP reference frame elements
-	// corrections applied for VSOP87 frame
-	function getOrbitalVSOP87(t, body, orbital)
-	{
-		// js is funky :)
-		var fn = this;
-		// get uncorrected VSOP elements from function
-		orbital = getOrbital.call(fn, t, body, orbital);
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		solver(theory, jy2k, elems, addGM, addEpoch, off);
 		// a bit expensive to get as we need to
 		// convert into cartesian to apply rotation
 		// we then reconstruct the kepler elements
-		// ToDo: can the be implemented directly?
+		// ToDo: can this be implemented directly?
 		// Note: doesn't seem to be too obvious!?
-		if (matrix = fn.VSOP87mat3) {
+		if (toVSOP = theory.toVSOP) {
 			// translate via cartesian coords
 			// there might be an easier way?
 			// do we really need to convert?
-			var orb = new Orbital(orbital);
+			var orbit = new Orbit({
+				a: elems[off+0],
+				L: elems[off+1],
+				k: elems[off+2],
+				h: elems[off+3],
+				q: elems[off+4],
+				p: elems[off+5],
+				GM: theory.GM,
+				epoch: jy2k
+			});
 			// get state vectors
-			var state = orb.state(t);
+			var state = orbit.state(jy2k);
 			// check for dynamic rotations
-			if (typeof matrix == "function") {
+			if (typeof toVSOP == "function") {
 				// get dynamic matrix
-				matrix(t, mat3);
-				matrix = mat3;
+				toVSOP(jy2k, mat3);
+				toVSOP = mat3;
 			}
 			// rotate cartesian vectors
-			state.r.applyMatrix3(matrix);
-			state.v.applyMatrix3(matrix);
+			state.r.applyMatrix3(toVSOP);
+			state.v.applyMatrix3(toVSOP);
 			// create via rotated state
-			orb = new Orbital(state);
-			// store results on original object
-			orbital.a = orb.a(); orbital.L = orb.L();
-			orbital.k = orb.k(); orbital.h = orb.h();
-			orbital.q = orb.q(); orbital.p = orb.p();
-			orbital.r = orb.r(); orbital.v = orb.v();
+			orbit = new Orbit(state);
+			// update state elements
+			elems[off++] = orbit._a;
+			elems[off++] = orbit.L();
+			elems[off++] = orbit.k();
+			elems[off++] = orbit.h();
+			elems[off++] = orbit.q();
+			elems[off++] = orbit.p();
 		}
-		// return object
-		return orbital;
+		// return state object
+		return elems;
 	}
-	// EO getOrbitalVSOP87
+	// EO vsop
 
-	/*************************************************************************/
-	/*************************************************************************/
-
-	// calculate VSOP and state vectors
-	function getCartesian(t, body, state)
+	// Return an orbital object suitable to create new Orbit
+	function orbital(solver, theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		// re-use or create
-		state = state || {};
-		// call main theory
-		getOrbitalVSOP87.call(this, t, body, state);
-		// attach state vectors (already calculated)
-		state.x = state.r.x; state.vx = state.v.x;
-		state.y = state.r.y; state.vy = state.v.y;
-		state.z = state.r.z; state.vz = state.v.z;
-		// return object
-		return state;
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// return orbital object
+		return {
+			a: elems[off++],
+			L: elems[off++],
+			k: elems[off++],
+			h: elems[off++],
+			q: elems[off++],
+			p: elems[off++],
+			GM: theory.GM,
+			epoch: jy2k
+		};
 	}
-	// EO getCartesian
+	// EO orbital
 
-	/*************************************************************************/
-	/*************************************************************************/
-
-	// helper function to setup satellite
-	function setupSatellite(fn, body, name)
+	// update state elements in elems at offset and return array
+	function state(solver, theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		fn[name] = function (t, orbital) { return getOrbitalVSOP87.call(fn, t, body, orbital); }
-		fn[name].orb = function (t, coords) { return getOrbital.call(fn, t, body, orbital); }
-		fn[name].xyz = function (t, coords) { return getCartesian.call(fn, t, body, coords); }
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// create orbit object from vsop array
+		var orbit = new Orbit({
+			a: elems[off+0],
+			L: elems[off+1],
+			k: elems[off+2],
+			h: elems[off+3],
+			q: elems[off+4],
+			p: elems[off+5],
+			GM: theory.GM,
+			epoch: jy2k
+		});
+		// calculate state vector
+		var state = orbit.state(jy2k);
+		// update state elements
+		elems[off++] = state.r.x;
+		elems[off++] = state.r.y;
+		elems[off++] = state.r.z;
+		elems[off++] = state.v.x;
+		elems[off++] = state.v.y;
+		elems[off++] = state.v.z;
+		// return state object
+		return elems;
 	}
-	// EO setupSatellite
+	// EO state
 
-	// helper function to setup satellites
-	function setup(type, fn, epoch, matrix3, satellites, rmu)
+	// update state elements in elems at offset and return state object
+	function position(solver, theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		fn.type = type, fn.epoch = epoch, fn.VSOP87mat3 = matrix3, fn.rmu = rmu;
-		fn.xyz = function xyz(t, body, state) { return getCartesian.call(fn, t, body, state); }
-		fn.orb = function orb(t, body, orbital) { return getOrbital.call(fn, t, body, orbital); }
-		fn.vsop = function orb(t, body, orbital) { return getOrbital.call(fn, t, body, orbital); }
-		for (var i = 0; i < satellites.length; i++) setupSatellite(fn, i, satellites[i]);
-		return fn; // return for assignment
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		state(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// return state object
+		return {
+			x: elems[off++],
+			y: elems[off++],
+			z: elems[off++],
+			vx: elems[off++],
+			vy: elems[off++],
+			vz: elems[off++],
+			GM: theory.GM,
+			epoch: jy2k
+		};
 	}
-	// EO setupSatellites
+	// EO position
 
-	/*************************************************************************/
-	/*************************************************************************/
-
-	// giving credit where credit is due
-	// export them under Stellarium namespace
-	// functions are pretty much taken one to one
-	exports.Stellarium = setup;
+	// Export the main exporter function
+	// Call this function for every theory
+	exports.SATELLITE = function(solver, name, GM, coeffs, matrix)
+	{
+		var theory = {};
+		// update raw elements in elems at offset and return elems array
+		theory.raw = function satellite_raw(jy2k, elems, addGM, addEpoch, off) {
+			return solver(theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return elems array
+		theory.vsop = function satellite_theory(jy2k, elems, addGM, addEpoch, off) {
+			return vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update state elements in elems at offset and return elems array
+		theory.state = function satellite_state(jy2k, elems, addGM, addEpoch, off) {
+			return state(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update state elements in elems at offset and return state object
+		theory.position = function satellite_position(jy2k, elems, addGM, addEpoch, off) {
+			return position(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return orbital object
+		theory.orbital = function satellite_orbital(jy2k, elems, addGM, addEpoch, off) {
+			return orbital(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return orbit object
+		theory.orbit = function satellite_orbit(jy2k, elems, addGM, addEpoch, off) {
+			return new Orbit(orbital(solver, theory, jy2k, elems, addGM, addEpoch, off));
+		}
+		// Attach static properties
+		theory.toVSOP = matrix;
+		theory.coeffs = coeffs;
+		theory.GM = GM;
+		// short name only
+		theory.name = name;
+		// Return theory
+		return theory;
+	}
+	// EO export vsop2k
 
 	/*************************************************************************/
 	/*************************************************************************/
