@@ -8,6 +8,196 @@ var vsop87e = {};
 //***********************************************************
 (function(exports) {
 
+	var mat3; // allocate when needed
+
+	// update vsop elements in elems at offset and return elems array
+	function vsop(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		solver(theory, jy2k, elems, addGM, addEpoch, off);
+		// check if theory gives mean motion
+		if (theory.givesMeanMotion) {
+			// assume that mean motion is in days, convert to years
+			var fact = elems[off+0] * theory.givesMeanMotion;
+			// convert mean motion to semi-major axis via gravitational parameter
+			elems[off+0] = Math.cbrt(theory.GM / fact / fact);
+		}
+		// a bit expensive to get as we need to
+		// convert into cartesian to apply rotation
+		// we then reconstruct the kepler elements
+		// ToDo: can this be implemented directly?
+		// Note: doesn't seem to be too obvious!?
+		if (toVSOP = theory.toVSOP) {
+			// translate via cartesian coords
+			// there might be an easier way?
+			// do we really need to convert?
+			var orbit = new Orbit({
+				a: elems[off+0],
+				L: elems[off+1],
+				k: elems[off+2],
+				h: elems[off+3],
+				q: elems[off+4],
+				p: elems[off+5],
+				GM: theory.GM,
+				epoch: jy2k
+			});
+			// get state vectors
+			var state = orbit.state(jy2k);
+			// check for dynamic rotations
+			if (typeof toVSOP == "function") {
+				// create only once needed
+				mat3 = mat3 || new THREE.Matrix3();
+				// get dynamic matrix
+				toVSOP(jy2k, mat3);
+				toVSOP = mat3;
+			}
+			// rotate cartesian vectors
+			state.r.applyMatrix3(toVSOP);
+			state.v.applyMatrix3(toVSOP);
+			// create via rotated state
+			orbit = new Orbit(state);
+			// update state elements
+			elems[off++] = orbit._a;
+			elems[off++] = orbit.L();
+			elems[off++] = orbit.k();
+			elems[off++] = orbit.h();
+			elems[off++] = orbit.q();
+			elems[off++] = orbit.p();
+		}
+		// return state object
+		return elems;
+	}
+	// EO vsop
+
+	// Return an orbital object suitable to create new Orbit
+	function orbital(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// return orbital object
+		return {
+			a: elems[off++],
+			L: elems[off++],
+			k: elems[off++],
+			h: elems[off++],
+			q: elems[off++],
+			p: elems[off++],
+			GM: theory.GM,
+			epoch: jy2k
+		};
+	}
+	// EO orbital
+
+	// update state elements in elems at offset and return array
+	function state(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// create orbit object from vsop array
+		var orbit = new Orbit({
+			a: elems[off+0],
+			L: elems[off+1],
+			k: elems[off+2],
+			h: elems[off+3],
+			q: elems[off+4],
+			p: elems[off+5],
+			GM: theory.GM,
+			epoch: jy2k
+		});
+		// calculate state vector
+		var state = orbit.state(jy2k);
+		// update state elements
+		elems[off++] = state.r.x;
+		elems[off++] = state.r.y;
+		elems[off++] = state.r.z;
+		elems[off++] = state.v.x;
+		elems[off++] = state.v.y;
+		elems[off++] = state.v.z;
+		// return state object
+		return elems;
+	}
+	// EO state
+
+	// update state elements in elems at offset and return state object
+	function position(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		state(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// return state object
+		return {
+			x: elems[off++],
+			y: elems[off++],
+			z: elems[off++],
+			vx: elems[off++],
+			vy: elems[off++],
+			vz: elems[off++],
+			GM: theory.GM,
+			epoch: jy2k
+		};
+	}
+	// EO position
+
+	// Export the main exporter function
+	// Call this function for every theory
+	exports.VSOP = function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
+	{
+		var theory = {};
+		// update raw elements in elems at offset and return elems array
+		theory.raw = function vsop_raw(jy2k, elems, addGM, addEpoch, off) {
+			return solver(theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return elems array
+		theory.vsop = function vsop_theory(jy2k, elems, addGM, addEpoch, off) {
+			return vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update state elements in elems at offset and return elems array
+		theory.state = function vsop_state(jy2k, elems, addGM, addEpoch, off) {
+			return state(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update state elements in elems at offset and return state object
+		theory.position = function vsop_position(jy2k, elems, addGM, addEpoch, off) {
+			return position(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return orbital object
+		theory.orbital = function vsop_orbital(jy2k, elems, addGM, addEpoch, off) {
+			return orbital(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return orbit object
+		theory.orbit = function vsop_orbit(jy2k, elems, addGM, addEpoch, off) {
+			return new Orbit(orbital(solver, theory, jy2k, elems, addGM, addEpoch, off));
+		}
+		// Attach static properties
+		theory.givesMeanMotion = givesMeanMotion;
+		theory.toVSOP = toVSOP;
+		theory.coeffs = coeffs;
+		theory.GM = GM;
+		// short name only
+		theory.name = name;
+		// Return theory
+		return theory;
+	}
+	// EO exports.VSOP
+
+})(this);;
+//***********************************************************
+// (c) 2016 by Marcel Greter
+// AstroJS VSOP87 utility lib
+// https://github.com/mgreter/ephem.js
+//***********************************************************
+(function(exports) {
+
 	// generic vsop87 solver (pass coefficients and time)
 	// this is basically a one to one translation from the official
 	// fortran code in vsop87.f at around line 185. Only change is
@@ -15,216 +205,143 @@ var vsop87e = {};
 	// it after the sum has been calculated. IMO this should be a bit
 	// faster than the original implementation, but not sure if the
 	// precision will suffer from that change.
-	if (typeof exports.vsop87 !== "function") {
-		// only define once in global scope
-		// otherwise we overwrite loaded data
-		exports.vsop87 = function vsop87(coeffs, time)
-		{
-			// want 1000 JY (KJY)
-			var t = time / 1000, result = {},
-			    u, cu, tt = [0, 1, t, t*t];
-			// reuse old multiplications
-			// fortran t(x) array starts at -1!
-			// therefore t(it) = tt[it+1] (js)
-			tt[4] = tt[3] * t, tt[5] = tt[4] * t, tt[6] = tt[5] * t;
-			// do a cheap test if coefficients are from the main vsop87
-			// theories. All other [a-e] only need 3 to calculate the
-			// full 6 elements (velocity is calculated from position).
-			var main = 'a' in coeffs;
-			// calculate poisson series
-			for (var v in coeffs) {
-				// init result holders
-				result[v] = 0;
-				if (!main) result['v'+v] = 0;
-				// loop all coefficients for all powers (t^0, t^1, t^2, etc.)
-				for (var it = 0, sum = 0, dsum = 0; it < coeffs[v].length; it += 1) {
-					var pow_sum = 0, dpow_sum = 0, coeff = coeffs[v][it];
-					for (var i = 0, cl = coeff.length; i < cl; i += 3) {
-						// assign coefficients as in fortran code
-						// `read (lu,1002,err=500) a,b,c` (line 187)
-						var a = coeff[i+0], b = coeff[i+1], c = coeff[i+2];
-						// `u=b+c*t(1)` and `cu=dcos(u)`
-						u = b + c * t, cu = Math.cos(u);
-						// `r(ic)=r(ic)+a*cu*t(it)`
-						pow_sum += a * cu * tt[it+1];
-						// condition for `if (iv.eq.0) goto 200`
-						// calculation for `t(it)*a*c*su` (line 194)
-						// note to myself: tt[it]*it != tt[it+1]
-						if (!main) dpow_sum += tt[it]*it*a*cu - tt[it+1]*a*c*Math.sin(u);
-					}
-					// this is the step for r(ic)=r(ic)+(...) (line 191)
-					result[v] += pow_sum; /*t(it)*/;
-					if (!main) result['v'+v] += dpow_sum / 365250;
-				}
-			}
-			// normalize angles
-			if ('L' in result) {
-				result.L = result.L % (Math.PI * 2);
-				if (result.L < 0) result.L += (Math.PI * 2);
-			}
-			if ('l' in result) {
-				result.l = result.l % (Math.PI * 2);
-				if (result.l < 0) result.l += (Math.PI * 2);
-			}
-			if ('b' in result) {
-				result.n = result.n % (Math.PI * 2);
-				if (result.n < 0) result.n += (Math.PI * 2);
-			}
-			// return result
-			return result;
-		}
-
-	}
-
-	// generic vsop2010/2013 solver (pass coefficients and time)
-	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof exports.vsop87.xyz !== "function") {
-		// only define once in global scope
-		// otherwise we overwrite loaded data
-		exports.vsop87.xyz = function vsop87_xyz(coeffs, j2ky)
-		{
-			// call main theory
-			var orb = exports.vsop87(coeffs, j2ky);
-			// create orbit object
-			var orbit = new Orbit(orb);
-			// query state vector
-			var state = orbit.state();
-			// attach new properties
-			orb.x = state.r.x; orb.vx = state.v.x;
-			orb.y = state.r.y; orb.vy = state.v.y;
-			orb.z = state.r.z; orb.vz = state.v.z;
-			// return object
-			return orb;
-		}
-	}
-	// EO fn vsop2k.xyz
-
-	/*
-	// position = heliocentric
-	function vsop2fk5(position, JD)
+	function vsop87_theory(theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		var LL, cos_LL, sin_LL, T, delta_L, delta_B, B;
-
-		// get julian centuries from 2000
-		T = (JD - 2451545.0) / 36525.0;
-
-		LL = position.L + (- 1.397 * DEG2RAD - 0.00031 * DEG2RAD * T) * T;
-		// LL = ln_deg_to_rad(LL);
-		cos_LL = Math.cos(LL);
-		sin_LL = Math.sin(LL);
-		// B = ln_deg_to_rad(position.B);
-
-		delta_L = (-0.09033 / 3600.0) + (0.03916 / 3600.0) *
-				(cos_LL + sin_LL) * Math.tan(B);
-		delta_B = (0.03916 / 3600.0) * (cos_LL - sin_LL);
-
-		return {
-			l: L + delta_L,
-			b: B + delta_B
-		};
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// get the coefficients
+		var coeffs = theory.coeffs;
+		// want in thousand years
+		var t = jy2k / 1000, orb = {},
+			u, cu, tt = [0, 1, t, t*t];
+		// reuse old multiplications
+		// fortran t(x) array starts at -1!
+		// therefore t(it) = tt[it+1] (js)
+		tt[4] = tt[3] * t, tt[5] = tt[4] * t, tt[6] = tt[5] * t;
+		// do a cheap test if coefficients are from the main vsop87
+		// theories. All other [a-e] only need 3 to calculate the
+		// full 6 elements (velocity is calculated from position).
+		var main = 'a' in coeffs;
+		// calculate poisson series
+		for (var v in coeffs) {
+			// init result holders
+			orb[v] = 0;
+			if (!main) orb['v'+v] = 0;
+			// loop all coefficients for all powers (t^0, t^1, t^2, etc.)
+			for (var it = 0; it < coeffs[v].length; it += 1) {
+				var pow_sum = 0, dpow_sum = 0, coeff = coeffs[v][it];
+				for (var i = 0, cl = coeff.length; i < cl; i += 3) {
+					// assign coefficients as in fortran code
+					// `read (lu,1002,err=500) a,b,c` (line 187)
+					var a = coeff[i+0], b = coeff[i+1], c = coeff[i+2];
+					// `u=b+c*t(1)` and `cu=dcos(u)`
+					u = b + c * t, cu = Math.cos(u);
+					// `r(ic)=r(ic)+a*cu*t(it)`
+					pow_sum += a * cu * tt[it+1];
+					// condition for `if (iv.eq.0) goto 200`
+					// calculation for `t(it)*a*c*su` (line 194)
+					// note to myself: tt[it]*it != tt[it+1]
+					if (!main) dpow_sum += tt[it]*it*a*cu - tt[it+1]*a*c*Math.sin(u);
+				}
+				// this is the step for r(ic)=r(ic)+(...) (line 191)
+				orb[v] += pow_sum; /*t(it)*/;
+				if (!main) orb['v'+v] += dpow_sum / 365250;
+			}
+		}
+		// normalize angles
+		if ('L' in orb) {
+			orb.L = orb.L % (Math.PI * 2);
+			if (orb.L < 0) orb.L += (Math.PI * 2);
+		}
+		if ('l' in orb) {
+			orb.l = orb.l % (Math.PI * 2);
+			if (orb.l < 0) orb.l += (Math.PI * 2);
+		}
+		if ('b' in orb) {
+			orb.n = orb.n % (Math.PI * 2);
+			if (orb.n < 0) orb.n += (Math.PI * 2);
+		}
+		// set orbital epoch
+		orb.epoch = jy2k;
+		// return orbital
+		return orb;
 	}
-	*/
+	// EO vsop87_theory
+
+	// Export the main export function
+	// Call this function for each theory
+	exports.VSOP87 = function(name, GM, coeffs)
+	{
+		// export generic VSOP theory with solver attached
+		return exports.VSOP(vsop87_theory, name, GM, coeffs);
+	}
+	// EO exports.VSOP87
 
 })(this);;
 (function(vsop87e) {;
 // generated by vsop87.pl
-function vsop87e_sun(tj) { return vsop87(vsop87e_sun.coeffs, tj); }
-function vsop87e_sun_xyz(tj) { return vsop87.xyz(vsop87e_sun.coeffs, tj); }
-vsop87e_sun.xyz = vsop87e_sun_xyz; // assign
-vsop87e.sun = vsop87e_sun; // export
-vsop87e_sun.coeffs = {
+vsop87e.sun = VSOP87('sun', 39.4769264324223, {
 	x: [[0.00495672739,3.74107356792,529.6909650946]],
 	y: [[0.00495536218,2.17046712634,529.6909650946]],
 	z: [[0.00011810648,0.46078690233,213.299095438]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_mer(tj) { return vsop87(vsop87e_mer.coeffs, tj); }
-function vsop87e_mer_xyz(tj) { return vsop87.xyz(vsop87e_mer.coeffs, tj); }
-vsop87e_mer.xyz = vsop87e_mer_xyz; // assign
-vsop87e.mer = vsop87e_mer; // export
-vsop87e_mer.coeffs = {
+vsop87e.mer = VSOP87('mer', 39.4769329861321, {
 	x: [[0.37546285495,4.39651506942,26087.9031415742,0.03825746037,1.16485604343,52175.8062831484,0.02596241714,3.14159265359,0]],
 	y: [[0.37953636588,2.83780617821,26087.9031415742,0.11592262295,3.14159265359,0,0.03854667576,5.88780608961,52175.8062831484]],
 	z: [[0.04607664562,1.99295081967,26087.9031415742]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_ven(tj) { return vsop87(vsop87e_ven.coeffs, tj); }
-function vsop87e_ven_xyz(tj) { return vsop87.xyz(vsop87e_ven.coeffs, tj); }
-vsop87e_ven.xyz = vsop87e_ven_xyz; // assign
-vsop87e.ven = vsop87e_ven; // export
-vsop87e_ven.coeffs = {
+vsop87e.ven = VSOP87('ven', 39.4770230655563, {
 	x: [[0.72211104628,3.17575836361,10213.285546211]],
 	y: [[0.72324643689,1.60573808356,10213.285546211]],
 	z: [[0.04282979819,0.26703856471,10213.285546211]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_ear(tj) { return vsop87(vsop87e_ear.coeffs, tj); }
-function vsop87e_ear_xyz(tj) { return vsop87.xyz(vsop87e_ear.coeffs, tj); }
-vsop87e_ear.xyz = vsop87e_ear_xyz; // assign
-vsop87e.ear = vsop87e_ear; // export
-vsop87e_ear.coeffs = {
+vsop87e.ear = VSOP87('ear', 39.477046459361, {
 	x: [[0.99982624851,1.75348568475,6283.0758499914]],
 	y: [[0.99988907017,0.18265890456,6283.0758499914,0.02408829501,3.14159265359,0]],
 	z: [[0.00011810174,0.46078312048,213.299095438]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_mar(tj) { return vsop87(vsop87e_mar.coeffs, tj); }
-function vsop87e_mar_xyz(tj) { return vsop87.xyz(vsop87e_mar.coeffs, tj); }
-vsop87e_mar.xyz = vsop87e_mar_xyz; // assign
-vsop87e.mar = vsop87e_mar; // export
-vsop87e_mar.coeffs = {
+vsop87e.mar = VSOP87('mar', 39.4769391722243, {
 	x: [[1.51769887405,6.20403346548,3340.6124266998,0.19473570996,3.14159265359,0,0.07070917372,0.25870338552,6681.2248533996]],
 	y: [[1.51558927367,4.63212206588,3340.6124266998,0.07064547959,4.97051892898,6681.2248533996,0.08689350637,0,0],[0.01427318093,3.14159265359,0]],
 	z: [[0.04901205639,3.76712324293,3340.6124266998]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_jup(tj) { return vsop87(vsop87e_jup.coeffs, tj); }
-function vsop87e_jup_xyz(tj) { return vsop87.xyz(vsop87e_jup.coeffs, tj); }
-vsop87e_jup.xyz = vsop87e_jup_xyz; // assign
-vsop87e.jup = vsop87e_jup; // export
-vsop87e_jup.coeffs = {
+vsop87e.jup = VSOP87('jup', 39.5146186826235, {
 	x: [[5.19167797375,0.59945079482,529.6909650946,0.3663326807,3.14159265359,0,0.12581924842,0.94911581432,1059.3819301892,0.01499237862,0.73175554601,522.5774180938,0.01474818211,3.61736901402,536.8045120954]],
 	y: [[5.19024510371,5.31203160043,529.6909650946,0.12580850775,5.66160225641,1059.3819301892,0.09329801081,3.14159265359,0,0.01506838468,5.43934599781,522.5774180938,0.01474403395,2.04679547637,536.8045120954],[0.01694792137,3.14159265359,0]],
 	z: [[0.11811822789,3.55844641987,529.6909650946]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_sat(tj) { return vsop87(vsop87e_sat.coeffs, tj); }
-function vsop87e_sat_xyz(tj) { return vsop87.xyz(vsop87e_sat.coeffs, tj); }
-vsop87e_sat.xyz = vsop87e_sat_xyz; // assign
-vsop87e.sat = vsop87e_sat; // export
-vsop87e_sat.coeffs = {
+vsop87e.sat = VSOP87('sat', 39.4882123322459, {
 	x: [[9.51366533422,0.8744138065,213.299095438,0.26404799161,0.12391580771,426.598190876,0.06758489145,4.16767544586,206.1855484372,0.06622371284,0.75094738122,220.4126424388,0.04274172066,0,0,0.02335961354,2.02227905783,7.1135470008,0.01255113414,2.17347170552,110.2063212194,0.01115372225,3.15690865182,419.4846438752,0.01097374519,5.65753938643,639.897286314],[0.07573807889,0,0,0.03084144308,4.27565898829,426.598190876,0.02714141496,5.85229546861,206.1855484372,0.02642347272,5.33291950842,220.4126424388]],
 	y: [[9.52714696877,5.58600556072,213.299095438,0.79354119271,3.14159265359,0,0.26434197609,4.83528742856,426.598190876,0.06914690347,2.55279029588,206.1855484372,0.066316792,5.46258849076,220.4126424388,0.02345226948,0.44652393276,7.1135470008,0.01183557497,1.34637027573,419.4846438752,0.012455238,0.60375781288,110.2063212194,0.01098442011,4.08609387384,639.897286314],[0.05373895252,0,0,0.03089676414,2.70347020059,426.598190876,0.02740812928,4.2666750646,206.1855484372,0.02646734779,3.76132299914,220.4126424388]],
 	z: [[0.41345140292,3.60234141893,213.299095438,0.01147953788,2.85128771957,426.598190876,0.01213097211,0,0],[0.0190595894,4.94544746619,213.299095438]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_ura(tj) { return vsop87(vsop87e_ura.coeffs, tj); }
-function vsop87e_ura_xyz(tj) { return vsop87.xyz(vsop87e_ura.coeffs, tj); }
-vsop87e_ura.xyz = vsop87e_ura_xyz; // assign
-vsop87e.ura = vsop87e_ura; // export
-vsop87e_ura.coeffs = {
+vsop87e.ura = VSOP87('ura', 39.4789600424755, {
 	x: [[19.17286937362,5.48133416758,74.7815985673,1.32301898121,0,0,0.44400556159,1.65967535182,149.5631971346,0.14667584671,3.42395875589,73.297125859,0.14129215712,4.39576776954,76.2660712756,0.06200970387,5.14043568284,1.4844727083,0.01542890129,4.12122840701,224.3447957019,0.0144415347,2.65117108186,148.0787244263]],
 	y: [[19.16434475791,3.91045677275,74.7815985673,0.44388525091,0.08884126943,149.5631971346,0.16222255941,3.14159265359,0,0.14755311401,1.85423292905,73.297125859,0.14122904825,2.82489928705,76.2660712756,0.06249939655,3.56960238469,1.4844727083,0.01542607086,2.5504154317,224.3447957019,0.01442293466,1.08004535633,148.0787244263],[0.02157902502,0,0]],
 	z: [[0.25876996652,2.61861278845,74.7815985673,0.01775471434,3.14159265359,0]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87e_nep(tj) { return vsop87(vsop87e_nep.coeffs, tj); }
-function vsop87e_nep_xyz(tj) { return vsop87.xyz(vsop87e_nep.coeffs, tj); }
-vsop87e_nep.xyz = vsop87e_nep_xyz; // assign
-vsop87e.nep = vsop87e_nep; // export
-vsop87e_nep.coeffs = {
+vsop87e.nep = VSOP87('nep', 39.4786500913706, {
 	x: [[30.05734568801,5.3121134003,38.1330356378,0.27050789973,3.14159265359,0,0.1350457827,3.50075407055,76.2660712756,0.15725280871,0.11319072402,36.6485629295,0.14934353052,1.08499398649,39.6175083461,0.02597449604,1.99590330725,1.4844727083]],
 	y: [[30.05900907352,3.74086294715,38.1330356378,0.30171988148,3.14159265359,0,0.13505308635,1.92949466968,76.2660712756,0.15705776296,4.82539969469,36.6485629295,0.14935398681,5.79694896309,39.6175083461,0.02584389323,0.42549727257,1.4844727083]],
 	z: [[0.92861252357,1.44103930199,38.1330356378,0.01244825806,0,0]]
-}; // assign
+});
 ;
 })(vsop87e)
-/* crc: FD5ACF6006A30E8EA6656553A1044ED1 */
+/* crc: 5FFF0BE3E2ACB4A2E4BED3F6790FDA9D */

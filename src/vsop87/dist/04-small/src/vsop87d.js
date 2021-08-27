@@ -8,6 +8,196 @@ var vsop87d = {};
 //***********************************************************
 (function(exports) {
 
+	var mat3; // allocate when needed
+
+	// update vsop elements in elems at offset and return elems array
+	function vsop(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		solver(theory, jy2k, elems, addGM, addEpoch, off);
+		// check if theory gives mean motion
+		if (theory.givesMeanMotion) {
+			// assume that mean motion is in days, convert to years
+			var fact = elems[off+0] * theory.givesMeanMotion;
+			// convert mean motion to semi-major axis via gravitational parameter
+			elems[off+0] = Math.cbrt(theory.GM / fact / fact);
+		}
+		// a bit expensive to get as we need to
+		// convert into cartesian to apply rotation
+		// we then reconstruct the kepler elements
+		// ToDo: can this be implemented directly?
+		// Note: doesn't seem to be too obvious!?
+		if (toVSOP = theory.toVSOP) {
+			// translate via cartesian coords
+			// there might be an easier way?
+			// do we really need to convert?
+			var orbit = new Orbit({
+				a: elems[off+0],
+				L: elems[off+1],
+				k: elems[off+2],
+				h: elems[off+3],
+				q: elems[off+4],
+				p: elems[off+5],
+				GM: theory.GM,
+				epoch: jy2k
+			});
+			// get state vectors
+			var state = orbit.state(jy2k);
+			// check for dynamic rotations
+			if (typeof toVSOP == "function") {
+				// create only once needed
+				mat3 = mat3 || new THREE.Matrix3();
+				// get dynamic matrix
+				toVSOP(jy2k, mat3);
+				toVSOP = mat3;
+			}
+			// rotate cartesian vectors
+			state.r.applyMatrix3(toVSOP);
+			state.v.applyMatrix3(toVSOP);
+			// create via rotated state
+			orbit = new Orbit(state);
+			// update state elements
+			elems[off++] = orbit._a;
+			elems[off++] = orbit.L();
+			elems[off++] = orbit.k();
+			elems[off++] = orbit.h();
+			elems[off++] = orbit.q();
+			elems[off++] = orbit.p();
+		}
+		// return state object
+		return elems;
+	}
+	// EO vsop
+
+	// Return an orbital object suitable to create new Orbit
+	function orbital(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// return orbital object
+		return {
+			a: elems[off++],
+			L: elems[off++],
+			k: elems[off++],
+			h: elems[off++],
+			q: elems[off++],
+			p: elems[off++],
+			GM: theory.GM,
+			epoch: jy2k
+		};
+	}
+	// EO orbital
+
+	// update state elements in elems at offset and return array
+	function state(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// create orbit object from vsop array
+		var orbit = new Orbit({
+			a: elems[off+0],
+			L: elems[off+1],
+			k: elems[off+2],
+			h: elems[off+3],
+			q: elems[off+4],
+			p: elems[off+5],
+			GM: theory.GM,
+			epoch: jy2k
+		});
+		// calculate state vector
+		var state = orbit.state(jy2k);
+		// update state elements
+		elems[off++] = state.r.x;
+		elems[off++] = state.r.y;
+		elems[off++] = state.r.z;
+		elems[off++] = state.v.x;
+		elems[off++] = state.v.y;
+		elems[off++] = state.v.z;
+		// return state object
+		return elems;
+	}
+	// EO state
+
+	// update state elements in elems at offset and return state object
+	function position(solver, theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// call main theory to fill elements
+		state(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		// return state object
+		return {
+			x: elems[off++],
+			y: elems[off++],
+			z: elems[off++],
+			vx: elems[off++],
+			vy: elems[off++],
+			vz: elems[off++],
+			GM: theory.GM,
+			epoch: jy2k
+		};
+	}
+	// EO position
+
+	// Export the main exporter function
+	// Call this function for every theory
+	exports.VSOP = function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
+	{
+		var theory = {};
+		// update raw elements in elems at offset and return elems array
+		theory.raw = function vsop_raw(jy2k, elems, addGM, addEpoch, off) {
+			return solver(theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return elems array
+		theory.vsop = function vsop_theory(jy2k, elems, addGM, addEpoch, off) {
+			return vsop(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update state elements in elems at offset and return elems array
+		theory.state = function vsop_state(jy2k, elems, addGM, addEpoch, off) {
+			return state(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update state elements in elems at offset and return state object
+		theory.position = function vsop_position(jy2k, elems, addGM, addEpoch, off) {
+			return position(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return orbital object
+		theory.orbital = function vsop_orbital(jy2k, elems, addGM, addEpoch, off) {
+			return orbital(solver, theory, jy2k, elems, addGM, addEpoch, off);
+		}
+		// update vsop elements in elems at offset and return orbit object
+		theory.orbit = function vsop_orbit(jy2k, elems, addGM, addEpoch, off) {
+			return new Orbit(orbital(solver, theory, jy2k, elems, addGM, addEpoch, off));
+		}
+		// Attach static properties
+		theory.givesMeanMotion = givesMeanMotion;
+		theory.toVSOP = toVSOP;
+		theory.coeffs = coeffs;
+		theory.GM = GM;
+		// short name only
+		theory.name = name;
+		// Return theory
+		return theory;
+	}
+	// EO exports.VSOP
+
+})(this);;
+//***********************************************************
+// (c) 2016 by Marcel Greter
+// AstroJS VSOP87 utility lib
+// https://github.com/mgreter/ephem.js
+//***********************************************************
+(function(exports) {
+
 	// generic vsop87 solver (pass coefficients and time)
 	// this is basically a one to one translation from the official
 	// fortran code in vsop87.f at around line 185. Only change is
@@ -15,205 +205,136 @@ var vsop87d = {};
 	// it after the sum has been calculated. IMO this should be a bit
 	// faster than the original implementation, but not sure if the
 	// precision will suffer from that change.
-	if (typeof exports.vsop87 !== "function") {
-		// only define once in global scope
-		// otherwise we overwrite loaded data
-		exports.vsop87 = function vsop87(coeffs, time)
-		{
-			// want 1000 JY (KJY)
-			var t = time / 1000, result = {},
-			    u, cu, tt = [0, 1, t, t*t];
-			// reuse old multiplications
-			// fortran t(x) array starts at -1!
-			// therefore t(it) = tt[it+1] (js)
-			tt[4] = tt[3] * t, tt[5] = tt[4] * t, tt[6] = tt[5] * t;
-			// do a cheap test if coefficients are from the main vsop87
-			// theories. All other [a-e] only need 3 to calculate the
-			// full 6 elements (velocity is calculated from position).
-			var main = 'a' in coeffs;
-			// calculate poisson series
-			for (var v in coeffs) {
-				// init result holders
-				result[v] = 0;
-				if (!main) result['v'+v] = 0;
-				// loop all coefficients for all powers (t^0, t^1, t^2, etc.)
-				for (var it = 0, sum = 0, dsum = 0; it < coeffs[v].length; it += 1) {
-					var pow_sum = 0, dpow_sum = 0, coeff = coeffs[v][it];
-					for (var i = 0, cl = coeff.length; i < cl; i += 3) {
-						// assign coefficients as in fortran code
-						// `read (lu,1002,err=500) a,b,c` (line 187)
-						var a = coeff[i+0], b = coeff[i+1], c = coeff[i+2];
-						// `u=b+c*t(1)` and `cu=dcos(u)`
-						u = b + c * t, cu = Math.cos(u);
-						// `r(ic)=r(ic)+a*cu*t(it)`
-						pow_sum += a * cu * tt[it+1];
-						// condition for `if (iv.eq.0) goto 200`
-						// calculation for `t(it)*a*c*su` (line 194)
-						// note to myself: tt[it]*it != tt[it+1]
-						if (!main) dpow_sum += tt[it]*it*a*cu - tt[it+1]*a*c*Math.sin(u);
-					}
-					// this is the step for r(ic)=r(ic)+(...) (line 191)
-					result[v] += pow_sum; /*t(it)*/;
-					if (!main) result['v'+v] += dpow_sum / 365250;
-				}
-			}
-			// normalize angles
-			if ('L' in result) {
-				result.L = result.L % (Math.PI * 2);
-				if (result.L < 0) result.L += (Math.PI * 2);
-			}
-			if ('l' in result) {
-				result.l = result.l % (Math.PI * 2);
-				if (result.l < 0) result.l += (Math.PI * 2);
-			}
-			if ('b' in result) {
-				result.n = result.n % (Math.PI * 2);
-				if (result.n < 0) result.n += (Math.PI * 2);
-			}
-			// return result
-			return result;
-		}
-
-	}
-
-	// generic vsop2010/2013 solver (pass coefficients and time)
-	// time is julian years from j2000 (delta JD2451545.0 in JY)
-	if (typeof exports.vsop87.xyz !== "function") {
-		// only define once in global scope
-		// otherwise we overwrite loaded data
-		exports.vsop87.xyz = function vsop87_xyz(coeffs, j2ky)
-		{
-			// call main theory
-			var orb = exports.vsop87(coeffs, j2ky);
-			// create orbit object
-			var orbit = new Orbit(orb);
-			// query state vector
-			var state = orbit.state();
-			// attach new properties
-			orb.x = state.r.x; orb.vx = state.v.x;
-			orb.y = state.r.y; orb.vy = state.v.y;
-			orb.z = state.r.z; orb.vz = state.v.z;
-			// return object
-			return orb;
-		}
-	}
-	// EO fn vsop2k.xyz
-
-	/*
-	// position = heliocentric
-	function vsop2fk5(position, JD)
+	function vsop87_theory(theory, jy2k, elems, addGM, addEpoch, off)
 	{
-		var LL, cos_LL, sin_LL, T, delta_L, delta_B, B;
-
-		// get julian centuries from 2000
-		T = (JD - 2451545.0) / 36525.0;
-
-		LL = position.L + (- 1.397 * DEG2RAD - 0.00031 * DEG2RAD * T) * T;
-		// LL = ln_deg_to_rad(LL);
-		cos_LL = Math.cos(LL);
-		sin_LL = Math.sin(LL);
-		// B = ln_deg_to_rad(position.B);
-
-		delta_L = (-0.09033 / 3600.0) + (0.03916 / 3600.0) *
-				(cos_LL + sin_LL) * Math.tan(B);
-		delta_B = (0.03916 / 3600.0) * (cos_LL - sin_LL);
-
-		return {
-			l: L + delta_L,
-			b: B + delta_B
-		};
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+		// get the coefficients
+		var coeffs = theory.coeffs;
+		// want in thousand years
+		var t = jy2k / 1000, orb = {},
+			u, cu, tt = [0, 1, t, t*t];
+		// reuse old multiplications
+		// fortran t(x) array starts at -1!
+		// therefore t(it) = tt[it+1] (js)
+		tt[4] = tt[3] * t, tt[5] = tt[4] * t, tt[6] = tt[5] * t;
+		// do a cheap test if coefficients are from the main vsop87
+		// theories. All other [a-e] only need 3 to calculate the
+		// full 6 elements (velocity is calculated from position).
+		var main = 'a' in coeffs;
+		// calculate poisson series
+		for (var v in coeffs) {
+			// init result holders
+			orb[v] = 0;
+			if (!main) orb['v'+v] = 0;
+			// loop all coefficients for all powers (t^0, t^1, t^2, etc.)
+			for (var it = 0; it < coeffs[v].length; it += 1) {
+				var pow_sum = 0, dpow_sum = 0, coeff = coeffs[v][it];
+				for (var i = 0, cl = coeff.length; i < cl; i += 3) {
+					// assign coefficients as in fortran code
+					// `read (lu,1002,err=500) a,b,c` (line 187)
+					var a = coeff[i+0], b = coeff[i+1], c = coeff[i+2];
+					// `u=b+c*t(1)` and `cu=dcos(u)`
+					u = b + c * t, cu = Math.cos(u);
+					// `r(ic)=r(ic)+a*cu*t(it)`
+					pow_sum += a * cu * tt[it+1];
+					// condition for `if (iv.eq.0) goto 200`
+					// calculation for `t(it)*a*c*su` (line 194)
+					// note to myself: tt[it]*it != tt[it+1]
+					if (!main) dpow_sum += tt[it]*it*a*cu - tt[it+1]*a*c*Math.sin(u);
+				}
+				// this is the step for r(ic)=r(ic)+(...) (line 191)
+				orb[v] += pow_sum; /*t(it)*/;
+				if (!main) orb['v'+v] += dpow_sum / 365250;
+			}
+		}
+		// normalize angles
+		if ('L' in orb) {
+			orb.L = orb.L % (Math.PI * 2);
+			if (orb.L < 0) orb.L += (Math.PI * 2);
+		}
+		if ('l' in orb) {
+			orb.l = orb.l % (Math.PI * 2);
+			if (orb.l < 0) orb.l += (Math.PI * 2);
+		}
+		if ('b' in orb) {
+			orb.n = orb.n % (Math.PI * 2);
+			if (orb.n < 0) orb.n += (Math.PI * 2);
+		}
+		// set orbital epoch
+		orb.epoch = jy2k;
+		// return orbital
+		return orb;
 	}
-	*/
+	// EO vsop87_theory
+
+	// Export the main export function
+	// Call this function for each theory
+	exports.VSOP87 = function(name, GM, coeffs)
+	{
+		// export generic VSOP theory with solver attached
+		return exports.VSOP(vsop87_theory, name, GM, coeffs);
+	}
+	// EO exports.VSOP87
 
 })(this);;
 (function(vsop87d) {;
 // generated by vsop87.pl
-function vsop87d_mer(tj) { return vsop87(vsop87d_mer.coeffs, tj); }
-function vsop87d_mer_xyz(tj) { return vsop87.xyz(vsop87d_mer.coeffs, tj); }
-vsop87d_mer.xyz = vsop87d_mer_xyz; // assign
-vsop87d.mer = vsop87d_mer; // export
-vsop87d_mer.coeffs = {
+vsop87d.mer = VSOP87('mer', 39.4769329861321, {
 	l: [[4.40250710144,0,0,0.40989414976,1.48302034194,26087.9031415742,0.05046294199,4.4778548954,52175.8062831484,0.00855346843,1.16520322351,78263.7094247226,0.00165590362,4.11969163181,104351.612566297,0.00034561897,0.77930765817,130439.515707871],[26088.1470622275,0,0,0.01126007832,6.21703970996,26087.9031415742,0.00303471395,3.05565472363,52175.8062831484,0.00080538452,6.10454743366,78263.7094247226,0.00021245035,2.83531934452,104351.612566297],[0.00053049845,0,0,0.00016903658,4.69072300649,26087.9031415742]],
 	b: [[0.11737528962,1.98357498767,26087.9031415742,0.02388076996,5.03738959685,52175.8062831484,0.01222839532,3.14159265359,0,0.0054325181,1.79644363963,78263.7094247226,0.0012977877,4.83232503961,104351.612566297,0.00031866927,1.58088495667,130439.515707871],[0.00429151362,3.50169780393,26087.9031415742,0.00146233668,3.14159265359,0,0.00022675295,0.0151536688,52175.8062831484,0.00010894981,0.48540174006,78263.7094247226],[0.00011830934,4.79065585784,26087.9031415742]],
 	r: [[0.39528271652,0,0,0.07834131817,6.19233722599,26087.9031415742,0.00795525557,2.95989690096,52175.8062831484,0.00121281763,6.01064153805,78263.7094247226,0.00021921969,2.77820093975,104351.612566297],[0.00217347739,4.65617158663,26087.9031415742,0.00044141826,1.42385543975,52175.8062831484,0.00010094479,4.47466326316,78263.7094247226]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_ven(tj) { return vsop87(vsop87d_ven.coeffs, tj); }
-function vsop87d_ven_xyz(tj) { return vsop87.xyz(vsop87d_ven.coeffs, tj); }
-vsop87d_ven.xyz = vsop87d_ven_xyz; // assign
-vsop87d.ven = vsop87d_ven; // export
-vsop87d_ven.coeffs = {
+vsop87d.ven = VSOP87('ven', 39.4770230655563, {
 	l: [[3.17614666774,0,0,0.01353968419,5.59313319619,10213.285546211,0.00089891645,5.30650048468,20426.571092422],[10213.529430529,0,0,0.00095707712,2.46424448979,10213.285546211,0.00014444977,0.51624564679,20426.571092422],[0.00054127076,0,0]],
 	b: [[0.05923638472,0.26702775813,10213.285546211,0.00040107978,1.14737178106,20426.571092422,0.00032814918,3.14159265359,0],[0.00513347602,1.80364310797,10213.285546211],[0.00022377665,3.38509143877,10213.285546211]],
 	r: [[0.72334820905,0,0,0.00489824185,4.02151832268,10213.285546211],[0.00034551039,0.89198710598,10213.285546211]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_ear(tj) { return vsop87(vsop87d_ear.coeffs, tj); }
-function vsop87d_ear_xyz(tj) { return vsop87.xyz(vsop87d_ear.coeffs, tj); }
-vsop87d_ear.xyz = vsop87d_ear_xyz; // assign
-vsop87d.ear = vsop87d_ear; // export
-vsop87d_ear.coeffs = {
+vsop87d.ear = VSOP87('ear', 39.477046459361, {
 	l: [[1.75347045673,0,0,0.03341656456,4.66925680417,6283.0758499914,0.00034894275,4.62610241759,12566.1516999828],[6283.31966747491,0,0,0.00206058863,2.67823455584,6283.0758499914],[0.0005291887,0,0]],
 	b: [[2.7962e-006,3.19870156017,84334.6615813083]],
 	r: [[1.00013988799,0,0,0.01670699626,3.09846350771,6283.0758499914,0.00013956023,3.0552460962,12566.1516999828],[0.00103018608,1.10748969588,6283.0758499914]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_mar(tj) { return vsop87(vsop87d_mar.coeffs, tj); }
-function vsop87d_mar_xyz(tj) { return vsop87.xyz(vsop87d_mar.coeffs, tj); }
-vsop87d_mar.xyz = vsop87d_mar_xyz; // assign
-vsop87d.mar = vsop87d_mar; // export
-vsop87d_mar.coeffs = {
+vsop87d.mar = VSOP87('mar', 39.4769391722243, {
 	l: [[6.20347711583,0,0,0.186563681,5.05037100303,3340.6124266998,0.01108216792,5.40099836958,6681.2248533996,0.00091798394,5.75478745111,10021.8372800994,0.00027744987,5.97049512942,3.523118349,0.0001061023,2.93958524973,2281.2304965106,0.00012315897,0.84956081238,2810.9214616052],[3340.85627474342,0,0,0.01458227051,3.60426053609,3340.6124266998,0.00164901343,3.92631250962,6681.2248533996,0.00019963338,4.2659406103,10021.8372800994],[0.00058015791,2.04979463279,3340.6124266998,0.00054187645,0,0,0.00013908426,2.45742359888,6681.2248533996]],
 	b: [[0.03197134986,3.76832042432,3340.6124266998,0.00298033234,4.10616996243,6681.2248533996,0.00289104742,0,0,0.00031365538,4.44651052853,10021.8372800994],[0.00350068845,5.36847836211,3340.6124266998,0.0001411603,3.14159265359,0],[0.0001672669,0.60221392419,3340.6124266998]],
 	r: [[1.53033488276,0,0,0.14184953153,3.47971283519,3340.6124266998,0.00660776357,3.81783442097,6681.2248533996,0.00046179117,4.15595316284,10021.8372800994],[0.0110743334,2.0325052495,3340.6124266998,0.00103175886,2.37071845682,6681.2248533996,0.000128772,0,0,0.0001081588,2.70888093803,10021.8372800994],[0.00044242247,0.47930603943,3340.6124266998]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_jup(tj) { return vsop87(vsop87d_jup.coeffs, tj); }
-function vsop87d_jup_xyz(tj) { return vsop87.xyz(vsop87d_jup.coeffs, tj); }
-vsop87d_jup.xyz = vsop87d_jup_xyz; // assign
-vsop87d.jup = vsop87d_jup; // export
-vsop87d_jup.coeffs = {
+vsop87d.jup = VSOP87('jup', 39.5146186826235, {
 	l: [[0.59954691495,0,0,0.09695898711,5.06191793105,529.6909650946,0.00573610145,1.44406205976,7.1135470008,0.0030638918,5.41734729976,1059.3819301892,0.0009717828,4.14264708819,632.7837393132,0.00072903096,3.64042909255,522.5774180938,0.00064263986,3.41145185203,103.0927742186,0.00039806051,2.29376744855,419.4846438752,0.0003885778,1.2723172486,316.3918696566,0.00027964622,1.78454589485,536.8045120954,0.00013589738,5.7748103159,1589.0728952838],[529.93480757497,0,0,0.00489741194,4.22066689928,529.6909650946,0.00228918538,6.02647464016,7.1135470008,0.0002765538,4.57265956824,1059.3819301892,0.00020720943,5.45938936295,522.5774180938,0.00012105732,0.16985765041,536.8045120954],[0.00047233598,4.32148323554,7.1135470008,0.00030629053,2.93021440216,529.6909650946,0.0003896555,0,0]],
 	b: [[0.02268615703,3.55852606718,529.6909650946,0.00109971634,3.90809347389,1059.3819301892,0.00110090358,0,0],[0.00177351787,5.70166488486,529.6909650946]],
 	r: [[5.20887429471,0,0,0.2520932702,3.49108640015,529.6909650946,0.00610599902,3.84115365602,1059.3819301892,0.00282029465,2.57419879933,632.7837393132,0.00187647391,2.07590380082,522.5774180938,0.00086792941,0.71001090609,419.4846438752,0.00072062869,0.21465694745,536.8045120954,0.00065517227,5.97995850843,316.3918696566,0.0002913462,1.6775924371,103.0927742186,0.00030135275,2.16132058449,949.1756089698,0.00023453209,3.54023147303,735.8765135318,0.0002228371,4.19362773546,1589.0728952838,0.0002394734,0.27457854894,7.1135470008,0.000130326,2.96043055741,1162.4747044078,0.00012749004,2.71550102862,1052.2683831884],[0.01271801596,2.64937511122,529.6909650946,0.00061661771,3.00076251018,1059.3819301892,0.00053443592,3.89717644226,522.5774180938,0.00031185167,4.88276663526,536.8045120954,0.00041390257,0,0,0.0001184719,2.41329588176,419.4846438752],[0.00079644833,1.35865896596,529.6909650946]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_sat(tj) { return vsop87(vsop87d_sat.coeffs, tj); }
-function vsop87d_sat_xyz(tj) { return vsop87.xyz(vsop87d_sat.coeffs, tj); }
-vsop87d_sat.xyz = vsop87d_sat_xyz; // assign
-vsop87d.sat = vsop87d_sat; // export
-vsop87d_sat.coeffs = {
+vsop87d.sat = VSOP87('sat', 39.4882123322459, {
 	l: [[0.87401354029,0,0,0.1110765978,3.96205090194,213.299095438,0.01414150958,4.58581515873,7.1135470008,0.00398379386,0.52112025957,206.1855484372,0.00350769223,3.30329903015,426.598190876,0.00206816296,0.24658366938,103.0927742186,0.00079271288,3.8400707853,220.4126424388,0.00023990338,4.6697693486,110.2063212194,0.00016573583,0.43719123541,419.4846438752,0.00014906995,5.76903283845,316.3918696566,0.000158203,0.9380895376,632.7837393132,0.00014609562,1.56518573691,3.9321532631,0.00013160308,4.44891180176,14.2270940016,0.00015053509,2.71670027883,639.897286314,0.00013005305,5.98119067061,11.0457002639,0.00010725066,3.12939596466,202.2533951741],[213.54295595986,0,0,0.01296855005,1.82820544701,213.299095438,0.00564347566,2.88500136429,7.1135470008,0.0009832303,1.08070061328,426.598190876,0.0010767877,2.27769911872,206.1855484372,0.00040254586,2.0412825709,220.4126424388,0.00019941734,1.27954662736,103.0927742186,0.00010511706,2.748803928,14.2270940016],[0.00116441181,1.17987850633,7.1135470008,0.00091920844,0.07425261094,213.299095438,0.00090592251,0,0,0.00015276909,4.06492007503,206.1855484372,0.00010631396,0.25778277414,220.4126424388,0.00010604979,5.40963595885,426.598190876],[0.00016038734,5.73945377424,7.1135470008]],
 	b: [[0.0433067804,3.60284428399,213.299095438,0.00240348303,2.8523848939,426.598190876,0.00084745939,0,0,0.00030863357,3.48441504465,220.4126424388,0.00034116063,0.57297307844,206.1855484372,0.0001473407,2.1184659787,639.897286314],[0.00397554998,5.33289992556,213.299095438,0.00049478641,3.14159265359,0,0.00018571607,6.09919206378,426.598190876,0.00014800587,2.3058606052,206.1855484372],[0.00020629977,0.50482422817,213.299095438]],
 	r: [[9.55758135801,0,0,0.52921382465,2.39226219733,213.299095438,0.01873679934,5.23549605091,206.1855484372,0.01464663959,1.64763045468,426.598190876,0.00821891059,5.93520025371,316.3918696566,0.00547506899,5.01532628454,103.0927742186,0.00371684449,2.27114833428,220.4126424388,0.00361778433,3.13904303264,7.1135470008,0.00140617548,5.70406652991,632.7837393132,0.00108974737,3.29313595577,110.2063212194,0.00069007015,5.94099622447,419.4846438752,0.0006105335,0.94037761156,639.897286314,0.00048913044,1.55733388472,202.2533951741,0.00034143794,0.19518550682,277.0349937414,0.00032401718,5.47084606947,949.1756089698,0.00020936573,0.46349163993,735.8765135318,0.00020839118,1.5210259064,433.7117378768,0.00020746678,5.33255667599,199.0720014364,0.00015298457,3.05943652881,529.6909650946,0.00014296479,2.60433537909,323.5054166574,0.00011993314,5.98051421881,846.0828347512,0.00011380261,1.73105746566,522.5774180938,0.00012884128,1.64892310393,138.5174968707],[0.06182981282,0.25843515034,213.299095438,0.00506577574,0.71114650941,206.1855484372,0.00341394136,5.7963577396,426.598190876,0.00188491375,0.47215719444,220.4126424388,0.0018626154,3.14159265359,0,0.00143891176,1.40744864239,7.1135470008,0.00049621111,6.0174446958,103.0927742186,0.00020928189,5.0924565447,639.897286314,0.00019952612,1.17560125007,419.4846438752,0.00018839639,1.60819563173,110.2063212194,0.00012892827,5.94330258435,433.7117378768,0.00013876565,0.75886204364,199.0720014364],[0.00436902464,4.78671673044,213.299095438,0.0007192276,2.50069994874,206.1855484372,0.00049766792,4.9716815087,220.4126424388,0.00043220894,3.86940443794,426.598190876,0.00029645554,5.96310264282,7.1135470008],[0.00020315005,3.02186626038,213.299095438]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_ura(tj) { return vsop87(vsop87d_ura.coeffs, tj); }
-function vsop87d_ura_xyz(tj) { return vsop87.xyz(vsop87d_ura.coeffs, tj); }
-vsop87d_ura.xyz = vsop87d_ura_xyz; // assign
-vsop87d.ura = vsop87d_ura; // export
-vsop87d_ura.coeffs = {
+vsop87d.ura = VSOP87('ura', 39.4789600424755, {
 	l: [[5.48129294299,0,0,0.09260408252,0.8910642153,74.7815985673,0.01504247826,3.62719262195,1.4844727083,0.00365981718,1.89962189068,73.297125859,0.00272328132,3.35823710524,149.5631971346,0.00070328499,5.39254431993,63.7358983034,0.00068892609,6.09292489045,76.2660712756,0.00061998592,2.26952040469,2.9689454166,0.00061950714,2.85098907565,11.0457002639,0.00026468869,3.14152087888,71.8126531507,0.00025710505,6.11379842935,454.9093665273,0.00021078897,4.36059465144,148.0787244263,0.00017818665,1.74436982544,36.6485629295,0.00014613471,4.73732047977,3.9321532631,0.00011162535,5.82681993692,224.3447957019,0.00010997934,0.48865493179,138.5174968707],[75.02543121646,0,0,0.00154458244,5.24201658072,74.7815985673,0.00024456413,1.71255705309,1.4844727083],[0.00053033277,0,0]],
 	b: [[0.01346277639,2.61877810545,74.7815985673,0.00062341405,5.08111175856,149.5631971346,0.00061601203,3.14159265359,0],[0.00206366162,4.12394311407,74.7815985673]],
 	r: [[19.21264847881,0,0,0.88784984055,5.60377526994,74.7815985673,0.03440835545,0.32836098991,73.297125859,0.02055653495,1.78295170028,149.5631971346,0.00649321851,4.52247298119,76.2660712756,0.00602248144,3.86003820462,63.7358983034,0.00496404171,1.40139934716,454.9093665273,0.00338525522,1.58002682946,138.5174968707,0.00243508222,1.57086595074,71.8126531507,0.00190521915,1.99809364502,1.4844727083,0.00161858251,2.79137863469,148.0787244263,0.00143705902,1.38368574483,11.0457002639,0.00093192359,0.17437193645,36.6485629295,0.00071424265,4.24509327405,224.3447957019,0.00089805842,3.66105366329,109.9456887885,0.00039009624,1.66971128869,70.8494453042,0.00046677322,1.39976563936,35.1640902212,0.00039025681,3.36234710692,277.0349937414,0.0003675516,3.88648934736,146.594251718,0.00030348875,0.70100446346,151.0476698429,0.00029156264,3.18056174556,77.7505439839,0.00020471584,1.555889615,202.2533951741,0.0002562036,5.25656292802,380.12776796,0.00025785805,3.78537741503,85.8272988312,0.00022637152,0.72519137745,529.6909650946,0.00020473163,2.79639811626,70.3281804424,0.00017900561,0.55455488605,2.9689454166,0.00012328151,5.96039150918,127.4717966068,0.00014701566,4.90434406648,108.4612160802,0.00011494701,0.43774027872,65.2203710117,0.00015502809,5.35405037603,38.1330356378,0.00010792699,1.42104858472,213.299095438,0.00011696085,3.29825599114,3.9321532631,0.00011959355,1.75044072173,984.6003316219,0.00012896507,2.62154018241,111.4301614968,0.00011852996,0.99342814582,52.6901980395],[0.0147989637,3.67205705317,74.7815985673,0.00071212085,6.22601006675,63.7358983034,0.00068626972,6.13411265052,149.5631971346,0.00020857262,5.24625494219,11.0457002639,0.00021468152,2.6017670427,76.2660712756,0.00024059649,3.14159265359,0,0.00011405346,0.01848461561,70.8494453042],[0.00022439904,0.6995311876,74.7815985673]]
-}; // assign
+});
 ;
 // generated by vsop87.pl
-function vsop87d_nep(tj) { return vsop87(vsop87d_nep.coeffs, tj); }
-function vsop87d_nep_xyz(tj) { return vsop87.xyz(vsop87d_nep.coeffs, tj); }
-vsop87d_nep.xyz = vsop87d_nep_xyz; // assign
-vsop87d.nep = vsop87d_nep; // export
-vsop87d_nep.coeffs = {
+vsop87d.nep = VSOP87('nep', 39.4786500913706, {
 	l: [[5.31188633047,0,0,0.01798475509,2.9010127305,38.1330356378,0.01019727662,0.4858092366,1.4844727083,0.00124531845,4.83008090682,36.6485629295,0.0004206445,5.41054991607,2.9689454166,0.00037714589,6.09221834946,35.1640902212,0.00033784734,1.24488865578,76.2660712756,0.00016482741,7.729261e-005,491.5579294568],[38.37687716731,0,0,0.00016604187,4.86319129565,1.4844727083,0.00015807148,2.27923488532,38.1330356378],[0.00053892649,0,0]],
 	b: [[0.03088622933,1.44104372626,38.1330356378,0.00027780087,5.91271882843,76.2660712756,0.00027623609,0,0,0.0001535549,2.52123799481,36.6485629295,0.00015448133,3.50877080888,39.6175083461],[0.00227279214,3.8079308987,38.1330356378]],
 	r: [[30.07013206102,0,0,0.2706225949,1.3299945893,38.1330356378,0.01691764281,3.25186138896,36.6485629295,0.00807830737,5.18592836167,1.4844727083,0.00537760613,4.52113902845,35.1640902212,0.00495725642,1.57105654815,491.5579294568,0.0027457197,1.84552256801,175.1660598002,0.00135134095,3.37220607384,39.6175083461,0.00121801825,5.79754444303,76.2660712756,0.00100895397,0.37702748681,73.297125859,0.00069791722,3.79617226928,2.9689454166,0.00046687838,5.74937810094,33.6796175129,0.00024593778,0.50801728204,109.9456887885,0.00016939242,1.59422166991,71.8126531507,0.00014229686,1.07786112902,74.7815985673,0.00012011825,1.92062131635,1021.2488945514],[0.00236338502,0.70498011235,38.1330356378,0.00013220279,3.32015499895,1.4844727083]]
-}; // assign
+});
 ;
 })(vsop87d)
-/* crc: 119442067BAD15C7E9243BB44CBD6866 */
+/* crc: 0CE4C55E277D271E36E5D01121F1F5A5 */
