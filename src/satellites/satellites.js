@@ -1,5 +1,5 @@
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS utility lib for moons
 // https://github.com/mgreter/ephem.js
 // pretty much only inspired by Stellarium
