@@ -8,7 +8,12 @@ Astronomical Calculations (https://github.com/mgreter/astro.js)
 (function(window) {;
 // THREE.js Math "Polyfill"
 
-if (!this.THREE) {
+(function() {
+
+	// exit early
+	if (this.THREE) {
+		return;
+	}
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -3114,7 +3119,7 @@ if (!this.THREE) {
 		Quaternion: Quaternion,
 	};
 
-}
+})()
 ;
 /*############################################################################*/
 // AstroJS Base Math Module (c) 2016 by Marcel Greter
@@ -3203,11 +3208,6 @@ AstroJS.PI = PI;
 AstroJS.TAU = TAU;
 AstroJS.JD2000 = JD2000;
 
-// got these from somewhere?
-// maybe another mass system?
-// var GM_EMB = 3.986004356e14;
-// var GM_SUN = 1.32712440041e20;
-
 // Gravitational parameters for astronomic scale
 // time in days, distance in AU, mass in sun-mass
 // http://astronomy.stackexchange.com/a/7981
@@ -3224,13 +3224,14 @@ var GMJD = AstroJS.GMJD = {
 	sat: 8.4597151856806587398e-08, // sat
 	ura: 1.2920249167819693900e-08, // ura
 	nep: 1.5243589007842762800e-08, // nep
-	plu: 2.1886997654259696800e-12 // plu
+	plu: 2.1886997654259696800e-12, // plu
+	moon: 1.0936508975881017456e-11 // moon
 };
 
 // covert to a different time factor
 // time in julian years, distance in AU
 var GMJY = AstroJS.GMJY = {};
-for (name in GMJD) {
+for (var name in GMJD) {
 	GMJY[name] = GMJD[name];
 	GMJY[name] *= 133407.5625;
 	// => Math.pow(365.25, 2)
@@ -3241,7 +3242,7 @@ for (name in GMJD) {
 // https://www.aanda.org/articles/aa/full_html/2013/09/aa21843-13/T1.html
 /*
 var GMJS = AstroJS.GMJS = {};
-for (name in GMJD) {
+for (var name in GMJD) {
 	GMJS[name] = GMJD[name];
 	GMJS[name] /= 746496e4;
 	// => Math.pow(86400, 2)
@@ -3270,17 +3271,17 @@ AstroJS.TURN =
 		return rad;
 	}
 
-AstroJS.JD2J2K =
+AstroJS.JDtoJY2K =
 	// Julian Days to J2000
-	function JD2J2K(JD)
+	function JDtoJY2K(JD)
 	{
 		// offset epoch and add ratio
 		return (JD - JD2000) / JY2JD;
 	}
 
-AstroJS.J2K2JD =
+AstroJS.JY2KtoJD =
 	// J2000 to Julian Days
-	function J2K2JD(J2K)
+	function JY2KtoJD(J2K)
 	{
 		// add ratio and offset epoch
 		return J2K * JY2JD + JD2000;
@@ -3314,9 +3315,12 @@ Math.fmod = Math.fmod || function (a, b)
 {
 	return a % b;
 }
-// THREE.Vector3 compatible implementation
+// THREEJS compatible implementation
 if (typeof THREE != "undefined") {
-	this.Vector3 = THREE.Vector3;
+	var Vector3 = this.Vector3 = THREE.Vector3;
+	var Matrix3 = this.Matrix3 = THREE.Matrix3;
+	var Matrix4 = this.Matrix4 = THREE.Matrix4;
+	var Quaternion = this.Quaternion = THREE.Quaternion;
 }
 ;
 /*############################################################################*/
@@ -3330,6 +3334,29 @@ if (typeof THREE != "undefined") {
 
 (function (exports)
 {
+
+	// Alias for math functions
+	// Better compressibility
+	// Saves about 0.4kb
+	var abs = Math.abs;
+	var pow = Math.pow;
+	var sin = Math.sin;
+	var cos = Math.cos;
+	var sqrt = Math.sqrt;
+	var cbrt = Math.cbrt;
+	var atan2 = Math.atan2;
+
+	// Ensure valid range
+	function asin(angle) {
+		return Math.asin(Math.min(1,
+			Math.max(-1, angle)));
+	}
+
+	// Ensure valid range
+	function acos(angle) {
+		return Math.acos(Math.min(1,
+			Math.max(-1, angle)));
+	}
 
 	/******************************************************************************/
 	// Orbits can be created from orbital elements (6 independent parameters)
@@ -3350,7 +3377,7 @@ if (typeof THREE != "undefined") {
 	// the units by adjusting the gravitational parameter. We use the solar
 	// gravitational parameter by default with the units: au^3/(solm*day^2).
 	// Normally in physics this parameter is measured in m^3/(kg*s^2). All
-	// distance and time units must therefore be in the same units as `G`.
+	// distance and time units must therefore be in the same units as `GM`.
 	/******************************************************************************/
 	// ToDo: finish and add tests for circular and hyperbola orbits.
 	/******************************************************************************/
@@ -3365,11 +3392,14 @@ if (typeof THREE != "undefined") {
 			return orbit;
 		}
 
+		// Give a warning about passing renamed parameter G
+		if ('G' in arg) console.warn('G has been renamed to GM');
+
 		// the gravitational parameter is very important and must
 		// match all others in terms of the units. In physics the
 		// units are by default m^3/(kg*s^2), but for astronomical
 		// uses we most often want to use au^3/(solm*day^2).
-		orbit._G = arg.G || Orbit.GMP.sun,
+		orbit._GM = arg.GM || arg.G || Orbit.GMP.sun,
 			orbit._t = arg.epoch || arg.t || 0;
 		orbit.translate = arg.translate || null;
 
@@ -3406,6 +3436,10 @@ if (typeof THREE != "undefined") {
 			}
 		}
 
+		// precession periods
+		orbit._PW = arg.PW || 0;
+		orbit._PO = arg.PO || 0;
+
 		// orbit may has name
 		if ('name' in arg) {
 			orbit.name = arg.name;
@@ -3432,9 +3466,12 @@ if (typeof THREE != "undefined") {
 	/******************************************************************************/
 
 	// copy existing orbit and return clone
-	Klass.clone = function clone(dt)
+	Klass.clone = function clone(jy2k)
 	{
 		var orbit = this;
+		var epoch = orbit._t || 0;
+		var dt = jy2k == null ?
+			0 :  jy2k - epoch;
 		// create an empty object (internal use)
 		var clone = new Orbit({ empty: true });
 		// avoid unnecessary cloning of objects
@@ -3449,7 +3486,7 @@ if (typeof THREE != "undefined") {
 			}
 		}
 		// optionally call update
-		if (dt) clone.update(dt);
+		if (dt) clone._update(jy2k);
 		// return copy
 		return clone;
 	}
@@ -3473,6 +3510,7 @@ if (typeof THREE != "undefined") {
 		if (!('_L' in orbit)) throw ('Orbit is missing mean longitude (L)');
 		if (!('_O' in orbit)) throw ('Orbit is missing right ascending node (O)');
 		if (!('_T' in orbit)) throw ('Orbit is missing time of periapsis (w)');
+		if (!('_t' in orbit)) throw ('Orbit is missing time of reference epoch (t)');
 		if (!('_w' in orbit)) throw ('Orbit is missing argument of periapsis (w)');
 		if (!('_W' in orbit)) throw ('Orbit is missing longitude of the periapsis (W)');
 		if (!('_n' in orbit)) throw ('Orbit is missing mean motion (n)');
@@ -3523,25 +3561,25 @@ if (typeof THREE != "undefined") {
 		if ('_r' in orbit && '_v' in orbit) {
 
 			var r = orbit._r, v = orbit._v,
-				G = orbit._G, rl = r.length();
+				GM = orbit._GM, rl = r.length();
 
 			// specific relative angular momentum
 			orbit._A3 = r.clone().cross(v);
 			orbit._A2 = orbit._A3.lengthSq();
-			orbit._A = Math.sqrt(orbit._A2);
+			orbit._A = sqrt(orbit._A2);
 			// calculate radial velocity
 			orbit._B = r.dot(v) / rl;
 
 			// calculate eccentricity vector
-			var e3 = orbit._e3 = r.clone().multiplyScalar(v.lengthSq() - (G / rl))
-				.sub(v.clone().multiplyScalar(rl * orbit._B)).multiplyScalar(1 / G);
+			var e3 = orbit._e3 = r.clone().multiplyScalar(v.lengthSq() - (GM / rl))
+				.sub(v.clone().multiplyScalar(rl * orbit._B)).multiplyScalar(1 / GM);
 			// get eccentricity value from vector
-			var e2 = e3.lengthSq(), e = orbit._e = Math.sqrt(e2);
+			var e2 = e3.lengthSq(), e = orbit._e = sqrt(e2);
 			// get inclination (i) via orbital momentum vector
-			orbit._i = Math.acos(orbit._A3.z / orbit._A);
+			orbit._i = acos(orbit._A3.z / orbit._A);
 
 			// calculate semilatus rectum (ℓ)
-			orbit._l = orbit._A2 / G;
+			orbit._l = orbit._A2 / GM;
 			// and periapsis (c) and apoapsis (C)
 			orbit._c = orbit._l / (1 + e);
 			orbit._C = orbit._l / (1 - e);
@@ -3551,17 +3589,17 @@ if (typeof THREE != "undefined") {
 			// pre-calculate node line
 			var nx = - orbit._A3.y,
 				ny = + orbit._A3.x;
-			var nl = Math.sqrt(nx * nx + ny * ny);
+			var nl = sqrt(nx * nx + ny * ny);
 
 			// calculate ascending node (O)
-			var omega = nl == 0 ? 0 : Math.acos(nx / nl);
+			var omega = nl == 0 ? 0 : acos(nx / nl);
 			orbit._O = ny < 0 ? (TAU - omega) : omega;
 
 			// calculate argument of periapsis (ω)
 			var nedot = nx * e3.x +
 				ny * e3.y;
 			if (nl === 0 || e === 0) { orbit._w = 0; }
-			else { orbit._w = Math.acos(nedot / nl / e); }
+			else { orbit._w = acos(nedot / nl / e); }
 			if (e3.z < 0) { orbit._w *= -1; }
 
 			// calculate true anomaly
@@ -3570,31 +3608,46 @@ if (typeof THREE != "undefined") {
 			// and without inclination
 			if (e === 0 && nl === 0) {
 				// orbit needs a test case
-				u = Math.acos(r.x / rl);
+				u = acos(r.x / rl);
 			}
 			// circular orbit
 			// with inclination
 			else if (e === 0) {
 				// orbit needs a test case
 				var nrdot = nx * r.x + ny * r.y;
-				u = Math.acos(nrdot / (nl * rl));
+				u = acos(nrdot / (nl * rl));
 			}
 			// elliptic orbit
 			else {
 				var redot = e3.x * r.x + e3.y * r.y + e3.z * r.z;
-				u = Math.acos(redot / e / rl);
+				u = acos(redot / e / rl);
 			}
 			// bring into correct range via simple check
 			var m = orbit._m = orbit._B < 0 ? (TAU - u) : u;
 
-			// calculate eccentric anomaly
-			var E = orbit._E = CYCLE(Math.atan2(
-				Math.sqrt(1 - e * e) * Math.sin(m),
-				e + Math.cos(m)
-			));
+			// for elliptic orbits
+			if (e < 1) {
+				// calculate eccentric anomaly
+				var E = orbit._E = CYCLE(atan2(
+					sqrt(1 - e * e) * sin(m),
+					e + cos(m)
+				));
+				// calculate mean anomaly
+				orbit._M = E - e * sin(E);
+			}
+			// for hyperbolic orbits
+			else if (e > 1) {
+				// calculate eccentric anomaly
+				var E = orbit._E = CYCLE(atan2(
+					sqrt(1 - e * e) * sin(m),
+					e + cos(m)
+				));
+				// calculate mean anomaly
+				orbit._M = E - e * sin(E);
+			}
 
 			// calculate mean anomaly
-			orbit._M = E - e * Math.sin(E);
+			orbit._M = E - e * sin(E);
 
 		}
 		// EO state vectors
@@ -3610,9 +3663,9 @@ if (typeof THREE != "undefined") {
 		// h = e*sin(W) [rad]
 		if ('_k' in orbit && '_h' in orbit) {
 			// periapsis longitude directly from p and q
-			orbit._W = Math.atan2(orbit._h, orbit._k);
-			// orbit._e = orbit._k / Math.cos(orbit._W);
-			orbit._e = orbit._h / Math.sin(orbit._W);
+			orbit._W = atan2(orbit._h, orbit._k);
+			// orbit._e = orbit._k / cos(orbit._W);
+			orbit._e = orbit._h / sin(orbit._W);
 		}
 
 		// VSOP arguments (q/p -> O/i)
@@ -3621,14 +3674,14 @@ if (typeof THREE != "undefined") {
 		// p = sin(i/2)*sin(O) [rad]
 		if ('_q' in orbit && '_p' in orbit) {
 			// ascending node directly from p and q
-			orbit._O = Math.atan2(orbit._p, orbit._q);
+			orbit._O = atan2(orbit._p, orbit._q);
 			// values for inclination
 			var d = orbit._p - orbit._q,
 				// using the faster but equivalent form for
-				// dt = Math.sin(orbit._O) - Math.cos(orbit._O);
-				dt = - Math.sqrt(2) * Math.sin(PI / 4 - orbit._O);
+				// dt = sin(orbit._O) - cos(orbit._O);
+				dt = - sqrt(2) * sin(PI / 4 - orbit._O);
 			// now calculate inclination
-			orbit._i = 2 * Math.asin(d / dt);
+			orbit._i = 2 * asin(d / dt);
 		}
 
 		/********************************************************/
@@ -3638,12 +3691,12 @@ if (typeof THREE != "undefined") {
 
 		if ('_n' in orbit && !('_a' in orbit)) {
 			// mean motion is translated directly to size via
-			orbit._a = Math.cbrt(orbit._G / orbit._n / orbit._n);
+			orbit._a = cbrt(orbit._GM / orbit._n / orbit._n);
 		}
 		if ('_P' in orbit && !('_a' in orbit)) {
-			// period is translated directly to size via G
+			// period is translated directly to size via GM
 			var PTAU = orbit._P / TAU; // reuse for square
-			orbit._a = Math.cbrt(orbit._G * PTAU * PTAU);
+			orbit._a = cbrt(orbit._GM * PTAU * PTAU);
 		}
 
 		/********************************************************/
@@ -3676,38 +3729,38 @@ if (typeof THREE != "undefined") {
 			var e2term = 1 - orbit._e * orbit._e;
 			if ('_a' in orbit) {
 				orbit._l = orbit._a * e2term;
-				orbit._b = Math.sqrt(orbit._a * orbit._l);
+				orbit._b = sqrt(orbit._a * orbit._l);
 			}
 			else if ('_b' in orbit) {
-				orbit._a = orbit._b / Math.sqrt(e2term);
+				orbit._a = orbit._b / sqrt(e2term);
 				orbit._l = orbit._a * e2term;
 			}
 			else if ('_l' in orbit) {
 				orbit._a = orbit._l / e2term;
-				orbit._b = Math.sqrt(orbit._a * orbit._l);
+				orbit._b = sqrt(orbit._a * orbit._l);
 			}
 		}
 		// 2 valid options with a
 		else if ('_a' in orbit) {
 			if ('_b' in orbit) {
 				orbit._l = orbit._b * orbit._b / orbit._a;
-				orbit._e = Math.sqrt(1 - orbit._l / orbit._a);
+				orbit._e = sqrt(1 - orbit._l / orbit._a);
 			}
 			else if ('_l' in orbit) {
-				orbit._e = Math.sqrt(1 - orbit._l / orbit._a);
-				orbit._b = Math.sqrt(orbit._a * orbit._l);
+				orbit._e = sqrt(1 - orbit._l / orbit._a);
+				orbit._b = sqrt(orbit._a * orbit._l);
 			}
 		}
 		// only one valid options left
 		else if ('_b' in orbit && '_l' in orbit) {
 			orbit.a = orbit._b * orbit._b / orbit._l;
-			orbit._e = Math.sqrt(1 - orbit._l / orbit._a);
+			orbit._e = sqrt(1 - orbit._l / orbit._a);
 		}
 
 		// calculate orbital period (P)
 		if ('_a' in orbit && !('_P' in orbit)) {
 			// calculate dependants via gravitational parameter
-			orbit._P = (TAU / Math.sqrt(orbit._G)) * Math.pow(orbit._a, 1.5);
+			orbit._P = (TAU / sqrt(orbit._GM)) * pow(orbit._a, 1.5);
 		}
 		// calculate mean motion (n)
 		if ('_P' in orbit && !('_n' in orbit)) {
@@ -3827,10 +3880,13 @@ if (typeof THREE != "undefined") {
 	// ("anomalies") that define a position along an orbit, the other two
 	// being the true anomaly (m) and the mean anomaly (M).
 	/******************************************************************************/
-	Klass.E = function eccentricAnomaly(dt)
+	Klass.E = function eccentricAnomaly(jy2k)
 	{
 
 		var orbit = this;
+		var epoch = orbit._t || 0;
+		var dt = jy2k == null ?
+			0 :  jy2k - epoch;
 
 		// return cached
 		if ('_E' in orbit && !dt) {
@@ -3845,9 +3901,9 @@ if (typeof THREE != "undefined") {
 		// from true anomaly (m)
 		// much easier calculation
 		if (!dt && e != null && m != null) {
-			return orbit._E = CYCLE(Math.atan2(
-				Math.sqrt(1 - e * e) * Math.sin(m),
-				e + Math.cos(m)
+			return orbit._E = CYCLE(atan2(
+				sqrt(1 - e * e) * sin(m),
+				e + cos(m)
 			));
 		}
 
@@ -3856,16 +3912,19 @@ if (typeof THREE != "undefined") {
 		// more expensive solver loop
 		if (e != null && M != null) {
 			// advance mean anomaly for new time offset
-			if (dt) M = CYCLE(orbit._n * (dt - orbit._T - orbit._t));
+			if (dt) M += CYCLE(orbit._n * dt);
+			// NOTE: not sure why line below needs the if
+			// TODO: find a unit test to exhibit edge case
+			// if (!dt) M = CYCLE(orbit._n * (- orbit._T));
 			// prepare for solution solver
-			var E = e < 0.8 ? M : PI, F;
-			var F = E - e * Math.sin(M) - M;
+			var E = e < 0.8 ? M : PI;
+			// var F = E - e * sin(M) - M;
 			// Newton-Raphson method to solve
 			// f(E) = M - E + e * sin(E) = 0
 			var f, dfdE, dE = 1;
-			for (var it = 0; Math.abs(dE) > EPSILON && it < MAXLOOP; ++it) {
-				f = M - E + e * Math.sin(E);
-				dfdE = e * Math.cos(E) - 1.0;
+			for (var it = 0; abs(dE) > EPSILON && it < MAXLOOP; ++it) {
+				f = M - E + e * sin(E);
+				dfdE = e * cos(E) - 1.0;
 				dE = f / dfdE;
 				E -= dE; // next iteration
 			}
@@ -3902,16 +3961,16 @@ if (typeof THREE != "undefined") {
 			// most expensive step
 			var hE = orbit.E() / 2;
 			// calculate the true anomaly
-			return orbit._m = CYCLE(2 * Math.atan2(
-				Math.sqrt(1 + orbit._e) * Math.sin(hE),
-				Math.sqrt(1 - orbit._e) * Math.cos(hE)
+			return orbit._m = CYCLE(2 * atan2(
+				sqrt(1 + orbit._e) * sin(hE),
+				sqrt(1 - orbit._e) * cos(hE)
 			));
 		}
 		else {
 			// calculate the true anomaly
-			return CYCLE(2 * Math.atan2(
-				Math.sqrt(1 + orbit._e) * Math.sin(E / 2),
-				Math.sqrt(1 - orbit._e) * Math.cos(E / 2)
+			return CYCLE(2 * atan2(
+				sqrt(1 + orbit._e) * sin(E / 2),
+				sqrt(1 - orbit._e) * cos(E / 2)
 			));
 		}
 	}
@@ -3962,10 +4021,10 @@ if (typeof THREE != "undefined") {
 		var r = orbit.r(), v = orbit.v();
 		if (r !== null && v !== null) {
 			return orbit._e3 = r.clone().multiplyScalar(
-				v.lengthSq() - (orbit._G / r.length())
+				v.lengthSq() - (orbit._GM / r.length())
 			).sub(
 				v.clone().multiplyScalar(r.length() * orbit.B())
-				).multiplyScalar(1 / orbit._G);
+				).multiplyScalar(1 / orbit._GM);
 		}
 	}
 
@@ -4082,6 +4141,39 @@ if (typeof THREE != "undefined") {
 	// astronomical object, which is calculated with respect to the stars.
 	Klass.P = function orbitalPeriod() { return this._P; }
 
+	// In celestial mechanics, the standard gravitational parameter μ of a
+	// celestial body is the product of the gravitational constant G and
+	// the mass M of the body. For several objects in the Solar System,
+	// the value of μ is known to greater accuracy than either G or M.
+	// The SI units of the standard gravitational parameter are m3 s−2.
+	// However, units of km3 s−2 are frequently used in the scientific
+	// literature and in spacecraft navigation. AstroJS normally will
+	// use units of AU3 and julian days or years (e.g. AstroJS.GMJY).
+	Klass.GM = function gravitationalParameter() { return this._GM; }
+
+	// In celestial mechanics, apsidal precession (or apsidal advance) is the
+	// precession (gradual rotation) of the line connecting the apsides (line
+	// of apsides) of an astronomical body's orbit. The apsides are the orbital
+	// points closest (periapsis) and farthest (apoapsis) from its primary body.
+	// The apsidal precession is the first time derivative of the argument of
+	// periapsis, one of the six main orbital elements of an orbit. Apsidal
+	// precession is considered positive when the orbit's axis rotates in the
+	// same direction as the orbital motion. An apsidal period is the time
+	// interval required for an orbit to precess through 360°.
+	Klass.PW = function apsidalPrecession() { return this._PW; }
+
+	// Nodal precession is the precession of the orbital plane of a satellite
+	// around the rotational axis of an astronomical body such as Earth. This
+	// precession is due to the non-spherical nature of a rotating body, which
+	// creates a non-uniform gravitational field. The direction of precession
+	// is opposite the direction of revolution. 
+	Klass.PO = function nodalPrecession() { return this._PO; }
+
+	// In chronology and periodization, an epoch or reference epoch is an
+	// instant in time chosen as the origin of a particular calendar era.
+	// The "epoch" serves as a reference point from which time is measured. 
+	Klass.epoch = function epoch() { return this._t; }
+
 	/*############################################################################*/
 	// convert to vsop parameters (never seen them anywhere else)
 	// those are calculated on demand, so you need to call me first
@@ -4094,8 +4186,8 @@ if (typeof THREE != "undefined") {
 		// return cached calculation
 		if ('_q' in orbit) return orbit._q;
 		// calculation given in vsop87 example.f
-		return orbit._q = Math.cos(orbit._O)
-			* Math.sin(orbit._i / 2);
+		return orbit._q = cos(orbit._O)
+			* sin(orbit._i / 2);
 	};
 
 	// p: sin(i/2)*sin(O) (vsop)
@@ -4105,8 +4197,8 @@ if (typeof THREE != "undefined") {
 		// return cached calculation
 		if ('_p' in orbit) return orbit._p;
 		// calculation given in vsop87 example.f
-		return orbit._p = Math.sin(orbit._O)
-			* Math.sin(orbit._i / 2);
+		return orbit._p = sin(orbit._O)
+			* sin(orbit._i / 2);
 	};
 
 	// k: e*cos(W) (vsop)
@@ -4116,7 +4208,7 @@ if (typeof THREE != "undefined") {
 		// return cached calculation
 		if ('_k' in orbit) return orbit._k;
 		// calculation given in vsop87 example.f
-		return orbit._k = orbit._e * Math.cos(orbit._W);
+		return orbit._k = orbit._e * cos(orbit._W);
 	};
 
 	// h: e*sin(W) (vsop)
@@ -4126,7 +4218,7 @@ if (typeof THREE != "undefined") {
 		// return cached calculation
 		if ('_h' in orbit) return orbit._h;
 		// calculation given in vsop87 example.f
-		return orbit._h = orbit._e * Math.sin(orbit._W);
+		return orbit._h = orbit._e * sin(orbit._W);
 	};
 
 	/*############################################################################*/
@@ -4137,15 +4229,26 @@ if (typeof THREE != "undefined") {
 	// update orbital state for new epoch
 	// advance position and reset some states
 	// for dt = P, mean anomaly does not change
-	Klass.update = function update(dt)
+	// Note: could just get state at jy2k and
+	// convert the result back to an orbit.
+	Klass._update = function update(jy2k)
 	{
 		var orbit = this;
+		var epoch = orbit._t || 0;
+		var dt = jy2k == null ?
+			0 :  jy2k - epoch;
 		// check if elements are already resolved
 		if (!orbit.elements) orbit.resolveElements(true);
 		// advance mean anomaly for new time
 		orbit._M = CYCLE(orbit._n * (dt - orbit._T));
 		// adjust mean longitude for new time
 		orbit._L = CYCLE(orbit._M + orbit._W);
+		// Argument of periapsis precession
+		if (orbit._PW) orbit._w = dt / orbit._PW * TAU;
+		// Longitude of the ascending node precession
+		if (orbit._PO) orbit._O += dt / orbit._PO * TAU;
+		// update to new epoch
+		orbit._t = dt + epoch;
 		// reset dependent parameters
 		delete orbit._E; delete orbit._m;
 		// invalidate state vectors
@@ -4156,8 +4259,11 @@ if (typeof THREE != "undefined") {
 
 	/*
 	// orbital elements to spherical position (lon/lat/r)
-	Klass.sph = function spherical (dt)
+	Klass.sph = function spherical (jy2k)
 	{
+		var epoch = this._t || 0;
+		var dt = jy2k == null ?
+			0 :  jy2k - epoch;
 		// check if elements are already resolved
 		if (!this.elements) this.resolveElements(true);
 		dt = dt || 0; // time offset
@@ -4165,47 +4271,64 @@ if (typeof THREE != "undefined") {
 	*/
 
 	// orbital elements to rectangular position (x/y/z)
-	Klass.state = function state(dt)
+	Klass.state = function state(jy2k)
 	{
 
 		var orbit = this, mat;
+		var epoch = orbit._t || 0;
+		var dt = jy2k == null ?
+			0 :  jy2k - epoch;
 
 		// check if elements are already resolved
 		if (!orbit.elements) orbit.resolveElements(true);
 
-		dt = dt || 0; // time offset
 		// return cached result for our epoch
 		// ToDo: also cache last epoch offsets?
 		if (!dt && '_r' in orbit && '_v' in orbit)
-		{ return { r: orbit._r, v: orbit._v, time: dt, orbit: orbit }; }
+		{
+			// state result
+			return {
+				r: orbit._r,
+				v: orbit._v,
+				epoch: epoch,
+				orbit: orbit,
+				GM: orbit._GM
+			};
+		}
 
 		var e = orbit._e, a = orbit._a, i = orbit._i,
 			O = orbit._O, w = orbit._w, M = orbit._M,
-			E = orbit.E(dt), // eccentric anomaly
+			E = orbit.E(jy2k), // eccentric anomaly
 			m = orbit.m(E); // true anomaly
 
+		// Argument of periapsis precession
+		if (orbit._PW) w += dt / orbit._PW * TAU;
+		// Longitude of the ascending node precession
+		if (orbit._PO) O += dt / orbit._PO * TAU;
+
 		// Distance to true anomaly position
-		var r = a * (1.0 - e * Math.cos(E));
-		var vf = Math.sqrt(orbit._G * a) / r;
+		var r = a * (1.0 - e * cos(E));
+		var vf = sqrt(orbit._GM * a) / r;
 
 		// Perifocal reference plane
-		var rx = r * Math.cos(m),
-			ry = r * Math.sin(m),
-			vx = vf * - Math.sin(E),
-			vy = vf * Math.sqrt(1.0 - e * e) * Math.cos(E);
+		var rx = r * cos(m),
+			ry = r * sin(m),
+			vx = vf * - sin(E),
+			vy = vf * sqrt(1.0 - e * e) * cos(E);
 
 		// Pre-calculate elements for rotation matrix
-		var sinO = Math.sin(O), cosO = Math.cos(O),
-			sinI = Math.sin(i), cosI = Math.cos(i),
-			sinW = Math.sin(w), cosW = Math.cos(w),
+		var sinO = sin(O), cosO = cos(O),
+			sinI = sin(i), cosI = cos(i),
+			sinW = sin(w), cosW = cos(w),
 			sinWcosO = sinW * cosO, sinWsinO = sinW * sinO,
 			cosWcosO = cosW * cosO, cosWsinO = cosW * sinO,
-			FxX = (cosW * cosO - sinW * sinO * cosI),
-			FyX = (cosW * sinO + sinW * cosO * cosI),
-			FxY = (cosW * sinO * cosI + sinW * cosO),
-			FyY = (cosW * cosO * cosI - sinW * sinO),
-			FzX = (sinW * sinI),
-			FzY = (cosW * sinI);
+			sinWcosI = sinW * cosI,
+			FxX = cosWcosO - sinWcosI * sinO,
+			FyX = cosWsinO + sinWcosI * cosO,
+			FxY = cosWsinO * cosI + sinWcosO,
+			FyY = cosWcosO * cosI - sinWsinO,
+			FzX = sinW * sinI,
+			FzY = cosW * sinI;
 
 		// Equatorial position
 		var r = new Vector3(
@@ -4224,7 +4347,13 @@ if (typeof THREE != "undefined") {
 		// return result object with reference
 		// ToDo: maybe add position object
 		// To calculate ra/dec and more stuff
-		return { r: r, v: v, time: dt, orbit: orbit };
+		return {
+			r: r,
+			v: v,
+			epoch: epoch,
+			orbit: orbit,
+			GM: orbit._GM
+		};
 
 	}
 	// EO state
@@ -4234,21 +4363,21 @@ if (typeof THREE != "undefined") {
 	/*############################################################################*/
 
 	// r: position state vector
-	Klass.r = function position3(dt)
+	Klass.r = function position3(jy2k)
 	{
 		// calculate at epoch time
 		// state will cache results
-		var state = this.state(dt);
+		var state = this.state(jy2k);
 		// return vector
 		return state.r;
 	}
 
 	// v: velocity state vector
-	Klass.v = function velocity3(dt)
+	Klass.v = function velocity3(jy2k)
 	{
 		// calculate at epoch time
 		// state will cache results
-		var state = this.state(dt);
+		var state = this.state(jy2k);
 		// return vector
 		return state.v;
 	}
@@ -4267,12 +4396,18 @@ if (typeof THREE != "undefined") {
 	Klass.meanLongitude = Klass.L;
 	Klass.ascendingNode = Klass.O;
 	Klass.argOfPericenter = Klass.w;
+	Klass.argOfPeriapsis = Klass.w;
 	Klass.timeOfPericenter = Klass.T;
 	Klass.longitudeOfPericenter = Klass.W;
 	Klass.meanMotion = Klass.n;
 	Klass.meanAnomaly = Klass.M;
 	Klass.orbitalPeriod = Klass.P;
 	Klass.angularMomentum = Klass.A;
+	Klass.gravitationalParameter = Klass.GM;
+
+	// first time derivates (precession periods)
+	Klass.apsidalPrecession = Klass.PW;
+	Klass.nodalPrecession = Klass.PO;
 
 	// additional orbital elements only on demand
 	// these must not be used as orbital input arguments
@@ -4428,10 +4563,10 @@ if (typeof THREE != "undefined") {
 		// c_JD = JD;
 
 		// get julian ephemeris day
-		var JDE = JD2JDE(JD);
+		var JDE = JD2toJDE(JD);
 
 		// calc T and dependants
-		var T = JD2J2K(JDE) / 100,
+		var T = JDtoJY2K(JDE) / 100,
 		    T2 = T * T, T3 = T2 * T;
 
 		// calculate D,M,M',F and Omega (convert to radians)
@@ -4578,14 +4713,14 @@ if (typeof THREE != "undefined") {
 	}
 
 	// Calculates the Julian Ephemeris Day(JDE)
-	function JD2JDE(JD)
+	function JDtoJDE(JD)
 	{
 		// from the given Julian Day (JD)
 		return JD + getDynamicalTimeDiff(JD) / JD2SEC;
 	}
 
 	// Calculates the Julian Day(JDE)
-	function JDE2JD(JDE)
+	function JDEtoJD(JDE)
 	{
 		// from the given Julian Ephemeris Day (JD)
 		return JDE - getDynamicalTimeDiff(JDE) / JD2SEC;
@@ -4606,7 +4741,7 @@ if (typeof THREE != "undefined") {
 	// returns rad (you want HMS?)
 	function getMeanSiderealTime(JD)
 	{
-		var T = JD2J2K(JD) / 100;
+		var T = JDtoJY2K(JD) / 100;
 		// calculate mean angle (in radians)
 		var sidereal = FST1 + FST2 *(JD - 2451545.0)
 			           + FST3 * T * T + FST4 * T * T * T;
@@ -4632,8 +4767,8 @@ if (typeof THREE != "undefined") {
 	/*############################################################################*/
 
 	// date converter
-	exports.JD2JDE = JD2JDE;
-	exports.JDE2JD = JDE2JD;
+	exports.JDtoJDE = JDtoJDE;
+	exports.JDEtoJD = JDEtoJD;
 
 	// sidereal time calculations
 	exports.getMeanSiderealTime = getMeanSiderealTime;
@@ -4938,4 +5073,4 @@ if (typeof THREE != "undefined") {
 })(this);
 ;
 }).call(this, this)
-/* crc: 06E39DED288C1CB3FD25EAE7E4949CDD */
+/* crc: 261C6A7AD7438A8E387F065EFDEDD7F2 */
