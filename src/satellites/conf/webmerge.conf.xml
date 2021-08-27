@@ -25,13 +25,13 @@
 
 		<js id="satellites">
 
-			<prepend>(function(exports) {</prepend>
+			<prepend>(function() {</prepend>
 			<prepend path="satellites.js" />
 			<input path="martians/src/martians.sat.js" />
 			<input path="jovians/src/jovians.l1.js" />
 			<input path="saturnians/src/saturnians.tass17.js" />
 			<input path="uranians/src/uranians.gust86.js" />
-			<append>}).call(this, this)</append>
+			<append>}).call(this)</append>
 
 			<!-- where to store the resulting files -->
 			<output path="dist/src/satellites.js" target="join" />

@@ -25,6 +25,8 @@
 
 		<js id="vsop87">
 
+			<prepend>var vsop87 = {}</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop87.js" />
 			<prepend>(function(vsop87) {</prepend>
 			<input path="src/vsop87_mer.js" />
@@ -46,6 +48,7 @@
 		<js id="vsop87a">
 
 			<prepend>var vsop87a = {}</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop87.js" />
 			<prepend>(function(vsop87a) {</prepend>
 			<input path="src/vsop87a_mer.js" />
@@ -68,6 +71,7 @@
 		<js id="vsop87b">
 
 			<prepend>var vsop87b = {}</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop87.js" />
 			<prepend>(function(vsop87b) {</prepend>
 			<input path="src/vsop87b_mer.js" />
@@ -89,6 +93,7 @@
 		<js id="vsop87c">
 
 			<prepend>var vsop87c = {}</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop87.js" />
 			<prepend>(function(vsop87c) {</prepend>
 			<input path="src/vsop87c_mer.js" />
@@ -110,6 +115,7 @@
 		<js id="vsop87d">
 
 			<prepend>var vsop87d = {}</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop87.js" />
 			<prepend>(function(vsop87d) {</prepend>
 			<input path="src/vsop87d_mer.js" />
@@ -131,6 +137,7 @@
 		<js id="vsop87e">
 
 			<prepend>var vsop87e = {}</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop87.js" />
 			<prepend>(function(vsop87e) {</prepend>
 			<input path="src/vsop87e_sun.js" />

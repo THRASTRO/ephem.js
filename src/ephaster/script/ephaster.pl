@@ -1,5 +1,5 @@
 ################################################################################
-# AstroJS VSOP2013 converter script (c) 2016 by Marcel Greter
+# AstroJS ephaster converter script (c) 2016 by Marcel Greter
 ################################################################################
 # Very quick and dirty perl script to get the job done.
 ################################################################################
@@ -122,7 +122,7 @@ sub gen_ephaster {
 
 // create function for body
 ephaster.${id} = function (jd) {
-	return ephaster(ephaster.${id}, jd);
+	return ephaster(ephaster.${id}.coeffs, jd);
 };
 
 // assign the coefficients

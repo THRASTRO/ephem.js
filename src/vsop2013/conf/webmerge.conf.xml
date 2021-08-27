@@ -25,8 +25,9 @@
 
 		<js id="vsop2013">
 
-			<prepend>(function(exports) {</prepend>
-			<prepend>exports.vsop2013 = {};</prepend>
+			<prepend>var vsop2013 = {}</prepend>
+			<prepend>(function(vsop2013) {</prepend>
+			<prepend path="../../../vsop.js" />
 			<prepend path="../../../vsop2k.js" />
 			<input path="src/vsop2013_mer.js" />
 			<input path="src/vsop2013_ven.js" />
@@ -37,7 +38,7 @@
 			<input path="src/vsop2013_ura.js" />
 			<input path="src/vsop2013_nep.js" />
 			<input path="src/vsop2013_plu.js" />
-			<append>})(this)</append>
+			<append>})(vsop2013)</append>
 
 			<!-- where to store the resulting files -->
 			<output path="dist/src/vsop2013.js" target="join" />

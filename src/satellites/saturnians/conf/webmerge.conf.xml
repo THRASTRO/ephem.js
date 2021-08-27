@@ -25,10 +25,11 @@
 
 		<js id="saturnians.tass17">
 
-			<prepend>(function(window) {</prepend>
+			<prepend>(function() {</prepend>
+			<input path="../../vsop.js" />
 			<input path="../satellites.js" />
 			<input path="src/saturnians.tass17.js" />
-			<append>}).call(this, this)</append>
+			<append>}).call(this)</append>
 
 			<!-- where to store the resulting files -->
 			<output path="dist/src/saturnians.tass17.js" target="join" />
