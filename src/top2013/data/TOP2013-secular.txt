@@ -1,0 +1,631 @@
+
+    -----------------------------------------------------
+    MEAN ELEMENTS OF THE PLANETS IN THE SOLUTIONS TOP2013
+    -----------------------------------------------------
+
+    Mean Elements are the secular terms of the series TOP2013
+    for the 6 elliptic:
+    
+    a       =  semi-major axis (astronomical unit), 
+    lambda  =  mean longitude (radian), 
+    k       =  e.cos(pi), 
+    h       =  e.sin(pi), 
+    q       =  sin(i/2).cos(omega), 
+    p       =  sin(i/2).sin(omega),
+    
+    with:
+    
+    e       =  eccentricity,
+    pi      =  perihelion longitude (radian),
+    i       =  inclination (radian),
+    omega   =  ascending node longitude (radian).
+    
+    T = TDB measured in thousands of Julian years from J2000 (JD 2451545.0).
+    
+    The secular terms of the set < a, lambda, k, h, p > are directly extracted 
+    from the series TOP2013. 
+    
+    The secular terms of the set < e, pi, i, omega > are deduced from the complete 
+    series TOP2013 and not from the mean elements of < a, lambda, k, h, p > 
+    (that would give inacurate results). 
+
+    -------
+    JUPITER
+    ------- 
+ 
+    0.5202603202515885D+01  ! T**00    JUPITER     a      : semi-major axis    
+    0.1911523347694301D-05  ! T**01    JUPITER     a      : semi-major axis    
+   -0.3880601335666185D-08  ! T**02    JUPITER     a      : semi-major axis    
+   -0.5988810000000000D-08  ! T**03    JUPITER     a      : semi-major axis    
+   -0.9691840000000002D-09  ! T**04    JUPITER     a      : semi-major axis    
+    0.6510419999999999D-10  ! T**05    JUPITER     a      : semi-major axis    
+    0.9768040000000000D-11  ! T**06    JUPITER     a      : semi-major axis    
+   -0.6990055395448001D-12  ! T**07    JUPITER     a      : semi-major axis    
+   -0.4332959600000000D-13  ! T**08    JUPITER     a      : semi-major axis    
+    0.3810574879415000D-14  ! T**09    JUPITER     a      : semi-major axis    
+    0.2768401776346000D-15  ! T**10    JUPITER     a      : semi-major axis    
+   -0.1375084242740000D-16  ! T**11    JUPITER     a      : semi-major axis    
+   -0.4548306503025000D-17  ! T**12    JUPITER     a      : semi-major axis    
+ 
+    0.5995446519720418D+00  ! T**00    JUPITER     lambda : mean longitude     
+    0.5296909622785881D+03  ! T**01    JUPITER     lambda : mean longitude     
+   -0.1482677724174409D-03  ! T**02    JUPITER     lambda : mean longitude     
+    0.2919534239355930D-06  ! T**03    JUPITER     lambda : mean longitude     
+    0.2276600460218782D-06  ! T**04    JUPITER     lambda : mean longitude     
+    0.2874722846108151D-07  ! T**05    JUPITER     lambda : mean longitude     
+   -0.1625059394599241D-08  ! T**06    JUPITER     lambda : mean longitude     
+   -0.2908383555851534D-09  ! T**07    JUPITER     lambda : mean longitude     
+    0.1036146684893339D-10  ! T**08    JUPITER     lambda : mean longitude     
+    0.3158933218941332D-11  ! T**09    JUPITER     lambda : mean longitude     
+   -0.5751454764370041D-13  ! T**10    JUPITER     lambda : mean longitude     
+   -0.3812146376536407D-14  ! T**11    JUPITER     lambda : mean longitude     
+    0.1744729941564573D-15  ! T**12    JUPITER     lambda : mean longitude     
+ 
+    0.4698584636155528D-01  ! T**00    JUPITER     k      : e cos(pi)          
+    0.1130317402720131D-02  ! T**01    JUPITER     k      : e cos(pi)          
+   -0.1093507140952982D-03  ! T**02    JUPITER     k      : e cos(pi)          
+   -0.4314874581757486D-05  ! T**03    JUPITER     k      : e cos(pi)          
+    0.1964406157943462D-06  ! T**04    JUPITER     k      : e cos(pi)          
+    0.2221866954173829D-08  ! T**05    JUPITER     k      : e cos(pi)          
+   -0.2026022564067575D-09  ! T**06    JUPITER     k      : e cos(pi)          
+   -0.3935847715091894D-11  ! T**07    JUPITER     k      : e cos(pi)          
+    0.3997773394906900D-12  ! T**08    JUPITER     k      : e cos(pi)          
+    0.3385318767521612D-13  ! T**09    JUPITER     k      : e cos(pi)          
+   -0.1971700351600592D-14  ! T**10    JUPITER     k      : e cos(pi)          
+   -0.1318700442221827D-15  ! T**11    JUPITER     k      : e cos(pi)          
+    0.6479842761190519D-17  ! T**12    JUPITER     k      : e cos(pi)          
+ 
+    0.1200370853330469D-01  ! T**00    JUPITER     h      : e sin(pi)          
+    0.2171842706307846D-02  ! T**01    JUPITER     h      : e sin(pi)          
+    0.9860511610682612D-04  ! T**02    JUPITER     h      : e sin(pi)          
+   -0.5173984251286260D-05  ! T**03    JUPITER     h      : e sin(pi)          
+   -0.9928142375734451D-07  ! T**04    JUPITER     h      : e sin(pi)          
+    0.6961146135512574D-08  ! T**05    JUPITER     h      : e sin(pi)          
+   -0.7025087613649942D-10  ! T**06    JUPITER     h      : e sin(pi)          
+   -0.8248373848654200D-11  ! T**07    JUPITER     h      : e sin(pi)          
+   -0.8871214050784800D-13  ! T**08    JUPITER     h      : e sin(pi)          
+    0.2912373120017818D-13  ! T**09    JUPITER     h      : e sin(pi)          
+    0.1629080196957295D-14  ! T**10    JUPITER     h      : e sin(pi)          
+   -0.1309403365927912D-15  ! T**11    JUPITER     h      : e sin(pi)          
+   -0.5400616250818703D-17  ! T**12    JUPITER     h      : e sin(pi)          
+ 
+   -0.2065622744497305D-02  ! T**00    JUPITER     q      : sin(i/2) cos(omega)
+   -0.3135047644805806D-03  ! T**01    JUPITER     q      : sin(i/2) cos(omega)
+   -0.1671330732379254D-04  ! T**02    JUPITER     q      : sin(i/2) cos(omega)
+    0.7980035206336866D-06  ! T**03    JUPITER     q      : sin(i/2) cos(omega)
+    0.3666810390571401D-07  ! T**04    JUPITER     q      : sin(i/2) cos(omega)
+   -0.2252752023716484D-09  ! T**05    JUPITER     q      : sin(i/2) cos(omega)
+   -0.9668592904164786D-10  ! T**06    JUPITER     q      : sin(i/2) cos(omega)
+   -0.4052732442343024D-12  ! T**07    JUPITER     q      : sin(i/2) cos(omega)
+    0.2667836890859485D-12  ! T**08    JUPITER     q      : sin(i/2) cos(omega)
+   -0.3611572405044205D-14  ! T**09    JUPITER     q      : sin(i/2) cos(omega)
+   -0.4889045289797076D-15  ! T**10    JUPITER     q      : sin(i/2) cos(omega)
+    0.1845248872291206D-16  ! T**11    JUPITER     q      : sin(i/2) cos(omega)
+    0.4707096585257852D-18  ! T**12    JUPITER     q      : sin(i/2) cos(omega)
+ 
+    0.1118386452649965D-01  ! T**00    JUPITER     p      : sin(i/2) sin(omega)
+   -0.2343212049512929D-03  ! T**01    JUPITER     p      : sin(i/2) sin(omega)
+    0.2088082210034675D-04  ! T**02    JUPITER     p      : sin(i/2) sin(omega)
+    0.5275209577194922D-06  ! T**03    JUPITER     p      : sin(i/2) sin(omega)
+   -0.3433837804178587D-07  ! T**04    JUPITER     p      : sin(i/2) sin(omega)
+    0.6136181958053057D-09  ! T**05    JUPITER     p      : sin(i/2) sin(omega)
+    0.3916979653497475D-10  ! T**06    JUPITER     p      : sin(i/2) sin(omega)
+   -0.4663317967230898D-11  ! T**07    JUPITER     p      : sin(i/2) sin(omega)
+    0.3631084733710245D-14  ! T**08    JUPITER     p      : sin(i/2) sin(omega)
+    0.1173110261506053D-13  ! T**09    JUPITER     p      : sin(i/2) sin(omega)
+   -0.2646322414519078D-15  ! T**10    JUPITER     p      : sin(i/2) sin(omega)
+   -0.1620068489198254D-16  ! T**11    JUPITER     p      : sin(i/2) sin(omega)
+    0.6413683651712606D-18  ! T**12    JUPITER     p      : sin(i/2) sin(omega)
+
+    0.4849798180202756D-01  ! T**00    JUPITER     e 
+    0.1632585457280076D-02  ! T**01    JUPITER     e 
+   -0.4721125648119212D-04  ! T**02    JUPITER     e 
+   -0.2004549577575371D-05  ! T**03    JUPITER     e 
+    0.1015142674467420D-06  ! T**04    JUPITER     e 
+   -0.2151367046225275D-08  ! T**05    JUPITER     e 
+    0.1026517903280480D-09  ! T**06    JUPITER     e 
+   -0.1284412092788647D-10  ! T**07    JUPITER     e 
+    0.1149820734476976D-12  ! T**08    JUPITER     e 
+
+    0.2501228755957691D+00  ! T**00    JUPITER     pi 
+    0.3762168150762563D-01  ! T**01    JUPITER     pi 
+    0.1261614661527813D-02  ! T**02    JUPITER     pi 
+   -0.7832053255188689D-04  ! T**03    JUPITER     pi 
+    0.3625550796238715D-05  ! T**04    JUPITER     pi 
+   -0.1018349151618641D-06  ! T**05    JUPITER     pi 
+   -0.6587753318567104D-09  ! T**06    JUPITER     pi 
+    0.1946282711288085D-09  ! T**07    JUPITER     pi 
+   -0.1924168288261267D-10  ! T**08    JUPITER     pi 
+
+    0.2274653744389788D-01  ! T**00    JUPITER     i 
+   -0.3469898203932840D-03  ! T**01    JUPITER     i 
+    0.5796569697230876D-04  ! T**02    JUPITER     i 
+    0.1692751740401512D-05  ! T**03    JUPITER     i 
+   -0.1317186384597561D-06  ! T**04    JUPITER     i 
+   -0.6047583168620983D-08  ! T**05    JUPITER     i 
+    0.1264677577338730D-09  ! T**06    JUPITER     i 
+    0.2659567309015717D-10  ! T**07    JUPITER     i 
+    0.9323526345999430D-12  ! T**08    JUPITER     i 
+
+    0.1753434781056836D+01  ! T**00    JUPITER     omega 
+    0.3084923682948794D-01  ! T**01    JUPITER     omega 
+    0.1582226316759821D-02  ! T**02    JUPITER     omega 
+   -0.1270070567736992D-03  ! T**03    JUPITER     omega 
+   -0.1020883867580205D-04  ! T**04    JUPITER     omega 
+    0.2177955714108728D-06  ! T**05    JUPITER     omega 
+    0.5604245597165093D-07  ! T**06    JUPITER     omega 
+    0.4674595444438983D-09  ! T**07    JUPITER     omega 
+   -0.2629708785453651D-09  ! T**08    JUPITER     omega 
+
+    ------
+    SATURN
+    ------ 
+ 
+    0.9554910430026835D+01  ! T**00    SATURN      a      : semi-major axis    
+   -0.2135876206071700D-04  ! T**01    SATURN      a      : semi-major axis    
+    0.4012382373784494D-07  ! T**02    SATURN      a      : semi-major axis    
+    0.6035302332159295D-07  ! T**03    SATURN      a      : semi-major axis    
+    0.1078200000000000D-07  ! T**04    SATURN      a      : semi-major axis    
+   -0.7312880000000000D-09  ! T**05    SATURN      a      : semi-major axis    
+   -0.1090950000000000D-09  ! T**06    SATURN      a      : semi-major axis    
+    0.7789608240073000D-11  ! T**07    SATURN      a      : semi-major axis    
+    0.4541009248106000D-12  ! T**08    SATURN      a      : semi-major axis    
+   -0.4354646705822000D-13  ! T**09    SATURN      a      : semi-major axis    
+   -0.2243298824248000D-14  ! T**10    SATURN      a      : semi-major axis    
+    0.1747842681078000D-15  ! T**11    SATURN      a      : semi-major axis    
+    0.3497288357133000D-16  ! T**12    SATURN      a      : semi-major axis    
+ 
+    0.8740209500379822D+00  ! T**00    SATURN      lambda : mean longitude     
+    0.2132990811942489D+03  ! T**01    SATURN      lambda : mean longitude     
+    0.3661100071660248D-03  ! T**02    SATURN      lambda : mean longitude     
+   -0.8250752564028410D-06  ! T**03    SATURN      lambda : mean longitude     
+   -0.5667094891095977D-06  ! T**04    SATURN      lambda : mean longitude     
+   -0.6805280231735395D-07  ! T**05    SATURN      lambda : mean longitude     
+    0.3959262622780795D-08  ! T**06    SATURN      lambda : mean longitude     
+    0.4982017620489072D-09  ! T**07    SATURN      lambda : mean longitude     
+   -0.3103264753253006D-10  ! T**08    SATURN      lambda : mean longitude     
+   -0.1634611774848988D-11  ! T**09    SATURN      lambda : mean longitude     
+    0.1427249852423892D-12  ! T**10    SATURN      lambda : mean longitude     
+    0.6737517736380359D-14  ! T**11    SATURN      lambda : mean longitude     
+   -0.4829278426517560D-15  ! T**12    SATURN      lambda : mean longitude     
+ 
+   -0.2959898653042646D-02  ! T**00    SATURN      k      : e cos(pi)          
+   -0.5295953999385400D-02  ! T**01    SATURN      k      : e cos(pi)          
+    0.3093187199303761D-03  ! T**02    SATURN      k      : e cos(pi)          
+    0.1296359760146963D-04  ! T**03    SATURN      k      : e cos(pi)          
+   -0.6293127927813510D-06  ! T**04    SATURN      k      : e cos(pi)          
+   -0.6044236406011233D-08  ! T**05    SATURN      k      : e cos(pi)          
+    0.7493503950435621D-09  ! T**06    SATURN      k      : e cos(pi)          
+    0.1558019238900383D-10  ! T**07    SATURN      k      : e cos(pi)          
+   -0.2154492845396590D-11  ! T**08    SATURN      k      : e cos(pi)          
+   -0.1409241739781118D-12  ! T**09    SATURN      k      : e cos(pi)          
+    0.1044967006198421D-13  ! T**10    SATURN      k      : e cos(pi)          
+    0.5516161928016230D-15  ! T**11    SATURN      k      : e cos(pi)          
+   -0.3265973201601484D-16  ! T**12    SATURN      k      : e cos(pi)          
+ 
+    0.5542966084452297D-01  ! T**00    SATURN      h      : e sin(pi)          
+   -0.3756085178245521D-02  ! T**01    SATURN      h      : e sin(pi)          
+   -0.3198804050881689D-03  ! T**02    SATURN      h      : e sin(pi)          
+    0.1598601391220426D-04  ! T**03    SATURN      h      : e sin(pi)          
+    0.3046944008029214D-06  ! T**04    SATURN      h      : e sin(pi)          
+   -0.2273738493999722D-07  ! T**05    SATURN      h      : e sin(pi)          
+    0.1173750496175260D-09  ! T**06    SATURN      h      : e sin(pi)          
+    0.3429514208020116D-10  ! T**07    SATURN      h      : e sin(pi)          
+    0.1001491154767648D-11  ! T**08    SATURN      h      : e sin(pi)          
+   -0.1065557074802762D-12  ! T**09    SATURN      h      : e sin(pi)          
+   -0.7099233969811536D-14  ! T**10    SATURN      h      : e sin(pi)          
+    0.6770904060756630D-15  ! T**11    SATURN      h      : e sin(pi)          
+    0.2406513034829794D-16  ! T**12    SATURN      h      : e sin(pi)          
+ 
+   -0.8717455812248373D-02  ! T**00    SATURN      q      : sin(i/2) cos(omega)
+    0.8016915019960306D-03  ! T**01    SATURN      q      : sin(i/2) cos(omega)
+    0.4145041023018692D-04  ! T**02    SATURN      q      : sin(i/2) cos(omega)
+   -0.1998273850020408D-05  ! T**03    SATURN      q      : sin(i/2) cos(omega)
+   -0.8964620042351566D-07  ! T**04    SATURN      q      : sin(i/2) cos(omega)
+    0.5808685102320658D-09  ! T**05    SATURN      q      : sin(i/2) cos(omega)
+    0.2365843142330355D-09  ! T**06    SATURN      q      : sin(i/2) cos(omega)
+    0.1005543262760657D-11  ! T**07    SATURN      q      : sin(i/2) cos(omega)
+   -0.6554234222932355D-12  ! T**08    SATURN      q      : sin(i/2) cos(omega)
+    0.8889305421262259D-14  ! T**09    SATURN      q      : sin(i/2) cos(omega)
+    0.1204150599468153D-14  ! T**10    SATURN      q      : sin(i/2) cos(omega)
+   -0.4452385407874727D-16  ! T**11    SATURN      q      : sin(i/2) cos(omega)
+ 
+    0.1989143616559623D-01  ! T**00    SATURN      p      : sin(i/2) sin(omega)
+    0.5943891450119465D-03  ! T**01    SATURN      p      : sin(i/2) sin(omega)
+   -0.5236761755535177D-04  ! T**02    SATURN      p      : sin(i/2) sin(omega)
+   -0.1299004306406390D-05  ! T**03    SATURN      p      : sin(i/2) sin(omega)
+    0.8627888211483174D-07  ! T**04    SATURN      p      : sin(i/2) sin(omega)
+   -0.1572026898611060D-08  ! T**05    SATURN      p      : sin(i/2) sin(omega)
+   -0.9758822510796267D-10  ! T**06    SATURN      p      : sin(i/2) sin(omega)
+    0.1166158863385626D-10  ! T**07    SATURN      p      : sin(i/2) sin(omega)
+   -0.1478346217952919D-13  ! T**08    SATURN      p      : sin(i/2) sin(omega)
+   -0.2919823779987998D-13  ! T**09    SATURN      p      : sin(i/2) sin(omega)
+    0.6706997994438157D-15  ! T**10    SATURN      p      : sin(i/2) sin(omega)
+    0.4115300166884428D-16  ! T**11    SATURN      p      : sin(i/2) sin(omega)
+
+    0.5554826111150618D-01  ! T**00    SATURN      e 
+   -0.3466582739637568D-02  ! T**01    SATURN      e 
+   -0.6439763834994394D-04  ! T**02    SATURN      e 
+    0.3383013061614053D-05  ! T**03    SATURN      e 
+   -0.2301154353988511D-07  ! T**04    SATURN      e 
+   -0.3569263987881973D-09  ! T**05    SATURN      e 
+    0.5902386114363179D-09  ! T**06    SATURN      e 
+    0.3009210396560350D-10  ! T**07    SATURN      e 
+   -0.1699755536048057D-12  ! T**08    SATURN      e 
+
+    0.1624153483507455D+01  ! T**00    SATURN      pi 
+    0.9888083008546422D-01  ! T**01    SATURN      pi 
+    0.9211126106739882D-03  ! T**02    SATURN      pi 
+    0.8511946220662513D-04  ! T**03    SATURN      pi 
+    0.5846642866501607D-05  ! T**04    SATURN      pi 
+    0.4924844955429854D-06  ! T**05    SATURN      pi 
+    0.3361534445507030D-07  ! T**06    SATURN      pi 
+    0.1638300602544285D-08  ! T**07    SATURN      pi 
+    0.1151189464352294D-09  ! T**08    SATURN      pi 
+
+    0.4343904687010454D-01  ! T**00    SATURN      i 
+    0.4453194170595764D-03  ! T**01    SATURN      i 
+   -0.8564288252447954D-04  ! T**02    SATURN      i 
+    0.2956926779017050D-06  ! T**03    SATURN      i 
+    0.1294038366384424D-06  ! T**04    SATURN      i 
+   -0.7348193967720165D-08  ! T**05    SATURN      i 
+   -0.5796141888540449D-09  ! T**06    SATURN      i 
+    0.3927323752760831D-10  ! T**07    SATURN      i 
+    0.1692768688777736D-11  ! T**08    SATURN      i 
+
+    0.1983837500018423D+01  ! T**00    SATURN      omega
+   -0.4479542848236306D-01  ! T**01    SATURN      omega
+   -0.3210549049952939D-03  ! T**02    SATURN      omega
+    0.8286836003733611D-05  ! T**03    SATURN      omega
+    0.1297841725653437D-05  ! T**04    SATURN      omega
+    0.1768937866823528D-06  ! T**05    SATURN      omega
+   -0.1202882507838380D-07  ! T**06    SATURN      omega
+   -0.3221091844910606D-09  ! T**07    SATURN      omega
+    0.3066133620852674D-10  ! T**08    SATURN      omega
+
+    ------
+    URANUS
+    ------
+  
+    0.1921843827263307D+02  ! T**00    URANUS      a      : semi-major axis    
+   -0.5064502370598803D-06  ! T**01    URANUS      a      : semi-major axis    
+    0.3142150318822512D-07  ! T**02    URANUS      a      : semi-major axis    
+   -0.1326140000000000D-06  ! T**03    URANUS      a      : semi-major axis    
+   -0.8001786400000001D-09  ! T**04    URANUS      a      : semi-major axis    
+    0.4519407200000001D-08  ! T**05    URANUS      a      : semi-major axis    
+    0.6196733682770001D-12  ! T**07    URANUS      a      : semi-major axis    
+   -0.3378530828564000D-13  ! T**08    URANUS      a      : semi-major axis    
+   -0.1062849027796000D-13  ! T**09    URANUS      a      : semi-major axis    
+   -0.5111868346380000D-15  ! T**10    URANUS      a      : semi-major axis    
+    0.3298645372973000D-16  ! T**12    URANUS      a      : semi-major axis    
+ 
+    0.5481221869425160D+01  ! T**00    URANUS      lambda : mean longitude     
+    0.7478166163181234D+02  ! T**01    URANUS      lambda : mean longitude     
+   -0.8088095931829005D-05  ! T**02    URANUS      lambda : mean longitude     
+    0.2342024324365029D-06  ! T**03    URANUS      lambda : mean longitude     
+    0.3223881670179609D-08  ! T**04    URANUS      lambda : mean longitude     
+   -0.3340829016720572D-08  ! T**05    URANUS      lambda : mean longitude     
+    0.3547660470866994D-10  ! T**06    URANUS      lambda : mean longitude     
+    0.1100006734397197D-09  ! T**07    URANUS      lambda : mean longitude     
+   -0.4703257839833814D-12  ! T**08    URANUS      lambda : mean longitude     
+    0.2221003298672739D-13  ! T**09    URANUS      lambda : mean longitude     
+    0.6239812518109764D-14  ! T**10    URANUS      lambda : mean longitude     
+    0.2713007972880851D-15  ! T**11    URANUS      lambda : mean longitude     
+   -0.1992209943639494D-16  ! T**12    URANUS      lambda : mean longitude     
+ 
+   -0.4595310567952677D-01  ! T**00    URANUS      k      : e cos(pi)          
+    0.1833059850791674D-03  ! T**01    URANUS      k      : e cos(pi)          
+   -0.8190709126603351D-06  ! T**02    URANUS      k      : e cos(pi)          
+   -0.4499917049072256D-06  ! T**03    URANUS      k      : e cos(pi)          
+    0.1669457346871101D-07  ! T**04    URANUS      k      : e cos(pi)          
+    0.2101813022696755D-09  ! T**05    URANUS      k      : e cos(pi)          
+   -0.1439021132587244D-10  ! T**06    URANUS      k      : e cos(pi)          
+    0.3579405268991900D-13  ! T**07    URANUS      k      : e cos(pi)          
+    0.1858841978202121D-13  ! T**08    URANUS      k      : e cos(pi)          
+    0.1970704871088545D-14  ! T**09    URANUS      k      : e cos(pi)          
+   -0.1051530645589801D-15  ! T**10    URANUS      k      : e cos(pi)          
+   -0.1740615187729405D-16  ! T**11    URANUS      k      : e cos(pi)          
+ 
+    0.5648415809525967D-02  ! T**00    URANUS      h      : e sin(pi)          
+   -0.7487576365793964D-03  ! T**01    URANUS      h      : e sin(pi)          
+    0.1209880838805758D-04  ! T**02    URANUS      h      : e sin(pi)          
+   -0.4222608567556439D-06  ! T**03    URANUS      h      : e sin(pi)          
+   -0.1195162350382869D-07  ! T**04    URANUS      h      : e sin(pi)          
+    0.5879568616665394D-09  ! T**05    URANUS      h      : e sin(pi)          
+   -0.2975356126665681D-11  ! T**06    URANUS      h      : e sin(pi)          
+   -0.4482951417423522D-12  ! T**07    URANUS      h      : e sin(pi)          
+    0.7997106986504487D-14  ! T**08    URANUS      h      : e sin(pi)          
+ 
+    0.1859240409126892D-02  ! T**00    URANUS      q      : sin(i/2) cos(omega)
+   -0.1244777936437471D-03  ! T**01    URANUS      q      : sin(i/2) cos(omega)
+   -0.2075119430194951D-05  ! T**02    URANUS      q      : sin(i/2) cos(omega)
+    0.7891893964551454D-07  ! T**03    URANUS      q      : sin(i/2) cos(omega)
+    0.1627735694826033D-08  ! T**04    URANUS      q      : sin(i/2) cos(omega)
+    0.4544189487884600D-10  ! T**05    URANUS      q      : sin(i/2) cos(omega)
+   -0.3328269225378864D-11  ! T**06    URANUS      q      : sin(i/2) cos(omega)
+   -0.3084390248054677D-12  ! T**07    URANUS      q      : sin(i/2) cos(omega)
+    0.1332634374575757D-13  ! T**08    URANUS      q      : sin(i/2) cos(omega)
+    0.5422238005857479D-15  ! T**09    URANUS      q      : sin(i/2) cos(omega)
+ 
+    0.6486017668317297D-02  ! T**00    URANUS      p      : sin(i/2) sin(omega)
+   -0.1173701618473363D-03  ! T**01    URANUS      p      : sin(i/2) sin(omega)
+    0.3178956054638596D-05  ! T**02    URANUS      p      : sin(i/2) sin(omega)
+    0.7155289791679779D-07  ! T**03    URANUS      p      : sin(i/2) sin(omega)
+   -0.4992490206352824D-08  ! T**04    URANUS      p      : sin(i/2) sin(omega)
+   -0.2414860932406514D-11  ! T**05    URANUS      p      : sin(i/2) sin(omega)
+    0.8209342592541390D-11  ! T**06    URANUS      p      : sin(i/2) sin(omega)
+   -0.2550242743318825D-12  ! T**07    URANUS      p      : sin(i/2) sin(omega)
+   -0.1290701577009860D-13  ! T**08    URANUS      p      : sin(i/2) sin(omega)
+    0.7573321827355441D-15  ! T**09    URANUS      p      : sin(i/2) sin(omega)
+
+    0.4638403205993244D-01  ! T**00    URANUS      e 
+   -0.2728506157687063D-03  ! T**01    URANUS      e 
+    0.7890032101575827D-05  ! T**02    URANUS      e 
+    0.2423817040353409D-06  ! T**03    URANUS      e 
+   -0.1062300933843467D-07  ! T**04    URANUS      e 
+   -0.8334229779770958D-10  ! T**05    URANUS      e 
+    0.6615822427033005D-11  ! T**06    URANUS      e 
+    0.1035335183497194D-12  ! T**07    URANUS      e 
+   -0.1474451119084713D-13  ! T**08    URANUS      e 
+
+    0.3019291404753406D+01  ! T**00    URANUS      pi 
+    0.1556846126433026D-01  ! T**01    URANUS      pi 
+   -0.1653083284178986D-03  ! T**02    URANUS      pi 
+    0.7234571568961256D-05  ! T**03    URANUS      pi 
+    0.1776678454689242D-06  ! T**04    URANUS      pi 
+   -0.7595624340393519D-08  ! T**05    URANUS      pi 
+   -0.2465569672638429D-10  ! T**06    URANUS      pi 
+    0.7906868434559543D-11  ! T**07    URANUS      pi 
+   -0.3987449590340717D-13  ! T**08    URANUS      pi 
+
+    0.1349458836081101D-01  ! T**00    URANUS      i 
+   -0.2942600239583898D-03  ! T**01    URANUS      i 
+    0.6098428782457698D-05  ! T**02    URANUS      i 
+    0.2800014353579776D-06  ! T**03    URANUS      i 
+   -0.7239367401322870D-08  ! T**04    URANUS      i 
+   -0.1314711160599932D-09  ! T**05    URANUS      i 
+    0.5832577355350009D-11  ! T**06    URANUS      i 
+   -0.5840948663325613D-12  ! T**07    URANUS      i 
+    0.3076064890634269D-14  ! T**08    URANUS      i 
+
+    0.1291628627140328D+01  ! T**00    URANUS      omega
+    0.1294110425822708D-01  ! T**01    URANUS      omega
+    0.7076597126493840D-03  ! T**02    URANUS      omega
+    0.1622628904491798D-05  ! T**03    URANUS      omega
+   -0.9373488386591990D-06  ! T**04    URANUS      omega
+   -0.3324271795573726D-07  ! T**05    URANUS      omega
+    0.9355275936106982D-09  ! T**06    URANUS      omega
+    0.8223874290617552D-10  ! T**07    URANUS      omega
+   -0.8085724034593330D-12  ! T**08    URANUS      omega
+
+    -------
+    NEPTUNE
+    -------
+  
+    0.3011041587235254D+02  ! T**00    NEPTUNE     a      : semi-major axis    
+   -0.4567548596888378D-05  ! T**01    NEPTUNE     a      : semi-major axis    
+    0.5661692218941009D-06  ! T**02    NEPTUNE     a      : semi-major axis    
+    0.3410335810693964D-07  ! T**03    NEPTUNE     a      : semi-major axis    
+   -0.9862540201931008D-08  ! T**04    NEPTUNE     a      : semi-major axis    
+    0.4210120779247399D-09  ! T**05    NEPTUNE     a      : semi-major axis    
+    0.6326301438690877D-10  ! T**06    NEPTUNE     a      : semi-major axis    
+   -0.6412513176374089D-11  ! T**07    NEPTUNE     a      : semi-major axis    
+    0.4898501773903679D-12  ! T**08    NEPTUNE     a      : semi-major axis    
+   -0.9210367208032852D-13  ! T**09    NEPTUNE     a      : semi-major axis    
+    0.2034945533822463D-13  ! T**10    NEPTUNE     a      : semi-major axis    
+   -0.1050468612680000D-15  ! T**11    NEPTUNE     a      : semi-major axis    
+    0.5286621720418000D-16  ! T**12    NEPTUNE     a      : semi-major axis    
+ 
+    0.5311899042349121D+01  ! T**00    NEPTUNE     lambda : mean longitude     
+    0.3813297236217556D+02  ! T**01    NEPTUNE     lambda : mean longitude     
+    0.3782431726511231D-05  ! T**02    NEPTUNE     lambda : mean longitude     
+   -0.3504661425055335D-06  ! T**03    NEPTUNE     lambda : mean longitude     
+   -0.1280035371581740D-07  ! T**04    NEPTUNE     lambda : mean longitude     
+    0.8524825231667717D-08  ! T**05    NEPTUNE     lambda : mean longitude     
+   -0.1676509146379082D-09  ! T**06    NEPTUNE     lambda : mean longitude     
+   -0.2375413640740556D-09  ! T**07    NEPTUNE     lambda : mean longitude     
+    0.6092095891454813D-12  ! T**08    NEPTUNE     lambda : mean longitude     
+    0.2362875693845152D-11  ! T**09    NEPTUNE     lambda : mean longitude     
+    0.1965673498658645D-13  ! T**10    NEPTUNE     lambda : mean longitude     
+    0.3012034826301296D-15  ! T**11    NEPTUNE     lambda : mean longitude     
+    0.1611145311522812D-16  ! T**12    NEPTUNE     lambda : mean longitude     
+ 
+    0.5998861173510088D-02  ! T**00    NEPTUNE     k      : e cos(pi)          
+    0.8855002123313970D-05  ! T**01    NEPTUNE     k      : e cos(pi)          
+   -0.1200446412903214D-05  ! T**02    NEPTUNE     k      : e cos(pi)          
+   -0.3092619203615185D-07  ! T**03    NEPTUNE     k      : e cos(pi)          
+    0.1736544739304271D-08  ! T**04    NEPTUNE     k      : e cos(pi)          
+   -0.7970617633383000D-11  ! T**05    NEPTUNE     k      : e cos(pi)          
+   -0.1877367335442809D-10  ! T**06    NEPTUNE     k      : e cos(pi)          
+   -0.9686892588966181D-13  ! T**07    NEPTUNE     k      : e cos(pi)          
+   -0.4705828387088660D-13  ! T**08    NEPTUNE     k      : e cos(pi)          
+    0.5854554836870352D-14  ! T**09    NEPTUNE     k      : e cos(pi)          
+    0.1349754507030374D-14  ! T**10    NEPTUNE     k      : e cos(pi)          
+ 
+    0.6691707468950912D-02  ! T**00    NEPTUNE     h      : e sin(pi)          
+    0.7803628537751121D-04  ! T**01    NEPTUNE     h      : e sin(pi)          
+    0.8008547479010706D-06  ! T**02    NEPTUNE     h      : e sin(pi)          
+   -0.3433070421106195D-07  ! T**03    NEPTUNE     h      : e sin(pi)          
+   -0.7148083683711815D-09  ! T**04    NEPTUNE     h      : e sin(pi)          
+    0.2474193328128113D-10  ! T**05    NEPTUNE     h      : e sin(pi)          
+   -0.2286230500815245D-11  ! T**06    NEPTUNE     h      : e sin(pi)          
+    0.9695302013169350D-13  ! T**07    NEPTUNE     h      : e sin(pi)          
+   -0.1537923128571240D-13  ! T**08    NEPTUNE     h      : e sin(pi)          
+    0.3293869613804892D-14  ! T**09    NEPTUNE     h      : e sin(pi)          
+   -0.6729328020483094D-15  ! T**10    NEPTUNE     h      : e sin(pi)          
+ 
+   -0.1029147555159448D-01  ! T**00    NEPTUNE     q      : sin(i/2) cos(omega)
+   -0.7515504813291318D-06  ! T**01    NEPTUNE     q      : sin(i/2) cos(omega)
+   -0.6433486550021754D-07  ! T**02    NEPTUNE     q      : sin(i/2) cos(omega)
+    0.9002841342750643D-08  ! T**03    NEPTUNE     q      : sin(i/2) cos(omega)
+    0.2582180494254407D-09  ! T**04    NEPTUNE     q      : sin(i/2) cos(omega)
+   -0.3681586614409292D-11  ! T**05    NEPTUNE     q      : sin(i/2) cos(omega)
+   -0.9547789621687479D-13  ! T**06    NEPTUNE     q      : sin(i/2) cos(omega)
+   -0.4163690774342088D-13  ! T**07    NEPTUNE     q      : sin(i/2) cos(omega)
+    0.8278687676964398D-16  ! T**10    NEPTUNE     q      : sin(i/2) cos(omega)
+ 
+    0.1151676703575462D-01  ! T**00    NEPTUNE     p      : sin(i/2) sin(omega)
+    0.2572166113216691D-04  ! T**01    NEPTUNE     p      : sin(i/2) sin(omega)
+    0.1957980644878099D-06  ! T**02    NEPTUNE     p      : sin(i/2) sin(omega)
+    0.7511392411702289D-08  ! T**03    NEPTUNE     p      : sin(i/2) sin(omega)
+   -0.4297305553005630D-09  ! T**04    NEPTUNE     p      : sin(i/2) sin(omega)
+   -0.4151023879891697D-11  ! T**05    NEPTUNE     p      : sin(i/2) sin(omega)
+    0.1077771615170739D-11  ! T**06    NEPTUNE     p      : sin(i/2) sin(omega)
+   -0.5954278821486653D-13  ! T**07    NEPTUNE     p      : sin(i/2) sin(omega)
+   -0.1932808744755880D-13  ! T**08    NEPTUNE     p      : sin(i/2) sin(omega)
+    0.2279882644438951D-14  ! T**09    NEPTUNE     p      : sin(i/2) sin(omega)
+    0.5336823831925998D-15  ! T**10    NEPTUNE     p      : sin(i/2) sin(omega)
+
+    0.9454314936688819D-02  ! T**00    NEPTUNE     e 
+    0.6034808170645372D-04  ! T**01    NEPTUNE     e 
+   -0.5275281437644237D-07  ! T**02    NEPTUNE     e 
+   -0.3749520442127578D-07  ! T**03    NEPTUNE     e 
+    0.6016652801696396D-09  ! T**04    NEPTUNE     e 
+    0.5111493038870668D-11  ! T**05    NEPTUNE     e 
+   -0.1344880339389342D-10  ! T**06    NEPTUNE     e 
+    0.5654602279028699D-13  ! T**07    NEPTUNE     e 
+   -0.3861837466062612D-13  ! T**08    NEPTUNE     e 
+
+    0.8398976747490372D+00  ! T**00    NEPTUNE     pi 
+    0.5062113937850404D-02  ! T**01    NEPTUNE     pi 
+    0.1230736427648734D-03  ! T**02    NEPTUNE     pi 
+   -0.7727863876527351D-06  ! T**03    NEPTUNE     pi 
+   -0.1654157875168648D-06  ! T**04    NEPTUNE     pi 
+    0.3483668691835628D-08  ! T**05    NEPTUNE     pi 
+    0.1314093912624100D-08  ! T**06    NEPTUNE     pi 
+    0.2047950082105003D-10  ! T**07    NEPTUNE     pi 
+    0.3385651183929516D-11  ! T**08    NEPTUNE     pi 
+
+    0.3089138845252837D-01  ! T**00    NEPTUNE     i 
+    0.3936508551254808D-04  ! T**01    NEPTUNE     i 
+    0.3955726840110355D-06  ! T**02    NEPTUNE     i 
+   -0.6403602140889424D-09  ! T**03    NEPTUNE     i 
+   -0.9598662630240578D-09  ! T**04    NEPTUNE     i 
+   -0.1396858635138324D-11  ! T**05    NEPTUNE     i 
+    0.1730853012186988D-11  ! T**06    NEPTUNE     i 
+   -0.3202946606753880D-13  ! T**07    NEPTUNE     i 
+   -0.2898076369268784D-13  ! T**08    NEPTUNE     i 
+
+    0.2300068714159945D+01  ! T**00    NEPTUNE     omega
+   -0.1073393729133600D-02  ! T**01    NEPTUNE     omega
+   -0.3973356382121903D-05  ! T**02    NEPTUNE     omega
+   -0.7400941478737176D-06  ! T**03    NEPTUNE     omega
+    0.7042121399397708D-08  ! T**04    NEPTUNE     omega
+    0.3234355716291364D-09  ! T**05    NEPTUNE     omega
+   -0.4257574651700279D-10  ! T**06    NEPTUNE     omega
+    0.4667714899672424D-11  ! T**07    NEPTUNE     omega
+    0.8276311453115394D-12  ! T**08    NEPTUNE     omega
+
+    -----
+    PLUTO
+    -----
+  
+    0.3954461714403000D+02  ! T**00    PLUTO       a      : semi-major axis    
+    0.3789000000000001D-01  ! T**01    PLUTO       a      : semi-major axis    
+   -0.6019905974440888D-02  ! T**02    PLUTO       a      : semi-major axis    
+   -0.3609946076072884D-03  ! T**03    PLUTO       a      : semi-major axis    
+    0.1705980111551245D-03  ! T**04    PLUTO       a      : semi-major axis    
+   -0.2169979157948140D-04  ! T**05    PLUTO       a      : semi-major axis    
+   -0.4100010891962110D-05  ! T**06    PLUTO       a      : semi-major axis    
+    0.1200000000000000D-05  ! T**07    PLUTO       a      : semi-major axis    
+    0.4907347300000000D-06  ! T**08    PLUTO       a      : semi-major axis    
+   -0.2090447300000000D-07  ! T**09    PLUTO       a      : semi-major axis    
+   -0.1482514700000000D-07  ! T**10    PLUTO       a      : semi-major axis    
+ 
+    0.4165471124826000D+01  ! T**00    PLUTO       lambda : mean longitude     
+    0.2533566020437000D+02  ! T**01    PLUTO       lambda : mean longitude     
+   -0.1827221883916392D-01  ! T**02    PLUTO       lambda : mean longitude     
+    0.1940993166707158D-02  ! T**03    PLUTO       lambda : mean longitude     
+    0.8609995915056679D-04  ! T**04    PLUTO       lambda : mean longitude     
+   -0.3279996740878934D-04  ! T**05    PLUTO       lambda : mean longitude     
+    0.3419959542661816D-05  ! T**06    PLUTO       lambda : mean longitude     
+    0.6350000000000000D-06  ! T**07    PLUTO       lambda : mean longitude     
+   -0.1500000000000000D-06  ! T**08    PLUTO       lambda : mean longitude     
+   -0.2088276300000000D-07  ! T**09    PLUTO       lambda : mean longitude     
+    0.2324406300000000D-08  ! T**10    PLUTO       lambda : mean longitude     
+    0.3809481000000000D-09  ! T**11    PLUTO       lambda : mean longitude     
+ 
+   -0.1787389594035000D+00  ! T**00    PLUTO       k      : e cos(pi)          
+   -0.6133966380200786D-03  ! T**01    PLUTO       k      : e cos(pi)          
+    0.5716978431762315D-04  ! T**02    PLUTO       k      : e cos(pi)          
+    0.3964000000000000D-05  ! T**03    PLUTO       k      : e cos(pi)          
+   -0.1460000000000000D-05  ! T**04    PLUTO       k      : e cos(pi)          
+    0.1459985136555078D-06  ! T**05    PLUTO       k      : e cos(pi)          
+    0.4000030380721165D-07  ! T**06    PLUTO       k      : e cos(pi)          
+   -0.8300000000000000D-08  ! T**07    PLUTO       k      : e cos(pi)          
+   -0.1100000000000000D-08  ! T**08    PLUTO       k      : e cos(pi)          
+    0.1693381100000000D-09  ! T**09    PLUTO       k      : e cos(pi)          
+    0.2090842500000000D-10  ! T**10    PLUTO       k      : e cos(pi)          
+   -0.1325230700000000D-13  ! T**11    PLUTO       k      : e cos(pi)          
+ 
+   -0.1734047186423000D+00  ! T**00    PLUTO       h      : e sin(pi)          
+   -0.6391621023383662D-04  ! T**01    PLUTO       h      : e sin(pi)          
+    0.6782978361158025D-04  ! T**02    PLUTO       h      : e sin(pi)          
+    0.2413000000000000D-05  ! T**03    PLUTO       h      : e sin(pi)          
+   -0.2250000000000000D-05  ! T**04    PLUTO       h      : e sin(pi)          
+    0.3459999999999999D-06  ! T**05    PLUTO       h      : e sin(pi)          
+    0.5300076657490653D-07  ! T**06    PLUTO       h      : e sin(pi)          
+   -0.1910000000000000D-07  ! T**07    PLUTO       h      : e sin(pi)          
+   -0.7224327200000001D-08  ! T**08    PLUTO       h      : e sin(pi)          
+    0.2287453100000000D-09  ! T**09    PLUTO       h      : e sin(pi)          
+    0.1697158800000000D-09  ! T**10    PLUTO       h      : e sin(pi)          
+ 
+   -0.5170230782278001D-01  ! T**00    PLUTO       q      : sin(i/2) cos(omega)
+    0.1916684404718321D-03  ! T**01    PLUTO       q      : sin(i/2) cos(omega)
+   -0.3032000000000000D-05  ! T**02    PLUTO       q      : sin(i/2) cos(omega)
+    0.3174000000000000D-06  ! T**03    PLUTO       q      : sin(i/2) cos(omega)
+    0.1460000000000000D-06  ! T**04    PLUTO       q      : sin(i/2) cos(omega)
+   -0.2400000000000000D-07  ! T**05    PLUTO       q      : sin(i/2) cos(omega)
+   -0.1544814100000000D-09  ! T**06    PLUTO       q      : sin(i/2) cos(omega)
+    0.5133549400000001D-09  ! T**07    PLUTO       q      : sin(i/2) cos(omega)
+   -0.6444830999999999D-10  ! T**08    PLUTO       q      : sin(i/2) cos(omega)
+ 
+    0.1397799251564000D+00  ! T**00    PLUTO       p      : sin(i/2) sin(omega)
+    0.7799329701590763D-04  ! T**01    PLUTO       p      : sin(i/2) sin(omega)
+    0.2485000000000000D-05  ! T**02    PLUTO       p      : sin(i/2) sin(omega)
+    0.9700000000000000D-07  ! T**03    PLUTO       p      : sin(i/2) sin(omega)
+   -0.1380000000000000D-06  ! T**04    PLUTO       p      : sin(i/2) sin(omega)
+    0.1700000000000000D-07  ! T**05    PLUTO       p      : sin(i/2) sin(omega)
+    0.5447045299999999D-08  ! T**06    PLUTO       p      : sin(i/2) sin(omega)
+   -0.4511263200000001D-09  ! T**07    PLUTO       p      : sin(i/2) sin(omega)
+   -0.8411464000000002D-10  ! T**08    PLUTO       p      : sin(i/2) sin(omega)
+
+    0.2490502613962702D+00  ! T**00    PLUTO       e 
+    0.4847417112407936D-03  ! T**01    PLUTO       e 
+   -0.8796408127481973D-04  ! T**02    PLUTO       e 
+   -0.4511844219364296D-05  ! T**03    PLUTO       e 
+    0.2613107255337491D-05  ! T**04    PLUTO       e 
+   -0.3468343112155337D-06  ! T**05    PLUTO       e 
+   -0.6549285493070351D-07  ! T**06    PLUTO       e 
+    0.1930849288132239D-07  ! T**07    PLUTO       e 
+    0.5820546071753516D-08  ! T**08    PLUTO       e 
+  
+    0.3911847797430875D+01  ! T**00    PLUTO       pi 
+   -0.1531033429674921D-02  ! T**01    PLUTO       pi 
+   -0.3268095924215296D-04  ! T**02    PLUTO       pi 
+    0.3659894192702001D-05  ! T**03    PLUTO       pi 
+    0.2356022243596260D-05  ! T**04    PLUTO       pi 
+   -0.5763577663038632D-06  ! T**05    PLUTO       pi 
+   -0.4052764066772879D-07  ! T**06    PLUTO       pi 
+    0.3119806313409411D-07  ! T**07    PLUTO       pi 
+    0.1772976188061320D-07  ! T**08    PLUTO       pi 
+  
+    0.2991857575066009D+00  ! T**00    PLUTO       i 
+    0.1346669714554860D-04  ! T**01    PLUTO       i 
+    0.7131557565119071D-05  ! T**02    PLUTO       i 
+   -0.4429645070036292D-07  ! T**03    PLUTO       i 
+   -0.3632763432711546D-06  ! T**04    PLUTO       i 
+    0.4933056177496001D-07  ! T**05    PLUTO       i 
+    0.1039315216735940D-07  ! T**06    PLUTO       i 
+   -0.1210259580989276D-08  ! T**07    PLUTO       i 
+   -0.1134640488113588D-09  ! T**08    PLUTO       i 
+  
+    0.1925074084888253D+01  ! T**00    PLUTO       omega
+   -0.1387736482720735D-02  ! T**01    PLUTO       omega
+    0.1335867888527198D-04  ! T**02    PLUTO       omega
+   -0.2191483630296614D-05  ! T**03    PLUTO       omega
+   -0.5980383445456204D-06  ! T**04    PLUTO       omega
+    0.1098742926149100D-06  ! T**05    PLUTO       omega
+   -0.1145371921729199D-07  ! T**06    PLUTO       omega
+   -0.2139799391672203D-08  ! T**07    PLUTO       omega
+    0.5954054348951555D-09  ! T**08    PLUTO       omega
