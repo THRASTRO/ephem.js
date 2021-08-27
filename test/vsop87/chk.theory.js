@@ -35,20 +35,19 @@
 						{
 							var test = results[theory][body][i],
 							    time = (test[0] - T2K) / JY2JD,
-							    coeffs = window[theory][body].coeffs,
-							    orb = vsop87(coeffs, time);
+							    elems = window[theory][body].raw(time);
 							// test each computed variable for time
 							for (var n = 1; n < vars.length; n += 1)
 							{
 								// normalize angle values
 								// compensate overflow at TAU
 								if (vars[n].match(/^[lb]/)) {
-									if (Math.abs(test[n] - orb[vars[n]] - TAU) < (vsop87tst.eps)) orb[vars[n]] += TAU;
-									else if (Math.abs(orb[vars[n]] - test[n] - TAU) < (TAU - vsop87tst.eps)) test[n] += TAU;
+									if (Math.abs(test[n] - elems[vars[n]] - TAU) < (vsop87tst.eps)) elems[vars[n]] += TAU;
+									else if (Math.abs(elems[vars[n]] - test[n] - TAU) < (TAU - vsop87tst.eps)) test[n] += TAU;
 								}
 								// qunit assertion
 								assert.close(
-									orb[vars[n]], test[n], vsop87tst.eps,
+									elems[vars[n]], test[n], vsop87tst.eps,
 									test[0] + ": VSOP Parameter " +vars[n]
 								);
 							}

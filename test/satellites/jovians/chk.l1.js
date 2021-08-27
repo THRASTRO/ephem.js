@@ -1,6 +1,13 @@
 (function (tests, QUnit)
 {
 
+	var names = [
+		'io',
+		'europa',
+		'ganymede',
+		'callisto',
+	];
+
 	function testBody(body)
 	{
 
@@ -11,10 +18,11 @@
 			{
 
 				for (var i = 0; i < tests[body].length; i += 1) {
-					var test = tests[body][i],
-						time = test[0], elem = [];
+					var name = names[body];
+					var test = tests[body][i], elem;
+					var jy2k = test[0] / 365.25;
 
-					jovian(time, body, elem);
+					jovian[name].raw(jy2k, elem = []);
 
 					// elem[0] .. a/n,  elem[1] .. L
 					// elem[2] .. K=e*cos(Omega+omega)
@@ -25,18 +33,7 @@
 
 					for (var n = 0; n < 6; n += 1) {
 						assert.close(
-							elem[n], test[n + 1], 1e-12,
-							test[0] + ": Raw Parameter " + vars[n]
-						);
-					}
-
-					jovian.orb((time - 18262.5) / 365.25, body, elem);
-
-					var vars = ["a", "L", "k", "h", "q", "p"];
-
-					for (var n = 0; n < 6; n += 1) {
-						assert.close(
-							elem[vars[n]], test[n + 1], 1e-9,
+							elem[n], test[n + 1], 1e-10,
 							test[0] + ": Orbital Parameter " + vars[n]
 						);
 					}

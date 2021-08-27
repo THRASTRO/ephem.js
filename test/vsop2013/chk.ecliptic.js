@@ -11,35 +11,42 @@
 				{
 					for (var i = 0; i < tests[body].length; i += 1)
 					{
-						var test = tests[body][i],
-						    time = JD2J2K(test[0]);
-						var orbital = vsop2013[body].xyz(time);
+
+						var test = tests[body][i];
+						var jy2k = JDtoJY2K(test[0]);
+						var state = vsop2013[body].position(jy2k);
+
+						assert.equal(state.epoch, jy2k, "Orbital epoch time");
+						assert.equal(state.GM, vsop2013[body].GM, "Gravitational Parameter");
+
 						// position state vector
 						assert.close(
-							orbital.x, test[7], vsop2013tst.eps * prec.r,
-							test[0] + ": VSOP to position x"
+							state.x, test[7], vsop2013tst.eps * prec.r,
+							test[0] + ": Ecliptic position x"
 						);
 						assert.close(
-							orbital.y, test[8], vsop2013tst.eps * prec.r,
-							test[0] + ": VSOP to position y"
+							state.y, test[8], vsop2013tst.eps * prec.r,
+							test[0] + ": Ecliptic position y"
 						);
 						assert.close(
-							orbital.z, test[9], vsop2013tst.eps * prec.r,
-							test[0] + ": VSOP to position z"
+							state.z, test[9], vsop2013tst.eps * prec.r,
+							test[0] + ": Ecliptic position z"
 						);
+
 						// velocity state vector
 						assert.close(
-							orbital.vx, test[10], vsop2013tst.eps * prec.r,
-							test[0] + ": VSOP to velocity x"
+							state.vx / 365.25, test[10], vsop2013tst.eps * prec.r,
+							test[0] + ": Ecliptic velocity x"
 						);
 						assert.close(
-							orbital.vy, test[11], vsop2013tst.eps * prec.r,
-							test[0] + ": VSOP to velocity y"
+							state.vy / 365.25, test[11], vsop2013tst.eps * prec.r,
+							test[0] + ": Ecliptic velocity y"
 						);
 						assert.close(
-							orbital.vz, test[12], vsop2013tst.eps * prec.r,
-							test[0] + ": VSOP to velocity z"
+							state.vz / 365.25, test[12], vsop2013tst.eps * prec.r,
+							test[0] + ": Ecliptic velocity z"
 						);
+
 					}
 				});
 			})(body);

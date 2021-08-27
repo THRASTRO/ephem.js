@@ -1,6 +1,14 @@
 (function (tests, QUnit)
 {
 
+	var names = [
+		'miranda',
+		'ariel',
+		'umbriel',
+		'titania',
+		'oberon',
+	];
+
 	function testBody(body)
 	{
 
@@ -11,26 +19,46 @@
 			{
 
 				for (var i = 0; i < tests[body].length; i += 1) {
-					var test = tests[body][i],
-						time = test[0], elem = [];
+					var name = names[body];
+					var test = tests[body][i], elem;
+					var jy2k = test[0] / 365.25;
 
-					// time wanted is julian years from j2000 (delta JD2451545.0 in JY)
-					// time given is julian days from 1980 (delta JD2444239.5 in JY)
-					uranian.xyz((time - 7305.5) / 365.25, body, elem);
+					uranian[name].state(jy2k, elem = []);
 
 					// elem[0] .. a/n,  elem[1] .. L
 					// elem[2] .. K=e*cos(Omega+omega)
 					// elem[3] .. H=e*sin(Omega+omega)
 					// elem[4] .. Q=sin(i/2)*cos(Omega)
 					// elem[5] .. P=sin(i/2)*sin(Omega)
+					var vars = ["x", "y", "z", "vx", "vy", "vz"];
+
+					for (var n = 0; n < 6; n += 1) {
+						if (n > 2) elem[n] /= 365.25;
+						assert.close(
+							elem[n], test[n + 1], 1e-12,
+							test[0] + ": Coordinate " + vars[n]
+						);
+					}
+
+					var orb = uranian[name].orbit(jy2k, elem = []);;
+					var state = orb.state(jy2k);
 					var vars = ["x", "y", "z"];
 
 					for (var n = 0; n < 3; n += 1) {
 						assert.close(
-							elem[vars[n]], test[n + 1], 1e-8,
-							test[0] + ": Orbital Parameter " + vars[n]
+							state.r[vars[n]], test[n + 1], 1e-12,
+							test[0] + ": Coordinate " + vars[n]
 						);
 					}
+					for (var n = 0; n < 3; n += 1) {
+						assert.close(
+							state.v[vars[n]] / 365.25, test[n + 4], 1e-12,
+							test[0] + ": Velocity " + vars[n]
+						);
+					}
+
+					assert.equal(orb._GM, uranian[name].GM, "Orbit has GM");
+					assert.equal(orb._t, jy2k, "Orbit has epoch");
 
 				}
 

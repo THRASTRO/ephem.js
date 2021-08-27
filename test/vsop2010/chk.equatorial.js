@@ -11,44 +11,48 @@
 				{
 					for (var i = 0; i < tests[body].length; i += 1)
 					{
-						var test = tests[body][i],
-						    time = JD2J2K(test[0]);
-						var orb = vsop2010[body](time);
-						var orbital = new Orbital(orb);
+
+						var test = tests[body][i];
+						var jy2k = JDtoJY2K(test[0]);
+						var orbit = vsop2010[body].orbit(jy2k);
+
+						// rotate from ecliptic to equatorial
 						var e = 23 + 26/60 + 21.41136/3600;
-						var r_ecl = orbital.r(), v_ecl = orbital.v();
+						var r_ecl = orbit.r(jy2k), v_ecl = orbit.v();
 						var r_equ = (new Coord(r_ecl)).ecl2equ(e * DEG2RAD);
 						var v_equ = (new Coord(v_ecl)).ecl2equ(e * DEG2RAD);
-						// hardcoded conversion matrix from vsop ecliptic to ICRF equatorial frame
-						// var rx = Math.cos(p) * x - Math.sin(p)*Math.cos(e)*y + Math.sin(p)*Math.sin(e)*z;
-						// var ry = Math.sin(p) * x + Math.cos(p)*Math.cos(e)*y - Math.cos(p)*Math.sin(e)*z;
-						// var rz = Math.sin(e)*y + Math.cos(e)*z;
+
+						assert.equal(orbit._t, jy2k, "Orbital epoch time");
+						assert.equal(orbit._GM, vsop2010[body].GM, "Gravitational Parameter");
+
 						// position state vector
 						assert.close(
 							r_equ.x, test[13], vsop2010tst.eps * prec.r,
-							test[0] + ": VSOP to position x"
+							test[0] + ": Equatorial position x"
 						);
 						assert.close(
 							r_equ.y, test[14], vsop2010tst.eps * prec.r,
-							test[0] + ": VSOP to position y"
+							test[0] + ": Equatorial position y"
 						);
-							assert.close(
+						assert.close(
 							r_equ.z, test[15], vsop2010tst.eps * prec.r,
-							test[0] + ": VSOP to position z"
+							test[0] + ": Equatorial position z"
 						);
+
 						// velocity state vector
 						assert.close(
-							v_equ.x, test[16], vsop2010tst.eps * prec.r,
-							test[0] + ": VSOP to velocity x"
+							v_equ.x / 365.25, test[16], vsop2010tst.eps * prec.r,
+							test[0] + ": Equatorial velocity x"
 						);
 						assert.close(
-							v_equ.y, test[17], vsop2010tst.eps * prec.r,
-							test[0] + ": VSOP to velocity y"
+							v_equ.y / 365.25, test[17], vsop2010tst.eps * prec.r,
+							test[0] + ": Equatorial velocity y"
 						);
 						assert.close(
-							v_equ.z, test[18], vsop2010tst.eps * prec.r,
-							test[0] + ": VSOP to velocity z"
+							v_equ.z / 365.25, test[18], vsop2010tst.eps * prec.r,
+							test[0] + ": Equatorial velocity z"
 						);
+
 					}
 				});
 			})(body);

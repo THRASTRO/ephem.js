@@ -1,10 +1,10 @@
 // something seems fishy with the precision
 var vsop2013_tests = [
-	{ name: '02-tiny', eps: 1e-2 },
-	{ name: '04-small', eps: 1e-3 },
+	{ name: '02-tiny', eps: 4e-2 },
+	{ name: '04-small', eps: 2e-3 },
 	{ name: '06-normal', eps: 1e-4 },
 	{ name: '08-big', eps: 1e-5 },
-	{ name: '10-extreme', eps: 1e-5 },
+	{ name: '10-extreme', eps: 1e-6 },
 	{ name: '12-full', eps: 1e-5 }
 ];
 
