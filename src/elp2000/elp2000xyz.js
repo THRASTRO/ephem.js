@@ -178,15 +178,17 @@ var elp82 = [
       [     -34.78245, 1.5707963267949, 18.438311065844, 22756.8171602928, -0.000270825164100366, -1.22517265353191e-07, 5.68880373413929e-10 ],
       [     -11.64993, 1.5707963267949, 20.7938669641098, 31085.5085872482, -0.000113797406484755, 1.27893849076696e-07, -6.17458704261105e-10 ],
       [      -1.42255, 1.5707963267949, 23.1494228623756, 39414.2000142036, 4.32303511308562e-05, 3.78304963506582e-07, -1.80379778193614e-09 ],
-      // where is this comming from now? x12[NUM12]
+      // where is this coming from now? x12[NUM12]
     //  [   1.05870, 1.57288531137661, 10.3492252753131, 8364.7398435741, -0.000214122325585157, -1.86376923428939e-07, 8.76155284501153e-10 ],
     ],
   ],
 ];
 
-function elp2000xyz(t) {
+function elp2000xyz(jy2k)
+{
 
-	t *= 0.01;
+	// Using julian centuries
+	var t = jy2k / 100;
 
 	var rp = [];
 	// Main problem (elp1 - elp3)
@@ -226,74 +228,9 @@ function elp2000xyz(t) {
 		x: rp[2] * Math.cos(rp[1]) * Math.cos(rp[0]) * 6.68459e-9,
 		y: rp[2] * Math.cos(rp[1]) * Math.sin(rp[0]) * 6.68459e-9,
 		z: rp[2] * Math.sin(rp[1]) * 6.68459e-9,
+		epoch: jy2k
 	};
 
-	rv.x *= 1;
-	rv.y *= 1;
-	rv.z *= 1;
-
 	return rv;
 }
 
-/*
-// helper use in solsys-explorer
-// not fully sanctioned implementation
-// this needs to have velocity state
-elp2000xyz.orb = function elp2000xyzorb(t) {
-	var orb = elp2000xyz(t);
-	var orbital = new Orbital(orb);
-	orb.a = orbital.a();
-	orb.L = orbital.L();
-	orb.k = orbital.k();
-	orb.h = orbital.h();
-	orb.q = orbital.q();
-	orb.p = orbital.p();
-	var pos = orb2xyz(orb);
-	orb.x = - pos.x;
-	orb.y = pos.z;
-	orb.z = pos.y;
-	return orb;
-}
-*/
-
-// not sure if used anywhere?
-// seems to implement libnova?
-function elp82_moon_equ(t) {
-
-	return elp82_moon(t);
-
-  /*
-	return {
-		x: 0.7555662,
-		y: -0.6717840,
-		z: 0.0000211
-	}
-
-	var r = Math.sqrt(
-	-275357.939343 * -275357.939343
-	+ 251763.709161 * 251763.709161
-	+ 2756.585406 * 2756.585406
-	) * KM2AU;
-
-	var ra = 137.562877 * DEG2RAD;
-	var dec = 0.423307 * DEG2RAD;
-
-	var sin_rho = Math.sin(ra)
-	var cos_rho = Math.cos(ra);
-	var sin_phi = Math.sin(dec)
-	var cos_phi = Math.cos(dec)
-
-	return {
-		y: r * sin_rho * cos_phi,
-		z: r * sin_rho * sin_phi,
-		x: r * cos_rho
-	}
-
-	var rv = elp82_moon(t);
-
-	// convert ecliptic to equatorial
-
-	return rv;
-	*/
-
-}

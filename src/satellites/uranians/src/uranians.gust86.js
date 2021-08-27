@@ -24,6 +24,7 @@
   the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the
   Software is furnished to do so, subject to the following conditions:
+
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
 
@@ -36,7 +37,7 @@
   SOFTWARE.
 */
 
-(function (exports)
+(function(exports)
 {
 
 	/*************************************************************************/
@@ -46,11 +47,29 @@
 	// uses column-major order internally
 	var GUST86toVsop87 = {
 		elements: [
-			9.753206632086812015e-01, -2.006444610981783542e-01, 9.214881523275189928e-02,
+			9.753206632086812015e-01, -2.006444610981783542e-01,  9.214881523275189928e-02,
 			6.194425668001473004e-02, -1.519328516640849367e-01, -9.864478281437795399e-01,
-			2.119257251551559653e-01, 9.678110398294910731e-01, -1.357544776485127136e-01
+			2.119257251551559653e-01,  9.678110398294910731e-01, -1.357544776485127136e-01
 		]
 	};
+
+	/*
+	const double GUST86toVsop87[9] = {
+	   9.753206632086812015e-01, 6.194425668001473004e-02, 2.119257251551559653e-01,
+	  -2.006444610981783542e-01,-1.519328516640849367e-01, 9.678110398294910731e-01,
+	   9.214881523275189928e-02,-9.864478281437795399e-01,-1.357544776485127136e-01
+	};
+	const double GUST86toJ2000[9] = {
+	   9.753205572598290957e-01, 6.194437810676107434e-02, 2.119261772583629030e-01,
+	  -2.207428547845518695e-01, 2.529905336992995280e-01, 9.419492459363773150e-01,
+	   4.733143558215848563e-03,-9.654836528287313313e-01, 2.604206471702025216e-01
+	};
+	*/
+
+	/*************************************************************************/
+	/*************************************************************************/
+
+	var epoch = 7305.5;
 
 	/*************************************************************************/
 	/*************************************************************************/
@@ -114,29 +133,18 @@
 		4.206896
 	];
 
-	var gust86_rmu = [
-		1.291892353675174e-08,
-		1.291910570526396e-08,
-		1.291910102284198e-08,
-		1.291942656265575e-08,
-		1.291935967091320e-08
-	];
-
 	/*************************************************************************/
 	/*************************************************************************/
 
-	// return raw VSOP orbitals
-	// will return as an array
-	function uranian(t, body, elem)
+	// return raw VSOP(N) orbitals
+	// updates six elements of `elem`
+	function uranianN(theory, jy2k, elems, addGM, addEpoch, off)
 	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
 
-		// assert that body input number is valid
-		if (isNaN(body) || body < 0 || body > 4) {
-			throw Error("Invalid Jupiter Body: " + body);
-		}
-
-		// force integer
-		body = body | 0;
+		var t = jy2k * 365.25 + epoch;
 
 		for (var i = 0; i < 5; ++i) {
 			an[i] = fmod(fqn[i] * t + phn[i], 2 * PI);
@@ -144,15 +152,15 @@
 			ai[i] = fmod(fqi[i] * t + phi[i], 2 * PI);
 		}
 
-		if (body == 0) {
+		if (theory.coeffs == 0) {
 
-			elem[0 * 6 + 0] = 4.44352267
+			elems[off++] = 4.44352267
 				- cos(an[0] - an[1] * 3. + an[2] * 2.) * 3.492e-5
 				+ cos(an[0] * 2. - an[1] * 6. + an[2] * 4.) * 8.47e-6
 				+ cos(an[0] * 3. - an[1] * 9. + an[2] * 6.) * 1.31e-6
 				- cos(an[0] - an[1]) * 5.228e-5
 				- cos(an[0] * 2. - an[1] * 2.) * 1.3665e-4;
-			elem[0 * 6 + 1] =
+			elems[off++] =
 				sin(an[0] - an[1] * 3. + an[2] * 2.) * .02547217
 				- sin(an[0] * 2. - an[1] * 6. + an[2] * 4.) * .00308831
 				- sin(an[0] * 3. - an[1] * 9. + an[2] * 6.) * 3.181e-4
@@ -161,7 +169,7 @@
 				- sin(an[0] * 2. - an[1] * 2.) * 6.232e-5
 				- sin(an[0] * 3. - an[1] * 3.) * 2.795e-5
 				+ t * 4.44519055 - .23805158;
-			elem[0 * 6 + 2] = cos(ae[0]) * .00131238
+			elems[off++] = cos(ae[0]) * .00131238
 				+ cos(ae[1]) * 7.181e-5
 				+ cos(ae[2]) * 6.977e-5
 				+ cos(ae[3]) * 6.75e-6
@@ -169,7 +177,7 @@
 				+ cos(an[0]) * 1.941e-4
 				- cos(-an[0] + an[1] * 2.) * 1.2331e-4
 				+ cos(an[0] * -2. + an[1] * 3.) * 3.952e-5;
-			elem[0 * 6 + 3] = sin(ae[0]) * .00131238
+			elems[off++] = sin(ae[0]) * .00131238
 				+ sin(ae[1]) * 7.181e-5
 				+ sin(ae[2]) * 6.977e-5
 				+ sin(ae[3]) * 6.75e-6
@@ -177,25 +185,25 @@
 				+ sin(an[0]) * 1.941e-4
 				- sin(-an[0] + an[1] * 2.) * 1.2331e-4
 				+ sin(an[0] * -2. + an[1] * 3.) * 3.952e-5;
-			elem[0 * 6 + 4] = cos(ai[0]) * .03787171
+			elems[off++] = cos(ai[0]) * .03787171
 				+ cos(ai[1]) * 2.701e-5
 				+ cos(ai[2]) * 3.076e-5
 				+ cos(ai[3]) * 1.218e-5
 				+ cos(ai[4]) * 5.37e-6;
-			elem[0 * 6 + 5] = sin(ai[0]) * .03787171
+			elems[off++] = sin(ai[0]) * .03787171
 				+ sin(ai[1]) * 2.701e-5
 				+ sin(ai[2]) * 3.076e-5
 				+ sin(ai[3]) * 1.218e-5
 				+ sin(ai[4]) * 5.37e-6;
 
 		}
-		else if (body == 1) {
+		else if (theory.coeffs == 1) {
 
-			elem[0] = 2.49254257
+			elems[off++] = 2.49254257
 				+ cos(an[0] - an[1] * 3. + an[2] * 2.) * 2.55e-6
 				- cos(an[1] - an[2]) * 4.216e-5
 				- cos(an[1] * 2. - an[2] * 2.) * 1.0256e-4;
-			elem[1] =
+			elems[off++] =
 				- sin(an[0] - an[1] * 3. + an[2] * 2.) * .0018605
 				+ sin(an[0] * 2. - an[1] * 6. + an[2] * 4.) * 2.1999e-4
 				+ sin(an[0] * 3. - an[1] * 9. + an[2] * 6.) * 2.31e-5
@@ -205,7 +213,7 @@
 				- sin(an[1] * 3. - an[2] * 3.) * 4.275e-5
 				- sin(an[1] * 2. - an[3] * 2.) * 1.649e-5
 				+ t * 2.49295252 + 3.09804641;
-			elem[2] = cos(ae[0]) * -3.35e-6
+			elems[off++] = cos(ae[0]) * -3.35e-6
 				+ cos(ae[1]) * .00118763
 				+ cos(ae[2]) * 8.6159e-4
 				+ cos(ae[3]) * 7.15e-5
@@ -214,7 +222,7 @@
 				+ cos(an[1] * -2. + an[2] * 3.) * 9.181e-5
 				+ cos(-an[1] + an[3] * 2.) * 2.003e-5
 				+ cos(an[1]) * 8.977e-5;
-			elem[3] = sin(ae[0]) * -3.35e-6
+			elems[off++] = sin(ae[0]) * -3.35e-6
 				+ sin(ae[1]) * .00118763
 				+ sin(ae[2]) * 8.6159e-4
 				+ sin(ae[3]) * 7.15e-5
@@ -223,28 +231,28 @@
 				+ sin(an[1] * -2. + an[2] * 3.) * 9.181e-5
 				+ sin(-an[1] + an[3] * 2.) * 2.003e-5
 				+ sin(an[1]) * 8.977e-5;
-			elem[4] = cos(ai[0]) * -1.2175e-4
+			elems[off++] = cos(ai[0]) * -1.2175e-4
 				+ cos(ai[1]) * 3.5825e-4
 				+ cos(ai[2]) * 2.9008e-4
 				+ cos(ai[3]) * 9.778e-5
 				+ cos(ai[4]) * 3.397e-5;
-			elem[5] = sin(ai[0]) * -1.2175e-4
+			elems[off++] = sin(ai[0]) * -1.2175e-4
 				+ sin(ai[1]) * 3.5825e-4
 				+ sin(ai[2]) * 2.9008e-4
 				+ sin(ai[3]) * 9.778e-5
 				+ sin(ai[4]) * 3.397e-5;
 
 		}
-		else if (body == 2) {
+		else if (theory.coeffs == 2) {
 
-			elem[0] = 1.5159549
+			elems[off++] = 1.5159549
 				+ cos(an[2] - an[3] * 2. + ae[2]) * 9.74e-6
 				- cos(an[1] - an[2]) * 1.06e-4
 				+ cos(an[1] * 2. - an[2] * 2.) * 5.416e-5
 				- cos(an[2] - an[3]) * 2.359e-5
 				- cos(an[2] * 2. - an[3] * 2.) * 7.07e-5
 				- cos(an[2] * 3. - an[3] * 3.) * 3.628e-5;
-			elem[1] =
+			elems[off++] =
 				sin(an[0] - an[1] * 3. + an[2] * 2.) * 6.6057e-4
 				- sin(an[0] * 2. - an[1] * 6. + an[2] * 4.) * 7.651e-5
 				- sin(an[0] * 3. - an[1] * 9. + an[2] * 6.) * 8.96e-6
@@ -265,7 +273,7 @@
 				- sin(an[2] - an[4]) * 1.021e-5
 				- sin(an[2] * 2. - an[4] * 2.) * 1.708e-5
 				+ t * 1.51614811 + 2.28540169;
-			elem[2] = cos(ae[0]) * -2.1e-7
+			elems[off++] = cos(ae[0]) * -2.1e-7
 				- cos(ae[1]) * 2.2795e-4
 				+ cos(ae[2]) * .00390469
 				+ cos(ae[3]) * 3.0917e-4
@@ -281,7 +289,7 @@
 				+ cos(an[2] * -3. + an[3] * 4.) * 1.281e-5
 				+ cos(-an[2] + an[4] * 2.) * 2.181e-5
 				+ cos(an[2]) * 4.625e-5;
-			elem[3] = sin(ae[0]) * -2.1e-7
+			elems[off++] = sin(ae[0]) * -2.1e-7
 				- sin(ae[1]) * 2.2795e-4
 				+ sin(ae[2]) * .00390469
 				+ sin(ae[3]) * 3.0917e-4
@@ -297,21 +305,21 @@
 				+ sin(an[2] * -3. + an[3] * 4.) * 1.281e-5
 				+ sin(-an[2] + an[4] * 2.) * 2.181e-5
 				+ sin(an[2]) * 4.625e-5;
-			elem[4] = cos(ai[0]) * -1.086e-5
+			elems[off++] = cos(ai[0]) * -1.086e-5
 				- cos(ai[1]) * 8.151e-5
 				+ cos(ai[2]) * .00111336
 				+ cos(ai[3]) * 3.5014e-4
 				+ cos(ai[4]) * 1.065e-4;
-			elem[5] = sin(ai[0]) * -1.086e-5
+			elems[off++] = sin(ai[0]) * -1.086e-5
 				- sin(ai[1]) * 8.151e-5
 				+ sin(ai[2]) * .00111336
 				+ sin(ai[3]) * 3.5014e-4
 				+ sin(ai[4]) * 1.065e-4;
 
 		}
-		else if (body == 3) {
+		else if (theory.coeffs == 3) {
 
-			elem[0] = .72166316
+			elems[off++] = .72166316
 				- cos(an[2] - an[3] * 2. + ae[2]) * 2.64e-6
 				- cos(an[3] * 2. - an[4] * 3. + ae[4]) * 2.16e-6
 				+ cos(an[3] * 2. - an[4] * 3. + ae[3]) * 6.45e-6
@@ -324,7 +332,7 @@
 				- cos(an[3] * 4. - an[4] * 4.) * 3.86e-5
 				- cos(an[3] * 5. - an[4] * 5.) * 2.618e-5
 				- cos(an[3] * 6. - an[4] * 6.) * 1.806e-5;
-			elem[1] =
+			elems[off++] =
 				sin(an[2] - an[3] * 4. + an[4] * 3.) * 2.061e-5
 				- sin(an[2] - an[3] * 2. + ae[4]) * 2.07e-6
 				- sin(an[2] - an[3] * 2. + ae[3]) * 2.88e-6
@@ -345,7 +353,7 @@
 				- sin(an[3] * 7. - an[4] * 7.) * 2.056e-5
 				- sin(an[3] * 8. - an[4] * 8.) * 1.369e-5
 				+ t * .72171851 + .85635879;
-			elem[2] = cos(ae[0]) * -2e-8
+			elems[off++] = cos(ae[0]) * -2e-8
 				- cos(ae[1]) * 1.29e-6
 				- cos(ae[2]) * 3.2451e-4
 				+ cos(ae[3]) * 9.3281e-4
@@ -363,7 +371,7 @@
 				+ cos(an[3] * -4. + an[4] * 5.) * 4.483e-5
 				+ cos(an[3] * -5. + an[4] * 6.) * 2.513e-5
 				+ cos(an[3] * -6. + an[4] * 7.) * 1.543e-5;
-			elem[3] = sin(ae[0]) * -2e-8
+			elems[off++] = sin(ae[0]) * -2e-8
 				- sin(ae[1]) * 1.29e-6
 				- sin(ae[2]) * 3.2451e-4
 				+ sin(ae[3]) * 9.3281e-4
@@ -381,21 +389,21 @@
 				+ sin(an[3] * -4. + an[4] * 5.) * 4.483e-5
 				+ sin(an[3] * -5. + an[4] * 6.) * 2.513e-5
 				+ sin(an[3] * -6. + an[4] * 7.) * 1.543e-5;
-			elem[4] = cos(ai[0]) * -1.43e-6
+			elems[off++] = cos(ai[0]) * -1.43e-6
 				- cos(ai[1]) * 1.06e-6
 				- cos(ai[2]) * 1.4013e-4
 				+ cos(ai[3]) * 6.8572e-4
 				+ cos(ai[4]) * 3.7832e-4;
-			elem[5] = sin(ai[0]) * -1.43e-6
+			elems[off++] = sin(ai[0]) * -1.43e-6
 				- sin(ai[1]) * 1.06e-6
 				- sin(ai[2]) * 1.4013e-4
 				+ sin(ai[3]) * 6.8572e-4
 				+ sin(ai[4]) * 3.7832e-4;
 
 		}
-		else if (body == 4) {
+		else if (theory.coeffs == 4) {
 
-			elem[0] = .46658054
+			elems[off++] = .46658054
 				+ cos(an[3] * 2. - an[4] * 3. + ae[4]) * 2.08e-6
 				- cos(an[3] * 2. - an[4] * 3. + ae[3]) * 6.22e-6
 				+ cos(an[3] * 2. - an[4] * 3. + ae[2]) * 1.07e-6
@@ -406,7 +414,7 @@
 				+ cos(an[3] * 3. - an[4] * 3.) * 3.749e-5
 				+ cos(an[3] * 4. - an[4] * 4.) * 2.482e-5
 				+ cos(an[3] * 5. - an[4] * 5.) * 1.684e-5;
-			elem[1] =
+			elems[off++] =
 				- sin(an[2] - an[3] * 4. + an[4] * 3.) * 7.82e-6
 				+ sin(an[3] * 2. - an[4] * 3. + ae[4]) * 5.129e-5
 				- sin(an[3] * 2. - an[4] * 3. + ae[3]) * 1.5824e-4
@@ -422,7 +430,7 @@
 				+ sin(an[3] * 7. - an[4] * 7.) * 1.962e-5
 				+ sin(an[3] * 8. - an[4] * 8.) * 1.311e-5
 				+ t * .46669212 - .9155918;
-			elem[2] = cos(ae[1]) * -3.5e-7
+			elems[off++] = cos(ae[1]) * -3.5e-7
 				+ cos(ae[2]) * 7.453e-5
 				- cos(ae[3]) * 7.5868e-4
 				+ cos(ae[4]) * .00139734
@@ -438,7 +446,7 @@
 				- cos(an[3] * -5. + an[4] * 6.) * 3.241e-5
 				- cos(an[3] * -6. + an[4] * 7.) * 1.999e-5
 				- cos(an[3] * -7. + an[4] * 8.) * 1.294e-5;
-			elem[3] = sin(ae[1]) * -3.5e-7
+			elems[off++] = sin(ae[1]) * -3.5e-7
 				+ sin(ae[2]) * 7.453e-5
 				- sin(ae[3]) * 7.5868e-4
 				+ sin(ae[4]) * .00139734
@@ -454,12 +462,12 @@
 				- sin(an[3] * -5. + an[4] * 6.) * 3.241e-5
 				- sin(an[3] * -6. + an[4] * 7.) * 1.999e-5
 				- sin(an[3] * -7. + an[4] * 8.) * 1.294e-5;
-			elem[4] = cos(ai[0]) * -4.4e-7
+			elems[off++] = cos(ai[0]) * -4.4e-7
 				- cos(ai[1]) * 3.1e-7
 				+ cos(ai[2]) * 3.689e-5
 				- cos(ai[3]) * 5.9633e-4
 				+ cos(ai[4]) * 4.5169e-4;
-			elem[5] = sin(ai[0]) * -4.4e-7
+			elems[off++] = sin(ai[0]) * -4.4e-7
 				- sin(ai[1]) * 3.1e-7
 				+ sin(ai[2]) * 3.689e-5
 				- sin(ai[3]) * 5.9633e-4
@@ -467,36 +475,26 @@
 
 		}
 
-		else {
-
-			throw Error("Invalid Uranian Body: " + body);
-
-		}
-
+		// update optional elements
+		if (addGM) elems[off++] = theory.GM;
+		if (addEpoch) elems[off++] = jy2k;
+		// return array
+		return elems;
 	}
-	// EO uranian
+	// EO uranianN
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-	// export to globals
-	exports.uranian =
-		exports.Stellarium(
-			'n',
-			uranian,
-			7305.5,
-			GUST86toVsop87,
-			[
-				'miranda',
-				'ariel',
-				'umbriel',
-				'titania',
-				'oberon',
-			],
-			gust86_rmu
-		);
+	exports.uranian = {
+		miranda: VSOP(uranianN, 'miranda', 1.291892353675174e-08 * 133407.5625, 0, GUST86toVsop87, 365.25),
+		ariel: VSOP(uranianN, 'ariel', 1.291910570526396e-08 * 133407.5625, 1, GUST86toVsop87, 365.25),
+		umbriel: VSOP(uranianN, 'umbriel', 1.291910102284198e-08 * 133407.5625, 2, GUST86toVsop87, 365.25),
+		titania: VSOP(uranianN, 'titania', 1.291942656265575e-08 * 133407.5625, 3, GUST86toVsop87, 365.25),
+		oberon: VSOP(uranianN, 'oberon', 1.291935967091320e-08 * 133407.5625, 4, GUST86toVsop87, 365.25),
+	}
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-}.call(this, this))
+}(this))

@@ -24,6 +24,7 @@
   the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the
   Software is furnished to do so, subject to the following conditions:
+
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
 
@@ -36,7 +37,7 @@
   SOFTWARE.
 */
 
-(function (exports)
+(function(exports)
 {
 
 	/*************************************************************************/
@@ -46,20 +47,29 @@
 	// uses column-major order internally
 	var TASS17toVSOP87 = {
 		elements: [
-			-9.833473364922412278e-01, 1.817361158757799129e-01, 0.000000000000000000e+00,
+			-9.833473364922412278e-01,  1.817361158757799129e-01, 0.000000000000000000e+00,
 			-1.603871593615649693e-01, -8.678312794665074866e-01, 4.702603847778936010e-01,
-			8.546329577978411975e-02, 4.624292968291581735e-01, 8.825277165667645230e-01
+			 8.546329577978411975e-02,  4.624292968291581735e-01, 8.825277165667645230e-01
 		]
 	};
 
 	/*
-	static
+	const double TASS17toJ2000Ecl[9] = {
+	  -0.9833473364922412, -0.1603871593615652, 0.0854632957797842,
+	   0.1817361158757801, -0.8678312794665074, 0.4624292968291581,
+	   0.0,                 0.4702603847778936, 0.8825277165667645,
+	};
 	const double TASS17toJ2000[9] = {
 	  -9.833472564628459035e-01,-1.603876313013248428e-01, 8.546333092352678089e-02,
 	   1.667401119524148001e-01,-9.832783769705406668e-01, 7.322136606398094752e-02,
 	   7.229044385733251626e-02, 8.625219479949252372e-02, 9.936471459321866589e-01
 	};
 	*/
+
+	/*************************************************************************/
+	/*************************************************************************/
+
+	var epoch = 7305.0;
 
 	/*************************************************************************/
 	/*************************************************************************/
@@ -2896,8 +2906,6 @@
 
 	var tass17_bodies = [
 		[
-			"MIMAS",
-			8.457558957423141e-08,
 			6.667061728781588e+00,
 			[
 				-5.196910356411064e-03,
@@ -2914,8 +2922,6 @@
 			]
 		],
 		[
-			"ENCELADUS",
-			8.457559689847700e-08,
 			4.585536751533733e+00,
 			[
 				-3.147075653259473e-03,
@@ -2932,8 +2938,6 @@
 			]
 		],
 		[
-			"TETHYS",
-			8.457567386225863e-08,
 			3.328306445054557e+00,
 			[
 				-2.047958691903563e-03,
@@ -2950,8 +2954,6 @@
 			]
 		],
 		[
-			"DIONE",
-			8.457575023401118e-08,
 			2.295717646432711e+00,
 			[
 				-1.245046723085128e-03,
@@ -2968,8 +2970,6 @@
 			]
 		],
 		[
-			"RHEA",
-			8.457594957866317e-08,
 			1.390853715957114e+00,
 			[
 				-6.263338154589970e-04,
@@ -2986,8 +2986,6 @@
 			]
 		],
 		[
-			"TITAN",
-			8.459559800923616e-08,
 			3.940425676910059e-01,
 			[
 				-1.348089930929860e-04,
@@ -3004,8 +3002,6 @@
 			]
 		],
 		[
-			"IAPETUS",
-			8.457584639645043e-08,
 			7.920197763192791e-02,
 			[
 				-4.931880677088688e-04,
@@ -3022,8 +3018,6 @@
 			]
 		],
 		[
-			"HYPERION",
-			8.457558674940690e-08,
 			2.953088138695055e-01,
 			[
 				-1.574686065780747e-03,
@@ -3041,17 +3035,6 @@
 		],
 	];
 
-	var tass17_rmu = [
-		8.457558957423141e-08,
-		8.457559689847700e-08,
-		8.457567386225863e-08,
-		8.457575023401118e-08,
-		8.457594957866317e-08,
-		8.459559800923616e-08,
-		8.457584639645043e-08,
-		8.457558674940690e-08,
-	]
-
 	/*************************************************************************/
 	/*************************************************************************/
 
@@ -3064,38 +3047,33 @@
 	// allocate once
 	var lon = [];
 
-	// return raw VSOP orbitals
-	// will return as an array
-	function saturnian(t, body, elem)
+	// return raw VSOP(N) orbitals
+	// updates six elements of `elem`
+	function saturnianN(theory, jy2k, elems, addGM, addEpoch, off)
 	{
 
-		elem = elem || [];
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
 
-		// assert that body input number is valid
-		if (isNaN(body) || body < 0 || body > 7) {
-			throw Error("Invalid Saturn Body: " + body);
-		}
-
-		// force integer
-		body = body | 0;
+		var t = jy2k * 365.25 + epoch;
 
 		// get polynomial parameters
-		var params = tass17_bodies[body];
+		var params = tass17_bodies[theory.coeffs];
 
 		// get common items
-		// var name = params[0];
-		// var mu = params[1];
-		var aam = params[2];
-		var s0 = params[3]; // consts
-		var series = params[4];
+		var aam = params[0];
+		var s0 = params[1];
+		var series = params[2];
 
+		// calculate longitudes
 		for (var j = 0; j < 7; ++j) {
 
 			var arg = 0;
 
 			lon[j] = 0;
 
-			var terms = tass17_bodies[j][4][1];
+			var terms = tass17_bodies[j][2][1];
 
 			var coeffs = terms[0][2];
 
@@ -3110,7 +3088,7 @@
 		// initialize with constants
 		// 6th element seems constant!?
 		for (var i = 0; i < 6; i += 1) {
-			elem[i] = s0[i];
+			elems[off+i] = s0[i];
 		}
 
 		var terms = series[0];
@@ -3129,19 +3107,19 @@
 			for (var i = coeffs.length - 1; i != -1; i--) {
 				var coeff = coeffs[i];
 				var p = coeff[1] + coeff[2] * t + arg;
-				elem[0] += coeff[0] * cos(p);
+				elems[off+0] += coeff[0] * cos(p);
 			}
 		}
 
-		elem[0] = aam * (1.0 + elem[0]);
+		elems[off+0] = aam * (1.0 + elems[off+0]);
 
 		var first = -1;
 
 		var terms = series[1];
 
-		if (body != 7) {
+		if (theory.coeffs != 7) {
 			first++;
-			elem[1] += lon[body];
+			elems[off+1] += lon[theory.coeffs];
 		}
 
 		for (var j = terms.length - 1; j != first; --j) {
@@ -3158,12 +3136,12 @@
 			for (var i = coeffs.length - 1; i != -1; i--) {
 				var coeff = coeffs[i];
 				var x = coeff[1] + coeff[2] * t + arg;
-				elem[1] += coeff[0] * sin(x);
+				elems[off+1] += coeff[0] * sin(x);
 			}
 
 		}
 
-		elem[1] += aam * t;
+		elems[off+1] += aam * t;
 
 		var terms = series[2];
 
@@ -3181,8 +3159,8 @@
 			for (var i = coeffs.length - 1; i != -1; i--) {
 				var coeff = coeffs[i];
 				var x = coeff[1] + coeff[2] * t + arg;
-				elem[2] += coeff[0] * cos(x);
-				elem[3] += coeff[0] * sin(x);
+				elems[off+2] += coeff[0] * cos(x);
+				elems[off+3] += coeff[0] * sin(x);
 			}
 
 		}
@@ -3203,41 +3181,37 @@
 			for (var i = coeffs.length - 1; i != -1; i--) {
 				var coeff = coeffs[i];
 				var x = coeff[1] + coeff[2] * t + arg;
-				elem[4] += coeff[0] * cos(x);
-				elem[5] += coeff[0] * sin(x);
+				elems[off+4] += coeff[0] * cos(x);
+				elems[off+5] += coeff[0] * sin(x);
 			}
 
 		}
 
-		return elem;
+		// update optional elements
+		off += 6; // increment offset
+		if (addGM) elems[off++] = theory.GM;
+		if (addEpoch) elems[off++] = jy2k;
 
+		// return array
+		return elems;
 	}
-	// EO saturnian
+	// EO saturnianN
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-	// export to globals
-	exports.saturnian =
-		exports.Stellarium(
-			'n',
-			saturnian,
-			7305,
-			TASS17toVSOP87,
-			[
-				'mimas',
-				'enceladus',
-				'tethys',
-				'dione',
-				'rhea',
-				'titan',
-				'iapetus',
-				'hyperion',
-			],
-			tass17_rmu
-		);
+	exports.saturnian = {
+		mimas: VSOP(saturnianN, 'mimas', 8.457558957423141e-08 * 133407.5625, 0, TASS17toVSOP87, 365.25),
+		enceladus: VSOP(saturnianN, 'enceladus', 8.457559689847700e-08 * 133407.5625, 1, TASS17toVSOP87, 365.25),
+		tethys: VSOP(saturnianN, 'tethys', 8.457567386225863e-08 * 133407.5625, 2, TASS17toVSOP87, 365.25),
+		dione: VSOP(saturnianN, 'dione', 8.457575023401118e-08 * 133407.5625, 3, TASS17toVSOP87, 365.25),
+		rhea: VSOP(saturnianN, 'rhea', 8.457594957866317e-08 * 133407.5625, 4, TASS17toVSOP87, 365.25),
+		titan: VSOP(saturnianN, 'titan', 8.459559800923616e-08 * 133407.5625, 5, TASS17toVSOP87, 365.25),
+		iapetus: VSOP(saturnianN, 'iapetus', 8.457584639645043e-08 * 133407.5625, 6, TASS17toVSOP87, 365.25),
+		hyperion: VSOP(saturnianN, 'hyperion', 8.457558674940690e-08 * 133407.5625, 7, TASS17toVSOP87, 365.25),
+	}
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-}.call(this, this))
+}(this))

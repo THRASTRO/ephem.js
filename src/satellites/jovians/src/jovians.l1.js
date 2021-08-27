@@ -24,6 +24,7 @@
   the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the
   Software is furnished to do so, subject to the following conditions:
+
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
 
@@ -36,7 +37,7 @@
   SOFTWARE.
 */
 
-(function (exports)
+(function(exports)
 {
 
 	/*************************************************************************/
@@ -46,11 +47,24 @@
 	// uses column-major order internally
 	var L1toVsop87 = {
 		elements: [
-			9.994327815023905713e-01, -3.089770442223671880e-02, 1.339578739122566807e-02,
-			3.039550993390781261e-02, 9.988822846893227815e-01, 3.619798764705610479e-02,
+			 9.994327815023905713e-01, -3.089770442223671880e-02, 1.339578739122566807e-02,
+			 3.039550993390781261e-02,  9.988822846893227815e-01, 3.619798764705610479e-02,
 			-1.449924943755843383e-02, -3.577028369016394015e-02, 9.992548516622136737e-01
 		]
 	};
+
+	/*
+	const double L1toJ2000[9] = {
+	   9.994327653386544723e-01, 3.039594289062820484e-02,-1.449945596633516053e-02,
+	  -3.367710746976384242e-02, 9.020579123528089974e-01,-4.302991694091006926e-01,
+	   0.000000000000000000e+00, 4.305433885422950373e-01, 9.025698812737539884e-01
+	};
+	*/
+
+	/*************************************************************************/
+	/*************************************************************************/
+
+	var epoch = 18262.5;
 
 	/*************************************************************************/
 	/*************************************************************************/
@@ -635,7 +649,6 @@
 	var l1_bodies = [
 		[
 			"io",
-			2.82489428433814e-07,
 			3.551552286182400,
 			[
 				4.13349410167037e-05,
@@ -701,7 +714,6 @@
 		],
 		[
 			"europa",
-			2.82483274392893e-07,
 			1.769322711123470,
 			[
 				-1.17345718523364e-04,
@@ -767,7 +779,6 @@
 		],
 		[
 			"ganymede",
-			2.82498184184723e-07,
 			0.878207923589328,
 			[
 				-2.01249945111849e-04,
@@ -833,7 +844,6 @@
 		],
 		[
 			"callisto",
-			2.82492144889909e-07,
 			0.376486233433828,
 			[
 				1.53102173532307e-04,
@@ -910,38 +920,31 @@
 
 	// return raw VSOP orbitals
 	// will return as an array
-	function jovian(t, body, elem)
+	function jovian(theory, jy2k, elems, addGM, addEpoch, off)
 	{
 
-		elem = elem || [];
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
 
-		// assert that body input number is valid
-		if (isNaN(body) || body < 0 || body > 3) {
-			throw Error("Invalid Jupiter Body: " + body);
-		}
-
-		// force integer
-		body = body | 0;
+		var t = jy2k * 365.25 + epoch;
 
 		// get polynomial parameters
-		var params = l1_bodies[body];
+		var params = theory.coeffs;
 
 		// get common items
 		// var name = params[0];
-		// mu parameter needed to convert
-		// to cartesian coordinates
-		// var mu = params[1];
-		var l = params[2];
+		var l = params[1];
 		var cheb = 0;
-		var chebs = params[3];
-		var consts = params[4];
-		var coeffs = params[5];
+		var chebs = params[2];
+		var consts = params[3];
+		var coeffs = params[4];
 		var use_polynomials;
 
 		// initialize with constants
 		// 6th element seems constant!?
 		for (var i = 0; i < 6; i += 1) {
-			elem[i] = consts[i];
+			elems[off+i] = consts[i];
 		}
 
 		// calculate 1st and 2nd element
@@ -950,7 +953,7 @@
 			for (var i = terms.length - 1; i != -1; i--) {
 				var term = terms[i];
 				var d = term[0] + t * term[1];
-				elem[j] += term[2] * cos(d);
+				elems[off+j] += term[2] * cos(d);
 			}
 		}
 
@@ -960,15 +963,15 @@
 			for (var i = terms.length - 1; i != -1; i--) {
 				var term = terms[i];
 				var d = term[0] + t * term[1];
-				elem[j * 2 - 2] += term[2] * cos(d);
-				elem[j * 2 - 1] += term[2] * sin(d);
+				elems[off+j*2-2] += term[2] * cos(d);
+				elems[off+j*2-1] += term[2] * sin(d);
 			}
 		}
 
 		// apply final chebyshev term
 		// calculate the 5th element
 		for (var j = 0; j < 5; ++j) {
-			elem[j] += chebs[cheb++];
+			elems[off+j] += chebs[cheb++];
 		}
 
 		// Directly from stellarium implementation
@@ -990,24 +993,28 @@
 				use_polynomials = 1.0;
 
 			for (var j = 0; j < 5; ++j) {
-				elem[j] += use_polynomials * chebs[cheb++] * x;
+				elems[off+j] += use_polynomials * chebs[cheb++] * x;
 			}
 
 			for (var i = 2; i < 9; i += 1) {
 				var ti = 2.0 * x * ti1 - ti2;
 				ti2 = ti1, ti1 = ti;
 				for (var j = 0; j < 5; ++j) {
-					elem[j] += use_polynomials * chebs[cheb++] * ti;
+					elems[off+j] += use_polynomials * chebs[cheb++] * ti;
 				}
 			}
 
 		}
 
 		// apply `l` term
-		elem[1] += t * l;
+		elems[off+1] += t * l;
 
-		return elem;
-
+		// update optional elements
+		off += 6; // increment offset
+		if (addGM) elems[off++] = theory.GM;
+		if (addEpoch) elems[off++] = jy2k;
+		// return array
+		return elems;
 	}
 	// EO jovian
 
@@ -1015,22 +1022,14 @@
 	// export satellites
 	/*************************************************************************/
 
-	// export to globals
-	exports.jovian =
-		exports.Stellarium(
-			'a',
-			jovian,
-			18262.5,
-			L1toVsop87,
-			[
-				'io',
-				'europa',
-				'ganymede',
-				'callisto',
-			]
-		);
+	exports.jovian = {
+		io: VSOP(jovian, 'io', 2.82489428433814e-07 * 133407.5625, l1_bodies[0], L1toVsop87),
+		europa: VSOP(jovian, 'europa', 2.82483274392893e-07 * 133407.5625, l1_bodies[1], L1toVsop87),
+		ganymede: VSOP(jovian, 'ganymede', 2.82498184184723e-07 * 133407.5625, l1_bodies[2], L1toVsop87),
+		callisto: VSOP(jovian, 'callisto', 2.82492144889909e-07 * 133407.5625, l1_bodies[3], L1toVsop87),
+	}
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-}.call(this, this))
+}(this))

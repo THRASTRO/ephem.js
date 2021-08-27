@@ -9,9 +9,9 @@
 	if (typeof exports.ephaster !== "function") {
 		// only define once in global scope
 		// otherwise we overwrite loaded data
-		exports.ephaster = function ephaster(coeffss, jd)
+		exports.ephaster = function ephaster(coeffss, jy2k)
 		{
-
+			var jd = JY2KtoJD(jy2k);
 			var nser = 0;
 			// ToDo: which series to use?
 			// seems to be time dependent

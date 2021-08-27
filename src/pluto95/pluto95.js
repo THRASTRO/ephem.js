@@ -1,4 +1,4 @@
-(function(window)
+(function(exports)
 {
 	'use strict';
 
@@ -240,117 +240,130 @@
 	           33,-11127973411,  -1310869292,     -164753,
 	         -107,         284];
 
-	if (typeof window.pluto95 == "undefined") {
-		window.pluto95 = function pluto95(tjd)
-		{
-			// the only theory that wants JD
-			tjd = tjd * 365.25 + 2451545.0;
-			if ((tjd < 2340000.5) || (tjd > 2560000.5)) {
-				debugger;
-				throw new Error('julian date out of range: ' + tjd);
+	/*************************************************************************/
+	/*************************************************************************/
+
+	function pluto95(theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+
+		// the only theory that wants JD
+		var tjd = jy2k * 365.25 + 2451545.0;
+		if ((tjd < 2340000.5) || (tjd > 2560000.5)) {
+			console.warn('julian date out of range: ' + tjd);
+		}
+
+
+		// Results in table r
+		// ------------------
+		var r = [0, 0, 0, 0, 0, 0, 0]
+		var x= 2.0 * (tjd - tdeb) / dt - 1.0;
+		var fx = x * dt / 2;
+
+		// Compute the positions (secular terms)
+		// -------------------------------------
+
+		var v = [0, 0, 0, 0];
+		var wx = 1;
+		for (var i = 0; i <= 3; ++i) {
+			v[1] += ax[i] * wx;
+			v[2] += ay[i] * wx
+			v[3] += az[i] * wx
+			wx = wx * x;
+		}
+
+
+		// Compute the positions (periodic and Poisson terms)
+		// --------------------------------------------------
+		var imax = 0;
+		var w = [];
+		wx = 1;
+		for (var m = 0; m <= 2; ++m) {
+			for (var iv = 1; iv <= 3; ++iv) {
+				w[iv] = 0;
 			}
-
-
-			// Results in table r
-			// ------------------
-			var r = [0, 0, 0, 0, 0, 0, 0]
-			var x= 2.0 * (tjd - tdeb) / dt - 1.0;
-			var fx = x * dt / 2;
-
-			// Compute the positions (secular terms)
-			// -------------------------------------
-
-			var v = [0, 0, 0, 0];
-			var wx = 1;
-			for (var i = 0; i <= 3; ++i) {
-				v[1] += ax[i] * wx;
-				v[2] += ay[i] * wx
-				v[3] += az[i] * wx
-				wx = wx * x;
+			var imin = imax;
+			imax = imax + nf[m];
+			for (var i = imin; i < imax; ++i) {
+				var f = fq[i] * fx;
+				var cf = Math.cos(f);
+				var sf = Math.sin(f);
+				w[1] += cx[i] * cf + sx[i] * sf
+				w[2] += cy[i] * cf + sy[i] * sf
+				w[3] += cz[i] * cf + sz[i] * sf
 			}
+			for (var iv = 1; iv <= 3; ++iv) {
+				v[iv] += w[iv] * wx;
+			}
+			wx = wx * x;
+		}
 
+		// Compute the velocities (secular terms)
+		// --------------------------------------
+		var wt = 2 / dt;
+		v[4] = 0;
+		v[5] = 0;
+		v[6] = 0;
+		wx = 1;
+		for (var i = 1; i <= 3; ++i) {
+			v[4] += i * ax[i] * wx;
+			v[5] += i * ay[i] * wx;
+			v[6] += i * az[i] * wx;
+			wx = wx * x;
+		}
+		v[4] = wt * v[4];
+		v[5] = wt * v[5];
+		v[6] = wt * v[6];
 
-			// Compute the positions (periodic and Poisson terms)
-			// --------------------------------------------------
-		  var imax = 0;
-		  var w = [];
-		  wx = 1;
-			for (var m = 0; m <= 2; ++m) {
-				for (var iv = 1; iv <= 3; ++iv) {
-					w[iv] = 0;
+		// Compute the velocities (periodic and Poisson terms)
+		// ---------------------------------------------------
+		var imax = 0;
+		var wx = 1;
+		for (var m = 0; m <= 2; ++m) {
+			var imin = imax;
+			imax = imax + nf[m];
+			for (var i = imin; i < imax; ++i) {
+				var fw = fq[i];
+				var f = fw * fx;
+				var cf = Math.cos(f);
+				var sf = Math.sin(f);
+				v[4] += fw * (sx[i] * cf - cx[i] * sf) * wx;
+				v[5] += fw * (sy[i] * cf - cy[i] * sf) * wx;
+				v[6] += fw * (sz[i] * cf - cz[i] * sf) * wx;
+				if (m > 0) {
+					v[4] += m * wt * (cx[i] * cf + sx[i] * sf) * wy;
+					v[5] += m * wt * (cy[i] * cf + sy[i] * sf) * wy;
+					v[6] += m * wt * (cz[i] * cf + sz[i] * sf) * wy;
 				}
-				var imin = imax;
-				imax = imax + nf[m];
-				for (var i = imin; i < imax; ++i) {
-					var f = fq[i] * fx;
-					var cf = Math.cos(f);
-					var sf = Math.sin(f);
-					w[1] += cx[i] * cf + sx[i] * sf
-					w[2] += cy[i] * cf + sy[i] * sf
-					w[3] += cz[i] * cf + sz[i] * sf
-				}
-				for (var iv = 1; iv <= 3; ++iv) {
-					v[iv] += w[iv] * wx;
-				}
-				wx = wx * x;
 			}
+			var wy = wx;
+			wx = wx * x;
+		}
 
-			// Compute the velocities (secular terms)
-			// --------------------------------------
-			var wt = 2 / dt;
-			v[4] = 0;
-			v[5] = 0;
-			v[6] = 0;
-			wx = 1;
-			for (var i = 1; i <= 3; ++i) {
-				v[4] += i * ax[i] * wx;
-				v[5] += i * ay[i] * wx;
-				v[6] += i * az[i] * wx;
-				wx = wx * x;
-			}
-			v[4] = wt * v[4];
-			v[5] = wt * v[5];
-			v[6] = wt * v[6];
+		// Stock the results
+		// -----------------
 
-			// Compute the velocities (periodic and Poisson terms)
-			// ---------------------------------------------------
-			var imax = 0;
-			var wx = 1;
-			for (var m = 0; m <= 2; ++m) {
-				var imin = imax;
-				imax = imax + nf[m];
-				for (var i = imin; i < imax; ++i) {
-					var fw = fq[i];
-					var f = fw * fx;
-					var cf = Math.cos(f);
-					var sf = Math.sin(f);
-					v[4] += fw * (sx[i] * cf - cx[i] * sf) * wx;
-					v[5] += fw * (sy[i] * cf - cy[i] * sf) * wx;
-					v[6] += fw * (sz[i] * cf - cz[i] * sf) * wx;
-					if (m > 0) {
-						v[4] += m * wt * (cx[i] * cf + sx[i] * sf) * wy;
-						v[5] += m * wt * (cy[i] * cf + sy[i] * sf) * wy;
-						v[6] += m * wt * (cz[i] * cf + sz[i] * sf) * wy;
-					}
-				}
-				var wy = wx;
-				wx = wx * x;
-			}
+		for (var iv = 1; iv <= 6; ++iv) {
+			elems[off++] = v[iv] / 10000000000;
+			
+		}
 
-			// Stock the results
-			// -----------------
-
-			for (var iv = 1; iv <= (m ? 6 : 3); ++iv) {
-				v[iv] /= 1000000000;
-			}
-
-			// return object
-			return {
-				x: v[1] * 1e-1, y: v[2] * 1e-1, z: v[3] * 1e-1,
-				vx: v[4] * 1e-1, vy: v[5] * 1e-1, vz: v[6] * 1e-1
-			};
-
-		};
+		// update optional elements
+		if (addGM) elems[off++] = theory.GM;
+		if (addEpoch) elems[off++] = jy2k;
+		// return array
+		return elems;
 	}
+	// EO pluto95
 
-})(window);
+	/*************************************************************************/
+	/*************************************************************************/
+
+	exports.pluto95 = VSOP(pluto95, 'pluto95', GMJY.sun + GMJY.plu, 0, null, 0);
+
+	/*************************************************************************/
+	/*************************************************************************/
+
+})(this);

@@ -23,6 +23,7 @@
   the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the
   Software is furnished to do so, subject to the following conditions:
+
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
 
@@ -35,7 +36,7 @@
   SOFTWARE.
 */
 
-(function (exports)
+(function(exports)
 {
 
 	/*************************************************************************/
@@ -45,11 +46,16 @@
 	// uses column-major order internally
 	var J2000_to_VSOP87 = {
 		elements: [
-			9.999999999998848e-01, 4.403598133110236e-07, -1.909192461077750e-07,
+			 9.999999999998848e-01, 4.403598133110236e-07, -1.909192461077750e-07,
 			-4.799655442984222e-07, 9.174821370868568e-01, -3.977769829016049e-01,
-			0.000000000000000e+00, 3.977769829016507e-01, 9.174821370869625e-01
+			 0.000000000000000e+00, 3.977769829016507e-01,  9.174821370869625e-01
 		]
 	};
+
+	/*************************************************************************/
+	/*************************************************************************/
+
+	var epoch = 6491.5;
 
 	/*************************************************************************/
 	/*************************************************************************/
@@ -281,8 +287,6 @@
 
 	var mars_sat_bodies = [
 		[
-			"phobos",
-			9.549547741038312e-11,
 			1.970205562831390e+01,
 			1.657852042683113e-10,
 			[
@@ -300,8 +304,6 @@
 			]
 		],
 		[
-			"deimos",
-			9.549547622768120e-11,
 			4.977013889652300e+00,
 			-2.331793571572226e-14,
 			[
@@ -331,24 +333,28 @@
 
 	// return raw VSOP orbitals
 	// will return as an array
-	function martian(t, body, elem)
+	function martian(theory, jy2k, elems, addGM, addEpoch, off)
 	{
 
-		var params = mars_sat_bodies[body];
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
+
+		var t = jy2k * 365.25 + epoch;
+
+		var params = theory.coeffs;
 
 		// get common items
-		var name = params[0];
-		var mu = params[1];
-		var l = params[2];
-		var acc = params[3];
-		var consts = params[4];
-		var coeffs = params[5];
+		var l = params[0];
+		var acc = params[1];
+		var consts = params[2];
+		var coeffs = params[3];
 
 		// initialize with constants
 		// 5th element seems constant!?
 		// 6th element seems constant!?
 		for (var i = 0; i < 6; i += 1) {
-			elem[i] = consts[i];
+			elems[off+i] = consts[i];
 		}
 
 		// calculate 1st and 2nd element
@@ -357,7 +363,7 @@
 			for (var i = terms.length - 1; i != -1; i--) {
 				var term = terms[i];
 				var d = term[0] + t * term[1];
-				elem[j] += term[2] * cos(d);
+				elems[off+j] += term[2] * cos(d);
 			}
 		}
 
@@ -367,13 +373,19 @@
 			for (var i = terms.length - 1; i != -1; i--) {
 				var term = terms[i];
 				var d = term[0] + t * term[1];
-				elem[j * 2 - 2] += term[2] * cos(d);
-				elem[j * 2 - 1] += term[2] * sin(d);
+				elems[off+j*2-2] += term[2] * cos(d);
+				elems[off+j*2-1] += term[2] * sin(d);
 			}
 		}
 
-		elem[1] += (l + acc * t) * t;
+		elems[off+1] += (l + acc * t) * t;
 
+		// update optional elements
+		off += 6; // increment offset
+		if (addGM) elems[off++] = theory.GM;
+		if (addEpoch) elems[off++] = jy2k;
+		// return array
+		return elems;
 	}
 	// EO martian
 
@@ -388,14 +400,12 @@
 	/*************************************************************************/
 	/*************************************************************************/
 
-	// calculate dynamic rotation matrix
-	function calculateMatrix3(t, matrix3)
+	// calculate dynamic rotation matrix to J2000
+	function calculateMatrixToJ2000(jy2k, matrix3)
 	{
 
-		t -= 6491.5;
-
-		var ome = (ome0 + dome * t / 36525.) * (PI / 180.0);
-		var inc = (inc0 + dinc * t / 36525.) * (PI / 180.0);
+		var ome = (ome0 + dome * jy2k / 100) * (PI / 180);
+		var inc = (inc0 + dinc * jy2k / 100) * (PI / 180);
 		var co = cos(ome), so = sin(ome);
 		var ci = cos(inc), si = sin(inc);
 
@@ -406,34 +416,26 @@
 		)
 
 	}
-	// EO calculateMatrix3
+	// EO calculateMatrixToJ2000
 
 	/*************************************************************************/
 	// export satellites
 	/*************************************************************************/
 
-	// export to globals
-	exports.martian =
-		exports.Stellarium(
-			'a',
-			martian,
-			- 6491.5,
-			// dynamic rotation matrix
-			function (t, matrix3)
-			{
+	function martianToVSOP(jy2k, matrix3)
+	{
+		// rotate into intermediate frame
+		calculateMatrixToJ2000(jy2k, matrix3);
+		// create combined matrix for now and maybe later
+		matrix3.multiplyMatrices(J2000_to_VSOP87, matrix3);
+	}
 
-				// rotate into intermediate frame
-				calculateMatrix3(t * 365.25 + 6491.5, matrix3);
-				// create combined matrix for now and maybe later
-				matrix3.multiplyMatrices(J2000_to_VSOP87, matrix3);
-			},
-			[
-				'phobos',
-				'deimos',
-			]
-		);
+	exports.martian = {
+		phobos: VSOP(martian, 'phobos', 9.549547741038312e-11 * 133407.5625, mars_sat_bodies[0], martianToVSOP),
+		deimos: VSOP(martian, 'deimos', 9.549547622768120e-11 * 133407.5625, mars_sat_bodies[1], martianToVSOP),
+	}
 
 	/*************************************************************************/
 	/*************************************************************************/
 
-}.call(this, this))
+}(this))

@@ -27,10 +27,13 @@
 %            (0 <= true anomaly <= 2 pi)
 */
 
-function elp2000orb(tjd)
+function elp2000orb(theory, jy2k, elems, addGM, addEpoch, off)
 {
+	off = off || 0;
+	jy2k = jy2k || 0;
+	elems = elems || [];
 
-	var t = tjd / 100;
+	var t = jy2k / 100;
 
 	var t2 = t * t;
 	var t3 = t * t2;
@@ -333,31 +336,25 @@ function elp2000orb(tjd)
 	%            (0 <= true anomaly <= 2 pi)
 	*/
 
-	return {
-		a: sma / 1.495978707e+8, // KM2AU
-		e: ecc,
-		i: 2.0 * Math.asin(gamma),
-		w: (dtr * (lp - raan)) % (2.0 * Math.PI),
-		O: (dtr * raan) % (2.0 * Math.PI),
-		M: (dtr * (lambda - lp)) % (2.0 * Math.PI),
-	};
+	var a = sma / 1.495978707e+8; // KM2AU
+	var e = ecc;
+	var i = 2.0 * Math.asin(gamma);
+	var w = dtr * (lp - raan);
+	var O = dtr * raan;
+	var M = dtr * (lambda - lp);
+	var W = w + O;
 
+	elems[off++] = a;
+	elems[off++] = (W + M) % (2.0 * Math.PI);
+	elems[off++] = e * Math.cos(W);
+	elems[off++] = e * Math.sin(W);
+	elems[off++] = Math.cos(O) * Math.sin(i / 2);
+	elems[off++] = Math.sin(O) * Math.sin(i / 2);
+
+	// update optional elements
+	if (addGM) elems[off++] = theory.GM;
+	if (addEpoch) elems[off++] = jy2k;
+	return elems;
 }
 
-// helper use in solsys-explorer
-// not fully sanctioned implementation
-elp2000orb.xyz = function elp2000orbxyz(t) {
-	var orb = elp2000orb(t);
-	var orbital = new Orbital(orb);
-	orb.a = orbital.a();
-	orb.L = orbital.L();
-	orb.k = orbital.k();
-	orb.h = orbital.h();
-	orb.q = orbital.q();
-	orb.p = orbital.p();
-	var pos = orb2xyz(orb);
-	orb.x = - pos.x;
-	orb.y = pos.z;
-	orb.z = pos.y;
-	return orb;
-}
+elp2000orb = VSOP(elp2000orb, GMJY.ear + GMJY.moon)

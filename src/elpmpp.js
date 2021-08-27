@@ -5,7 +5,7 @@
 //***********************************************************
 // Direct conversion of ELPMPP02.for (fortran sample)
 //***********************************************************
-(function (exports) {
+(function(exports) {
 	'use strict';
 
 	// not shared?
@@ -17,7 +17,7 @@
 	    deg = cpi / 180,
 	    a405 = 384747.9613701725,
 	    aelp = 384747.980674318,
-	    rad = 648000 / cpi, sc = 36525,
+	    rad = 648000 / cpi,
 	    pis2 = cpi/2, dpi = 2*cpi;
 
 	var bp = [
@@ -312,157 +312,145 @@
 
 	}
 
-	// Used in solar system explorer
-	// Unsanctioned implementation!
-	var fact = Math.pow(1000, 3) * 10;
-	function Orbitalize(state) {
-		// velocity is in km/day
-		// unsure why this even works?
-		// GM is not right (sun not earth?)
-		// Gravitational COnstant in au^3/d^2
-		// maybe state to orbital is buggy?
-		state.vx *= sc/KM2AU/fact;
-		state.vy *= sc/KM2AU/fact;
-		state.vz *= sc/KM2AU/fact;
-		var orbital = new Orbital(state);
-		state.a = orbital.a();
-		state.L = orbital.L();
-		state.k = orbital.k();
-		state.h = orbital.h();
-		state.q = orbital.q();
-		state.p = orbital.p();
-		return state;
-	}
+	function elpmpp_theory(theory, jy2k, icor, elems, addGM, addEpoch, off)
+	{
 
-	if (typeof exports.elpmpp == "undefined") {
-		exports.elpmpp = function elpmpp(coeffs, tj, icor)
-		{
-			// initialize correction factors (cached)
-			var corr = elpmpp_init(coeffs, icor || 0);
-			// fundamental corrections
-			var w = corr.w, w0 = w[0];
+		off = off || 0;
+		jy2k = jy2k || 0;
+		elems = elems || [];
 
-			//********************************************************
-			// End init
-			//********************************************************
+		var coeffs = theory.coeffs;
 
-			// Initialization of time powers
-			var t = [1, tj/sc]
-			t[2] = t[1] * t[1];
-			t[3] = t[2] * t[1];
-			t[4] = t[3] * t[1];
+		// initialize correction factors (cached)
+		var corr = elpmpp_init(coeffs, icor || 0);
+		// fundamental corrections
+		var w = corr.w, w0 = w[0];
 
-			// Evaluation of the series: substitution of time in the series
-			var v = [];
-			// Variable iv=1 : Longitude
-			// Variable iv=2 : Latitude
-			// Variable iv=3 : Distance
+		//********************************************************
+		// End init
+		//********************************************************
 
-			var x, xp, y, yp, f;
-			for (var iv = 0; iv < 3; iv ++) {
-				v[iv] = v[iv+3] = 0;
+		// Initialization of time powers
+		var t = [1, jy2k/100]
+		t[2] = t[1] * t[1];
+		t[3] = t[2] * t[1];
+		t[4] = t[3] * t[1];
 
-				var cmpb = corr.CMPB[iv],
-				    fmpb = corr.FMPB[iv];
-				// Main Problem series
-				var fours = coeffs[iv][0][0][4]
-				for (var n = 0, nL = cmpb.length; n < nL; n ++) {
-					x = cmpb[n], y = fmpb[n][0], yp = 0;
-					for (var k = 1; k < 5; k ++) {
-						f = fmpb[n][k] * t[k-1];
-						y += f * t[1], yp += k * f;
-					}
-					v[iv] += x * Math.sin(y);
-					v[iv+3] += x * yp * Math.cos(y);
+		// Evaluation of the series: substitution of time in the series
+		var v = [];
+		// Variable iv=1 : Longitude
+		// Variable iv=2 : Latitude
+		// Variable iv=3 : Distance
+
+		var x, xp, y, yp, f;
+		for (var iv = 0; iv < 3; iv ++) {
+			v[iv] = v[iv+3] = 0;
+
+			var cmpb = corr.CMPB[iv],
+				fmpb = corr.FMPB[iv];
+			// Main Problem series
+			var fours = coeffs[iv][0][0][4]
+			for (var n = 0, nL = cmpb.length; n < nL; n ++) {
+				x = cmpb[n], y = fmpb[n][0], yp = 0;
+				for (var k = 1; k < 5; k ++) {
+					f = fmpb[n][k] * t[k-1];
+					y += f * t[1], yp += k * f;
 				}
-
-				var cpers = corr.CPER[iv],
-				    fpers = corr.FPER[iv];
-				// Perturbations series
-				for (var it = 0; it < 4; it ++) {
-					var cper = cpers[it], // n numbers
-					    fper = fpers[it]; // 5 arrs with n
-					for (var n = 0, nL = cper.length; n < nL; n ++) {
-						x = cper[n], y = fper[n][0], xp = 0, yp = 0;
-						if (it != 0) xp = it * x * t[it-1];
-						for (var k = 1; k < 5; k ++) {
-							f = fper[n][k] * t[k-1];
-							y += f * t[1], yp += k * f
-						}
-						var siny = Math.sin(y);
-						v[iv] += x * t[it] * siny;
-						v[iv+3] += xp * siny + x * t[it] * yp * Math.cos(y);
-					}
-				}
+				v[iv] += x * Math.sin(y);
+				v[iv+3] += x * yp * Math.cos(y);
 			}
 
-			// Computation of the rectangular coordinates (Epoch J2000)
-			v[0] = v[0] / rad + w0[0] + w0[1]*t[1] + w0[2]*t[2] + w0[3]*t[3] + w0[4]*t[4];
-			v[1] = v[1] / rad;
-			v[2] = v[2] * a405 / aelp;
-			v[3] = v[3] / rad + w0[1] + 2*w0[2]*t[1] + 3*w0[3]*t[2] + 4*w0[4]*t[3];
-			v[4] = v[4] / rad;
+			var cpers = corr.CPER[iv],
+				fpers = corr.FPER[iv];
+			// Perturbations series
+			for (var it = 0; it < 4; it ++) {
+				var cper = cpers[it], // n numbers
+					fper = fpers[it]; // 5 arrs with n
+				for (var n = 0, nL = cper.length; n < nL; n ++) {
+					x = cper[n], y = fper[n][0], xp = 0, yp = 0;
+					if (it != 0) xp = it * x * t[it-1];
+					for (var k = 1; k < 5; k ++) {
+						f = fper[n][k] * t[k-1];
+						y += f * t[1], yp += k * f
+					}
+					var siny = Math.sin(y);
+					v[iv] += x * t[it] * siny;
+					v[iv+3] += xp * siny + x * t[it] * yp * Math.cos(y);
+				}
+			}
+		}
 
-			var clamb  = Math.cos(v[0]),
-			    slamb  = Math.sin(v[0]),
-			    cbeta  = Math.cos(v[1]),
-			    sbeta  = Math.sin(v[1]),
-			    cw     = v[2]*cbeta,
-			    sw     = v[2]*sbeta,
+		// Computation of the rectangular coordinates (Epoch J2000)
+		v[0] = v[0] / rad + w0[0] + w0[1]*t[1] + w0[2]*t[2] + w0[3]*t[3] + w0[4]*t[4];
+		v[1] = v[1] / rad;
+		v[2] = v[2] * a405 / aelp;
+		v[3] = v[3] / rad + w0[1] + 2*w0[2]*t[1] + 3*w0[3]*t[2] + 4*w0[4]*t[3];
+		v[4] = v[4] / rad;
 
-			    x1     = cw*clamb,
-			    x2     = cw*slamb,
-			    x3     = sw,
-			    xp1    = (v[5]*cbeta-v[4]*sw)*clamb-v[3]*x2,
-			    xp2    = (v[5]*cbeta-v[4]*sw)*slamb+v[3]*x1,
-			    xp3    = v[5]*sbeta+v[4]*cw,
+		var clamb  = Math.cos(v[0]),
+			slamb  = Math.sin(v[0]),
+			cbeta  = Math.cos(v[1]),
+			sbeta  = Math.sin(v[1]),
+			cw     = v[2]*cbeta,
+			sw     = v[2]*sbeta,
 
-			    pw     = (p1+p2*t[1]+p3*t[2]+p4*t[3]+p5*t[4])*t[1],
-			    qw     = (q1+q2*t[1]+q3*t[2]+q4*t[3]+q5*t[4])*t[1],
-			    pwSqr  = pw*pw,
-			    qwSqr  = qw*qw,
-			    ra     = 2*Math.sqrt(1-pwSqr-qwSqr),
-			    pwqw   = 2*pw*qw,
-			    pw2    = 1-2*pwSqr,
-			    qw2    = 1-2*qwSqr,
-			    pwra   = pw*ra,
-			    qwra   = qw*ra,
+			x1     = cw*clamb,
+			x2     = cw*slamb,
+			x3     = sw,
+			xp1    = (v[5]*cbeta-v[4]*sw)*clamb-v[3]*x2,
+			xp2    = (v[5]*cbeta-v[4]*sw)*slamb+v[3]*x1,
+			xp3    = v[5]*sbeta+v[4]*cw,
 
-			    ppw    = p1+(2*p2+3*p3*t[1]+4*p4*t[2]+5*p5*t[3])*t[1],
-			    qpw    = q1+(2*q2+3*q3*t[1]+4*q4*t[2]+5*q5*t[3])*t[1],
-			    ppw2   = -4*pw*ppw,
-			    qpw2   = -4*qw*qpw,
-			    ppwqpw = 2*(ppw*qw+pw*qpw),
-			    rap    = (ppw2+qpw2)/ra,
-			    ppwra  = ppw*ra+pw*rap,
-			    qpwra  = qpw*ra+qw*rap;
-			
-			return {
-				x: (pw2*x1+pwqw*x2+pwra*x3)*KM2AU,
-				y: (pwqw*x1+qw2*x2-qwra*x3)*KM2AU,
-				z: (-pwra*x1+qwra*x2+(pw2+qw2-1)*x3)*KM2AU,
-				vx: (pw2*xp1+pwqw*xp2+pwra*xp3 + ppw2*x1+ppwqpw*x2+ppwra*x3)*KM2AU/sc,
-				vy: (pwqw*xp1+qw2*xp2-qwra*xp3 + ppwqpw*x1+qpw2*x2-qpwra*x3)*KM2AU/sc,
-				vz: (-pwra*xp1+qwra*xp2+(pw2+qw2-1)*xp3 - ppwra*x1+qpwra*x2+(ppw2+qpw2)*x3)*KM2AU/sc,
-				G: 2.9591220836841438269e-04, // sun works with factor?
-				// G: 8.9970116036316091182e-10, // earth does not?
-			};
+			pw     = (p1+p2*t[1]+p3*t[2]+p4*t[3]+p5*t[4])*t[1],
+			qw     = (q1+q2*t[1]+q3*t[2]+q4*t[3]+q5*t[4])*t[1],
+			pwSqr  = pw*pw,
+			qwSqr  = qw*qw,
+			ra     = 2*Math.sqrt(1-pwSqr-qwSqr),
+			pwqw   = 2*pw*qw,
+			pw2    = 1-2*pwSqr,
+			qw2    = 1-2*qwSqr,
+			pwra   = pw*ra,
+			qwra   = qw*ra,
 
-		};
-		// EO elpmpp
-
-		// create actual functions to call
-		elpmpp.llr = function elpmpp_llr(coeffs, tj)
-		{ return elpmpp(coeffs, tj, 0); }
-		elpmpp.jpl = function elpmpp_jpl(coeffs, tj)
-		{ return elpmpp(coeffs, tj, 1); }
-
-		// create actual functions to call (return full state)
-		elpmpp.llr.orb = function elpmpp_llr_orb(coeffs, t)
-		{ return Orbitalize(elpmpp(coeffs, t*365.25, 0)); }
-		elpmpp.jpl.orb = function elpmpp_jpl_orb(coeffs, t)
-		{ return Orbitalize(elpmpp(coeffs, t*365.25, 1)); }
-
+			ppw    = p1+(2*p2+3*p3*t[1]+4*p4*t[2]+5*p5*t[3])*t[1],
+			qpw    = q1+(2*q2+3*q3*t[1]+4*q4*t[2]+5*q5*t[3])*t[1],
+			ppw2   = -4*pw*ppw,
+			qpw2   = -4*qw*qpw,
+			ppwqpw = 2*(ppw*qw+pw*qpw),
+			rap    = (ppw2+qpw2)/ra,
+			ppwra  = ppw*ra+pw*rap,
+			qpwra  = qpw*ra+qw*rap;
+		
+		elems[off++] = (pw2*x1+pwqw*x2+pwra*x3)*KM2AU;
+		elems[off++] = (pwqw*x1+qw2*x2-qwra*x3)*KM2AU;
+		elems[off++] = (-pwra*x1+qwra*x2+(pw2+qw2-1)*x3)*KM2AU;
+		elems[off++] = (pw2*xp1+pwqw*xp2+pwra*xp3 + ppw2*x1+ppwqpw*x2+ppwra*x3)/100*KM2AU;
+		elems[off++] = (pwqw*xp1+qw2*xp2-qwra*xp3 + ppwqpw*x1+qpw2*x2-qpwra*x3)/100*KM2AU;
+		elems[off++] = (-pwra*xp1+qwra*xp2+(pw2+qw2-1)*xp3 - ppwra*x1+qpwra*x2+(ppw2+qpw2)*x3)/100*KM2AU;
+		// update optional elements
+		if (addGM) elems[off++] = theory.GM;
+		if (addEpoch) elems[off++] = jy2k;
+		// return array
+		return elems;
 	}
+
+	function elpmpp_llr_theory(theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		return elpmpp_theory(theory, jy2k, 0, elems, addGM, addEpoch, off);
+	}
+
+	function elpmpp_jpl_theory(theory, jy2k, elems, addGM, addEpoch, off)
+	{
+		return elpmpp_theory(theory, jy2k, 1, elems, addGM, addEpoch, off);
+	}
+
+	// Export the main export function
+	// Call this function for each theory
+	exports.ELPMPP02 = function(elpmpp02, GM, coeffs)
+	{
+		elpmpp02.llr = STATE(elpmpp_llr_theory, 'llr', GM, coeffs);
+		elpmpp02.jpl = STATE(elpmpp_jpl_theory, 'jpl', GM, coeffs);
+	}
+	// EO exports.ELPMPP02
 
 })(this);

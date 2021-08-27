@@ -27,7 +27,6 @@ function jovians(jde)
 
 	// deg to rad conversion
 	var p = Math.PI / 180;
-	// 
 	var d = jde - 2451545.0;
 
 	// Argument for the long-period term in the motion of Jupiter:
