@@ -28,7 +28,7 @@
 			<prepend>var top2010 = {}</prepend>
 			<prepend>(function(top2010) {</prepend>
 			<prepend path="../../../vsop.js" />
-			<prepend path="../../../vsop2k.js" />
+			<prepend path="../../../top2k.js" />
 			<input path="src/top2010_jup.js" />
 			<input path="src/top2010_sat.js" />
 			<input path="src/top2010_ura.js" />
