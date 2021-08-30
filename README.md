@@ -143,6 +143,16 @@ These are the most modern theories for all planets (including Pluto).
 To access the specific bodies use the first three letters of its name, e.g.:
 - `mer`, `ven`, `emb`, `mar`, `jup`, `sat`, `ura`, `nep`, `plu`
 
+#### TOP2010/2013 outer planets (Jupiter to Pluto)
+
+These are the most modern theories for all outer planets.
+
+- `top2010.bdy`
+- `top2013.bdy`
+
+To access the specific bodies use the first three letters of its name, e.g.:
+- `jup`, `sat`, `ura`, `nep`, `plu`
+
 ### JavaScript Examples
 
 ```js
@@ -185,6 +195,26 @@ Application to the five outer planets (Pluto95).
 - ftp://ftp.imcce.fr/pub/ephem/planets/vsop87
 - ftp://ftp.imcce.fr/pub/ephem/planets/vsop2010
 - ftp://ftp.imcce.fr/pub/ephem/planets/vsop2013
+
+### Outer Planets (TOP)
+
+The TOP2010 solution is fitted to the Ephemeris DE405 over the time
+interval +1890...+2000. The reference system in the solution TOP2010
+is defined by the dynamical equinox and ecliptic J2000.0.
+
+The TOP2013 solution is fitted to the numerical integration INPOP10a
+built at IMCCE (Paris Observatory) over the time interval +1890...+2000.
+The reference system in the solution TOP2013 is defined by the dynamical
+equinox and ecliptic of J2000.0.
+
+The TOP2013 solution is the best for the motion over the time interval
+−4000...+8000. Its precision is of a few 0.1″ for the four planets,
+i.e. a gain of a factor between 1.5 and 15, depending on the planet,
+compared to VSOP2013. The precision of the theory of Pluto remains
+valid up to the time span from 0 to +4000.
+
+- ftp://ftp.imcce.fr/pub/ephem/planets/top2010
+- ftp://ftp.imcce.fr/pub/ephem/planets/top2013
 
 ### Lunar/Moon (ELP)
 
@@ -249,6 +279,8 @@ of the original Fortran code given in each of these theories:
 - [VSOP87](src/vsop87/data) - [tiny](src/vsop87/dist/02-tiny/min) | [small](src/vsop87/dist/04-small/min) | [normal](src/vsop87/dist/06-normal/min) | [big](src/vsop87/dist/08-big/min) | [full](src/vsop87/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop87/06-normal.html)
 - [VSOP2010](src/vsop2010/data) - [tiny](src/vsop2010/dist/02-tiny/min) | [small](src/vsop2010/dist/04-small/min) | [normal](src/vsop2010/dist/06-normal/min) | [big](src/vsop2010/dist/08-big/min) | [extreme](src/vsop2010/dist/10-extreme/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop2010/06-normal.html)
 - [VSOP2013](src/vsop2013/data) - [tiny](src/vsop2013/dist/02-tiny/min) | [small](src/vsop2013/dist/04-small/min) | [normal](src/vsop2013/dist/06-normal/min) | [big](src/vsop2013/dist/08-big/min) | [extreme](src/vsop2013/dist/10-extreme/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/vsop2013/06-normal.html)
+- [TOP2010](src/top2010/data) - [tiny](src/top2010/dist/02-tiny/min) | [small](src/top2010/dist/04-small/min) | [normal](src/top2010/dist/06-normal/min) | [big](src/top2010/dist/08-big/min) | [extreme](src/top2010/dist/10-extreme/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/top2010/06-normal.html)
+- [TOP2013](src/top2013/data) - [tiny](src/top2013/dist/02-tiny/min) | [small](src/top2013/dist/04-small/min) | [normal](src/top2013/dist/06-normal/min) | [big](src/top2013/dist/08-big/min) | [extreme](src/top2013/dist/10-extreme/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/top2013/06-normal.html)
 - [EPHASTER](src/ephaster/data) - [tiny](src/ephaster/dist/02-tiny/min) | [small](src/ephaster/dist/04-small/min) | [normal](src/ephaster/dist/06-normal/min) | [big](src/ephaster/dist/08-big/min) | [extreme](src/ephaster/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/ephaster/06-normal.html)
 - [ELP2000-MPP02](src/elpmpp02/data) - [tiny](src/elpmpp02/dist/02-tiny/min) | [small](src/elpmpp02/dist/04-small/min) | [normal](src/elpmpp02/dist/06-normal/min) | [big](src/elpmpp02/dist/08-big/min) | [full](src/elpmpp02/dist/12-full/min) - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/elpmpp02/06-normal.html)
 - [ELP2000-82b](src/elp2000/data) - [libnova](src/elp2000/nova/dist) | [orb](src/elp2000/elp2000orb.js) | [xyz](src/elp2000/elp2000xyz.js)  - [Unit tests](https://rawgit.com/mgreter/ephem.js/develop/test/elp2000/test.html)
