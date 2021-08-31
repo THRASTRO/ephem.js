@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="icon" href="data:;base64,=" />
+	<meta name="viewport" content="width=device-width">
+	<title>TOP2010 QUnit Tests</title>
+	<link rel="stylesheet" href="../lib/qunit-1.23.1.css">
+	<script src="../lib/qunit-1.23.1.js"></script>
+	<script src="../lib/qunit-assert-close.js"></script>
+</head>
+<body>
+
+	<!-- result will be here -->
+	<div id="qunit"></div>
+
+	<!-- dom restored after tests -->
+	<div id="qunit-fixture"></div>
+
+	<!-- include needed libraries -->
+	<script src="../../src/vsop.js"></script>
+	<script src="../../src/top2k.js"></script>
+	<script src="../lib/astro.math.js"></script>
+	<script src="../lib/astro.full.js"></script>
+
+	<!-- include needed libraries -->
+	<script src="tests.js"></script>
+	<!-- select the test case -->
+	<script>var top2010tst = top2010_tests[4];</script>
+
+	<script>
+		document.write('<script src="../../src/top2010/dist/'+top2010tst.name+'/src/top2010.js"></scr'+'ipt>');
+	</script>
+
+	<script src="results.js"></script>
+	<script src="chk.theory.js"></script>
+	<!--	
+	<script src="chk.ecliptic.js"></script>
+	<script src="chk.equatorial.js"></script>
+	-->
+
+</body>
+</html>
