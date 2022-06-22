@@ -3,11 +3,11 @@
 var elpmpp02 = {};;
 (function(elpmpp02) {;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function() {
+(function(exports) {
 
 	// update state elements in elems at offset and return state object
 	function position(solver, theory, jy2k, elems, addGM, addEpoch, off)
@@ -86,7 +86,7 @@ var elpmpp02 = {};;
 
 	// Export the main export function
 	// Call this function for each theory
-	this.STATE = function(solver, name, GM, coeffs)
+	exports.STATE = exports.STATE || function(solver, name, GM, coeffs)
 	{
 		var theory = {};
 		// update vsop elements in elems at offset and return elems array
@@ -121,7 +121,7 @@ var elpmpp02 = {};;
 
 })(this);;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS ELP2000-MPP utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
@@ -568,7 +568,7 @@ var elpmpp02 = {};;
 
 	// Export the main export function
 	// Call this function for each theory
-	exports.ELPMPP02 = function(elpmpp02, GM, coeffs)
+	exports.ELPMPP02 = exports.ELPMPP02 || function(elpmpp02, GM, coeffs)
 	{
 		elpmpp02.llr = STATE(elpmpp_llr_theory, 'llr', GM, coeffs);
 		elpmpp02.jpl = STATE(elpmpp_jpl_theory, 'jpl', GM, coeffs);
@@ -588,4 +588,4 @@ ELPMPP02(elpmpp02, GMJY.ear + GMJY.moon, [
 ]);
 ;
 })(elpmpp02)
-/* crc: 6EC455A41D7AD110B582C5FC12A7C3D0 */
+/* crc: 3F45B32745AED8AAE69C8C1180494D8F */

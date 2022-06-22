@@ -2,7 +2,7 @@
 ;
 var vsop87b = {};
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
@@ -151,7 +151,7 @@ var vsop87b = {};
 
 	// Export the main exporter function
 	// Call this function for every theory
-	exports.VSOP = function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
+	exports.VSOP = exports.VSOP || function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
 	{
 		var theory = {};
 		// update raw elements in elems at offset and return elems array
@@ -192,7 +192,7 @@ var vsop87b = {};
 
 })(this);;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
@@ -271,7 +271,7 @@ var vsop87b = {};
 
 	// Export the main export function
 	// Call this function for each theory
-	exports.VSOP87 = function(name, GM, coeffs)
+	exports.VSOP87 = exports.VSOP87 || function(name, GM, coeffs)
 	{
 		// export generic VSOP theory with solver attached
 		return exports.VSOP(vsop87_theory, name, GM, coeffs);
@@ -337,4 +337,4 @@ vsop87b.nep = VSOP87('nep', 39.4786500913706, {
 });
 ;
 })(vsop87b)
-/* crc: 09E2D1A16135B21DDD4D5A890AE8ED6F */
+/* crc: BD42FD8A31953AC7CD9A94D3BBB1F32D */

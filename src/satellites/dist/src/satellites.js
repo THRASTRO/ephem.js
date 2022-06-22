@@ -2,7 +2,7 @@
 ;
 (function() {;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS utility lib for moons
 // https://github.com/mgreter/ephem.js
 // pretty much only inspired by Stellarium
@@ -5385,4 +5385,4 @@
 }(this))
 ;
 }).call(this)
-/* crc: 00AD22F0B0537EA18D1CFC40A7FD1111 */
+/* crc: DB892333083C8ED4C8408FD4F160E7FE */

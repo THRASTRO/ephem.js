@@ -3,7 +3,7 @@
 var vsop2013 = {};
 (function(vsop2013) {;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
@@ -152,7 +152,7 @@ var vsop2013 = {};
 
 	// Export the main exporter function
 	// Call this function for every theory
-	exports.VSOP = function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
+	exports.VSOP = exports.VSOP || function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
 	{
 		var theory = {};
 		// update raw elements in elems at offset and return elems array
@@ -371,4 +371,4 @@ vsop2013.plu = VSOP2K('plu', 39.4769267244114, {
 });
 ;
 })(vsop2013)
-/* crc: 8FDAD65DBC62CAFD5CBEB9DEF9C5AEE3 */
+/* crc: BE3FDDF845B858AD4CAB24D2A19AD056 */

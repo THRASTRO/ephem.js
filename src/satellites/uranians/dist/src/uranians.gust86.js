@@ -2,7 +2,7 @@
 ;
 (function() {;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
@@ -151,7 +151,7 @@
 
 	// Export the main exporter function
 	// Call this function for every theory
-	exports.VSOP = function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
+	exports.VSOP = exports.VSOP || function VSOP(solver, name, GM, coeffs, toVSOP, givesMeanMotion)
 	{
 		var theory = {};
 		// update raw elements in elems at offset and return elems array
@@ -192,7 +192,7 @@
 
 })(this);;
 //***********************************************************
-// (c) 2016 by Marcel Greter
+// (c) 2016-2021 by Marcel Greter
 // AstroJS utility lib for moons
 // https://github.com/mgreter/ephem.js
 // pretty much only inspired by Stellarium
@@ -879,4 +879,4 @@
 }(this))
 ;
 }).call(this)
-/* crc: E8929FB42041A86E614A540C181B3F37 */
+/* crc: BD6B4F0A23C749A67716509BB8FD804C */
