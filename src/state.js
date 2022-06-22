@@ -3,7 +3,7 @@
 // AstroJS VSOP87 utility lib
 // https://github.com/mgreter/ephem.js
 //***********************************************************
-(function() {
+(function(exports) {
 
 	// update state elements in elems at offset and return state object
 	function position(solver, theory, jy2k, elems, addGM, addEpoch, off)
@@ -82,7 +82,7 @@
 
 	// Export the main export function
 	// Call this function for each theory
-	this.STATE = function(solver, name, GM, coeffs)
+	exports.STATE = exports.STATE || function(solver, name, GM, coeffs)
 	{
 		var theory = {};
 		// update vsop elements in elems at offset and return elems array

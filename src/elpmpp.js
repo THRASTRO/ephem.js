@@ -446,7 +446,7 @@
 
 	// Export the main export function
 	// Call this function for each theory
-	exports.ELPMPP02 = function(elpmpp02, GM, coeffs)
+	exports.ELPMPP02 = exports.ELPMPP02 || function(elpmpp02, GM, coeffs)
 	{
 		elpmpp02.llr = STATE(elpmpp_llr_theory, 'llr', GM, coeffs);
 		elpmpp02.jpl = STATE(elpmpp_jpl_theory, 'jpl', GM, coeffs);

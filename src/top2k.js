@@ -55,7 +55,7 @@
 
 	// Export the main export function
 	// Call this function for each theory
-	exports.TOP2K = function(name, GM, coeffs, ipla, freq)
+	exports.TOP2K = exports.TOP2K || function(name, GM, coeffs, ipla, freq)
 	{
 		// export generic VSOP theory with solver attached
 		var theory = exports.VSOP(top2k_theory, name, GM, coeffs);

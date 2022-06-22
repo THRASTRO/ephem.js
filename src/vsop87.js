@@ -78,7 +78,7 @@
 
 	// Export the main export function
 	// Call this function for each theory
-	exports.VSOP87 = function(name, GM, coeffs)
+	exports.VSOP87 = exports.VSOP87 || function(name, GM, coeffs)
 	{
 		// export generic VSOP theory with solver attached
 		return exports.VSOP(vsop87_theory, name, GM, coeffs);
