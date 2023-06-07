@@ -1,0 +1,55 @@
+<xml>
+	<!-- include default configuration file (relative to this file) -->
+	<include src="{EXT}/conf/common.conf.xml" />
+
+	<config>
+		<!-- where is your htdocs root directory -->
+		<!-- this is needed to create absolute urls -->
+		<!-- default is relative to the config file -->
+		<webroot>{CONF}/..</webroot>
+		<directory>{CONF}/..</directory>
+		<!-- disable checksums -->
+		<crc-check>0</crc-check>
+		<crc-file>0</crc-file>
+	</config>
+
+	<!-- prepare operations -->
+	<prepare step="prepare" disabled="false" >
+		<!-- create neccessary paths -->
+		<mkdir path="dist" />
+		<mkdir path="dist/src" />
+		<mkdir path="dist/min" />
+	</prepare>
+
+	<merge>
+
+		<js id="mgsat23">
+
+			<prepend>(function() {</prepend>
+			<prepend>var data = {}</prepend>
+			<prepend path="../../state.js" />
+			<input path="data/saturnian.601.js" />
+			<input path="data/saturnian.602.js" />
+			<input path="data/saturnian.603.js" />
+			<input path="data/saturnian.604.js" />
+			<input path="data/saturnian.605.js" />
+			<input path="data/saturnian.606.js" />
+			<input path="data/saturnian.607.js" />
+			<input path="data/saturnian.608.js" />
+			<input path="data/saturnian.609.js" />
+			<input path="data/saturnian.613.js" />
+			<input path="data/saturnian.614.js" />
+			<input path="data/saturnian.632.js" />
+			<input path="data/saturnian.634.js" />
+			<input path="data/saturnian.699.js" />
+			<input path="../mgsat23/src/mgsat23.js" />
+			<append>})()</append>
+
+			<!-- where to store the resulting files -->
+			<output path="dist/src/mgsat23.js" target="join" />
+			<output path="dist/min/mgsat23.js" target="compile" />
+
+		</js>
+
+	</merge>
+</xml>
